@@ -20,6 +20,15 @@
   --color-chip-over-bg: #fde6e3;
   --color-chip-prev-fg: #1d3fa6;
   --color-chip-prev-bg: #e5ecfd;
+  --color-chip-none-fg: #454b58;
+  --color-chip-none-bg: #eceef2;
+
+  --color-head: #fafafb;
+  --color-seg: #e9ebf0;
+  --color-switch-off: #c9ced8;
+  --color-danger-line: #f0c4bf;
+  --color-review-bg: #fffbef;
+  --color-review-line: #f0d9a0;
 }
 
 @theme inline {
