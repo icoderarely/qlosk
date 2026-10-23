@@ -42,3 +42,31 @@ body {
 .admin-root button {
   font-family: inherit;
 }
+
+/* ShopPage: colours and fonts come from CSS variables set on the page root by
+   components/shop-page (see themes.ts and fonts.ts). */
+@theme inline {
+  --color-sp-bg: var(--bg);
+  --color-sp-card: var(--card);
+  --color-sp-text: var(--text);
+  --color-sp-muted: var(--muted);
+  --color-sp-line: var(--line);
+  --color-sp-btn: var(--btn);
+  --color-sp-btntext: var(--btntext);
+  --color-sp-iconbg: var(--iconbg);
+  --color-sp-iconfg: var(--iconfg);
+  --color-sp-chipbg: var(--chipbg);
+  --color-sp-chiptext: var(--chiptext);
+  --font-sp-head: var(--head);
+  --font-sp-body: var(--body);
+}
+
+/* Visible focus on every shop page control (design: 2px, current colour). */
+.shop-page :is(a, button):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.shop-page button {
+  font-family: inherit;
+}
