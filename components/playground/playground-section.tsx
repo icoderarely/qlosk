@@ -93,7 +93,7 @@ export function PlaygroundSection({
       </h1>
 
       <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="flex min-w-0 flex-1 flex-col gap-5">
+        <div className="flex min-w-0 flex-1 flex-col gap-5 lg:gap-4">
           <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
           <Group title="Shop type">
             <div className="flex flex-wrap gap-2">
@@ -216,9 +216,10 @@ export function PlaygroundSection({
             href={whatsappLink(look, labels, whatsappNumber)}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex min-h-12 items-center justify-center rounded-xl bg-[#0B6B3A] px-6 font-bold text-white shadow-lg lg:self-start max-lg:fixed max-lg:inset-x-4 max-lg:bottom-4 max-lg:z-10 max-lg:w-auto ${FOCUS}`}
+            className={`mt-3 inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#0B6B3A] px-6 text-lg font-extrabold text-white shadow-lg ring-4 ring-[#0B6B3A]/20 hover:bg-[#095c32] max-lg:mt-0 max-lg:fixed max-lg:inset-x-4 max-lg:bottom-4 max-lg:z-10 max-lg:w-auto ${FOCUS}`}
           >
             Get this for my shop
+            <span aria-hidden="true">→</span>
             <span className="sr-only"> (opens WhatsApp with your choices)</span>
           </a>
         </div>
