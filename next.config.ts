@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     agentFeedback: true,
   },
   cacheComponents: true,
+  // The print routes read fonts from disk; make sure they ship with the function.
+  outputFileTracingIncludes: { "/admin/print/**": ["./assets/fonts/**"] },
   partialPrefetching: true,
   turbopack: {
     rules: {

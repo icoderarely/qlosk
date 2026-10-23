@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { assignQrCode, reassignQrCode, retireQrCode } from "@/app/admin/qr/actions";
-import { Button } from "./button";
+import { Button, DownloadButton } from "./button";
 import { Card } from "./card";
 import { Chip } from "./chip";
 import { DataTable, Td, Th } from "./data-table";
@@ -209,11 +209,21 @@ function CodeRow({
         </Td>
         <Td className="text-muted">{formatAgo(row.lastScan, now)}</Td>
         <Td className="pr-4 text-right">
-          {canEdit && row.status !== "retired" ? (
-            <Button aria-expanded={open} aria-label={`${open ? "Close" : "Manage"} code ${row.code}`} onClick={onToggle}>
-              {open ? "Close" : assigned ? "Manage" : "Assign"}
-            </Button>
-          ) : null}
+          <div className="inline-flex flex-wrap justify-end gap-2">
+            {assigned && row.shopId ? (
+              <DownloadButton
+                href={`/admin/print/shop/${row.shopId}/a5`}
+                aria-label={`Download print file for ${row.code}`}
+              >
+                Download
+              </DownloadButton>
+            ) : null}
+            {canEdit && row.status !== "retired" ? (
+              <Button aria-expanded={open} aria-label={`${open ? "Close" : "Manage"} code ${row.code}`} onClick={onToggle}>
+                {open ? "Close" : assigned ? "Manage" : "Assign"}
+              </Button>
+            ) : null}
+          </div>
         </Td>
       </tr>
       {open ? (

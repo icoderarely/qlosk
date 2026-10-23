@@ -3,7 +3,7 @@ import { useState, useTransition } from "react";
 import { assignQrCode, reassignQrCode, retireQrCode } from "@/app/admin/qr/actions";
 import { changeShopStatusAction } from "@/app/admin/shops/editor-actions";
 import type { DbShopStatus } from "@/services/shops";
-import { Button } from "../button";
+import { Button, DownloadButton } from "../button";
 import { Card } from "../card";
 import { Chip } from "../chip";
 import { TextField, FieldRow, SelectField } from "../form-field";
@@ -91,14 +91,13 @@ export function QrPlanTab({
             <div className="text-[13px] text-muted">Save the shop first, then assign a code.</div>
           ) : (
             <>
-              {/* TODO(slice 6): print files and SVG download */}
               {info.code ? (
                 <div className="flex flex-wrap gap-2.5">
-                  <Button variant="primary" icon={ICON_DOWNLOAD}>
+                  <DownloadButton variant="primary" icon={ICON_DOWNLOAD} href={`/admin/print/shop/${id}/a5`}>
                     A5 print file
-                  </Button>
-                  <Button>4x6 card</Button>
-                  <Button>QR as SVG</Button>
+                  </DownloadButton>
+                  <DownloadButton href={`/admin/print/shop/${id}/card`}>4x6 card</DownloadButton>
+                  <DownloadButton href={`/admin/print/shop/${id}/svg`}>QR as SVG</DownloadButton>
                 </div>
               ) : null}
               {canEdit ? (

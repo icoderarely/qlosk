@@ -64,3 +64,20 @@ export function LinkButton({
     </Link>
   );
 }
+
+// A plain link for file downloads. next/link would try to prefetch and
+// client-navigate to a route that answers with a file.
+export function DownloadButton({
+  variant = "secondary",
+  icon,
+  className = "",
+  children,
+  ...rest
+}: ComponentProps<"a"> & { variant?: ButtonVariant; icon?: string }) {
+  return (
+    <a download className={buttonClass(variant, className)} {...rest}>
+      {icon ? <Icon d={icon} /> : null}
+      {children}
+    </a>
+  );
+}

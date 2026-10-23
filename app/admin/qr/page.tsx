@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { Button, LinkButton } from "@/components/admin/button";
+import { buttonClass, LinkButton } from "@/components/admin/button";
+import { SelectField } from "@/components/admin/form-field";
+import { Icon } from "@/components/admin/icon";
 import { GenerateBatch } from "@/components/admin/generate-batch";
 import { ICON_DOWNLOAD, ICON_PLUS } from "@/components/admin/icons";
 import { PageHeader } from "@/components/admin/page-header";
@@ -34,8 +36,18 @@ export default async function Page({
         subtitle="Printed codes never change. Assign them to shops when you sign them up."
         actions={
           <>
-            {/* TODO(slice 6): print sheet of unassigned codes */}
-            <Button icon={ICON_DOWNLOAD}>Print sheet (PDF)</Button>
+            {/* A plain GET form: the browser downloads the PDF the route sends back. */}
+            <form action="/admin/print/sheet" method="get" className="flex flex-wrap items-end gap-2.5">
+              <SelectField label="Sticker size" name="size" defaultValue="card">
+                <option value="card">4x6 card</option>
+                <option value="a5">A5 standee</option>
+                <option value="small">Small sticker</option>
+              </SelectField>
+              <button type="submit" className={buttonClass("secondary", "")}>
+                <Icon d={ICON_DOWNLOAD} />
+                Print sheet (PDF)
+              </button>
+            </form>
             {canEdit ? (
               <LinkButton href="#generate-batch" variant="primary" icon={ICON_PLUS}>
                 Generate codes
