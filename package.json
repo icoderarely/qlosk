@@ -2,6 +2,7 @@
   "name": "biztree",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,7 +13,8 @@
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
-    "db:seed": "node prisma/seed.ts"
+    "db:seed": "node prisma/seed.ts",
+    "db:seed:shops": "node prisma/seed-shops.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",

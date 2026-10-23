@@ -1,13 +1,15 @@
-import type { PaymentStatus, ShopStatus } from "@/services/shops";
+import type { DbShopStatus, PaymentStatus, ShopStatus } from "@/services/shops";
 import { Chip, type ChipTone } from "./chip";
 
-const SHOP_STATUS: Record<ShopStatus, { label: string; tone: ChipTone }> = {
+const SHOP_STATUS: Record<ShopStatus | DbShopStatus, { label: string; tone: ChipTone }> = {
   live: { label: "Live", tone: "green" },
   quiet: { label: "Quiet", tone: "amber" },
   preview: { label: "Preview sent", tone: "blue" },
   printing: { label: "Printing", tone: "amber" },
   building: { label: "Building", tone: "neutral" },
   expired: { label: "Expired", tone: "red" },
+  paused: { label: "Paused", tone: "neutral" },
+  archived: { label: "Archived", tone: "neutral" },
 };
 
 const PAYMENT: Record<PaymentStatus, { label: string; tone: ChipTone }> = {
@@ -17,11 +19,11 @@ const PAYMENT: Record<PaymentStatus, { label: string; tone: ChipTone }> = {
   not_started: { label: "Not started", tone: "neutral" },
 };
 
-export function statusLabel(status: ShopStatus): string {
+export function statusLabel(status: ShopStatus | DbShopStatus): string {
   return SHOP_STATUS[status].label;
 }
 
-export function StatusChip({ status }: { status: ShopStatus }) {
+export function StatusChip({ status }: { status: ShopStatus | DbShopStatus }) {
   const s = SHOP_STATUS[status];
   return <Chip tone={s.tone}>{s.label}</Chip>;
 }

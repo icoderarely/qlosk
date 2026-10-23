@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { bulkChangeLook } from "@/app/admin/shops/actions";
 import { Button, LinkButton } from "./button";
 import { Card } from "./card";
 import { DataTable, Td, Th } from "./data-table";
@@ -8,16 +10,14 @@ import { formatCode, formatScans } from "./format";
 import { ICON_PLUS, ICON_SEARCH } from "./icons";
 import { Icon } from "./icon";
 import { Chip } from "./chip";
-import { LAYOUT_OPTIONS, THEME_OPTIONS, lookLabel } from "./look-options";
+import { FONT_OPTIONS, LAYOUT_OPTIONS, THEME_OPTIONS, lookLabel } from "./look-options";
 import { PageHeader } from "./page-header";
 import { Segmented } from "./segmented";
 import { StatusChip } from "./status-chip";
 import { SelectField, TextField } from "./form-field";
-import type { ShopList, ShopRow, ShopTab } from "@/services/shops";
+import { SHOP_TABS, type ShopList, type ShopListQuery, type ShopListTab } from "@/services/shops";
 
-const PAGE_SIZE = 8;
-
-const TAB_LABELS: Record<ShopTab, string> = {
+const TAB_LABELS: Record<ShopListTab, string> = {
   all: "All",
   live: "Live",
   preview: "Preview",
@@ -25,62 +25,41 @@ const TAB_LABELS: Record<ShopTab, string> = {
   expired: "Expired",
 };
 
-// Which shop statuses each tab holds. Quiet shops are still live; a shop at the
-// printing stage has been approved from a preview.
-const TAB_STATUSES: Record<Exclude<ShopTab, "all">, ShopRow["status"][]> = {
-  live: ["live", "quiet"],
-  preview: ["preview", "printing"],
-  building: ["building"],
-  expired: ["expired"],
-};
-
-type Filters = { type: string; theme: string; layout: string; plan: string };
-const NO_FILTERS: Filters = { type: "", theme: "", layout: "", plan: "" };
-
-function matches(shop: ShopRow, tab: ShopTab, query: string, f: Filters): boolean {
-  if (tab !== "all" && !TAB_STATUSES[tab].includes(shop.status)) return false;
-  if (f.type && shop.typeLabel !== f.type) return false;
-  if (f.theme && shop.theme !== f.theme) return false;
-  if (f.layout && shop.layout !== f.layout) return false;
-  if (f.plan && shop.plan !== f.plan) return false;
-  const q = query.trim().toLowerCase();
-  if (!q) return true;
-  return [shop.name, shop.code ?? "", shop.slug].some((v) => v.toLowerCase().includes(q));
+// The URL holds the tab, search, filters and page, so a copied link reopens the
+// same list. Defaults are left out to keep it short.
+function listHref(pathname: string, query: ShopListQuery): string {
+  const p = new URLSearchParams();
+  if (query.tab !== "all") p.set("tab", query.tab);
+  if (query.q) p.set("q", query.q);
+  if (query.type) p.set("type", query.type);
+  if (query.theme) p.set("theme", query.theme);
+  if (query.layout) p.set("layout", query.layout);
+  if (query.plan) p.set("plan", query.plan);
+  if (query.page > 1) p.set("page", String(query.page));
+  const qs = p.toString();
+  return qs ? `${pathname}?${qs}` : pathname;
 }
 
-export function ShopsTable({ shops, tabCounts }: ShopList) {
-  const [tab, setTab] = useState<ShopTab>("all");
-  const [query, setQuery] = useState("");
-  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+type BulkChoice = { theme: string; layout: string; font: string };
+const NO_CHOICE: BulkChoice = { theme: "", layout: "", font: "" };
+
+export function ShopsTable({ list, canEdit }: { list: ShopList; canEdit: boolean }) {
+  const { shops, tabCounts, query, total, page, pageCount, pageSize, types, plans } = list;
+  const router = useRouter();
+  const pathname = usePathname();
+  const [pending, startTransition] = useTransition();
+  const [search, setSearch] = useState(query.q);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [page, setPage] = useState(0);
+  const [choice, setChoice] = useState<BulkChoice>(NO_CHOICE);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
-  const types = useMemo(
-    () => Array.from(new Set(shops.map((s) => s.typeLabel))).sort(),
-    [shops],
-  );
-  const plans = useMemo(() => Array.from(new Set(shops.map((s) => s.plan))), [shops]);
-
-  const rows = useMemo(
-    () => shops.filter((s) => matches(s, tab, query, filters)),
-    [shops, tab, query, filters],
-  );
-  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const current = Math.min(page, pageCount - 1);
-  const visible = rows.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE);
-
-  // The design shows 48 shops but lists 8. With no search or filter the total
-  // is the tab count from the design; otherwise it is the rows that matched.
-  const unfiltered = !query.trim() && !Object.values(filters).some(Boolean);
-  const total = unfiltered ? tabCounts[tab] : rows.length;
-  const from = visible.length ? current * PAGE_SIZE + 1 : 0;
-  const to = current * PAGE_SIZE + visible.length;
-
-  function reset<T>(setter: (v: T) => void) {
-    return (v: T) => {
-      setter(v);
-      setPage(0);
-    };
+  // Changing the list clears the selection, so a bulk action never reaches
+  // shops that are no longer on screen.
+  function go(change: Partial<ShopListQuery>) {
+    setSelected(new Set());
+    setMessage(null);
+    const next = { ...query, page: 1, ...change };
+    startTransition(() => router.push(listHref(pathname, next)));
   }
 
   function toggle(id: string) {
@@ -92,10 +71,41 @@ export function ShopsTable({ shops, tabCounts }: ShopList) {
     });
   }
 
-  const setFilter = (key: keyof Filters) => (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilters((f) => ({ ...f, [key]: e.target.value }));
-    setPage(0);
-  };
+  const allOnPage = shops.length > 0 && shops.every((s) => selected.has(s.id));
+  function toggleAll() {
+    setSelected(allOnPage ? new Set() : new Set(shops.map((s) => s.id)));
+  }
+
+  function applyBulk() {
+    const ids = Array.from(selected);
+    startTransition(async () => {
+      try {
+        const result = await bulkChangeLook({
+          ids,
+          theme: choice.theme || undefined,
+          layout: choice.layout || undefined,
+          font: choice.font || undefined,
+        });
+        if (result.ok) {
+          setMessage({
+            ok: true,
+            text: `Updated ${result.updated} ${result.updated === 1 ? "shop" : "shops"}.`,
+          });
+          setSelected(new Set());
+          setChoice(NO_CHOICE);
+        } else {
+          setMessage({ ok: false, text: result.error });
+        }
+      } catch {
+        setMessage({ ok: false, text: "You do not have permission to change shops." });
+      }
+    });
+  }
+
+  const from = shops.length ? (page - 1) * pageSize + 1 : 0;
+  const to = (page - 1) * pageSize + shops.length;
+  const columns = canEdit ? 8 : 7;
+  const nothingChosen = !choice.theme && !choice.layout && !choice.font;
 
   return (
     <>
@@ -106,23 +116,32 @@ export function ShopsTable({ shops, tabCounts }: ShopList) {
           <>
             <Segmented
               label="Filter by status"
-              value={tab}
-              onChange={reset(setTab)}
-              options={(Object.keys(TAB_LABELS) as ShopTab[]).map((id) => ({
+              value={query.tab}
+              onChange={(tab) => go({ tab })}
+              options={SHOP_TABS.map((id) => ({
                 id,
                 label: `${TAB_LABELS[id]} ${tabCounts[id]}`,
               }))}
             />
-            <LinkButton href="/admin/shops/new" variant="primary" icon={ICON_PLUS}>
-              New shop
-            </LinkButton>
+            {canEdit ? (
+              <LinkButton href="/admin/shops/new" variant="primary" icon={ICON_PLUS}>
+                New shop
+              </LinkButton>
+            ) : null}
           </>
         }
       />
 
-      <Card aria-label="Shops table" className="overflow-hidden p-0">
+      <Card aria-label="Shops table" aria-busy={pending} className="overflow-hidden p-0">
         <div className="flex flex-wrap gap-2.5 border-b border-line-soft px-4 py-3.5">
-          <div className="relative flex-[1_1_240px]">
+          <form
+            role="search"
+            className="relative flex-[1_1_240px]"
+            onSubmit={(e) => {
+              e.preventDefault();
+              go({ q: search.trim() });
+            }}
+          >
             <span className="pointer-events-none absolute left-3 top-[13px] text-muted">
               <Icon d={ICON_SEARCH} />
             </span>
@@ -133,20 +152,20 @@ export function ShopsTable({ shops, tabCounts }: ShopList) {
               type="search"
               placeholder="Search name, code, slug or phone"
               className="pl-[38px]"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setPage(0);
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onBlur={() => {
+                if (search.trim() !== query.q) go({ q: search.trim() });
               }}
             />
-          </div>
+          </form>
           <SelectField
             block
             hideLabel
             label="Shop type"
             className="w-auto font-bold"
-            value={filters.type}
-            onChange={setFilter("type")}
+            value={query.type}
+            onChange={(e) => go({ type: e.target.value })}
           >
             <option value="">Shop type</option>
             {types.map((t) => (
@@ -160,8 +179,8 @@ export function ShopsTable({ shops, tabCounts }: ShopList) {
             hideLabel
             label="Theme"
             className="w-auto font-bold"
-            value={filters.theme}
-            onChange={setFilter("theme")}
+            value={query.theme}
+            onChange={(e) => go({ theme: e.target.value as ShopListQuery["theme"] })}
           >
             <option value="">Theme</option>
             {THEME_OPTIONS.map((t) => (
@@ -175,8 +194,8 @@ export function ShopsTable({ shops, tabCounts }: ShopList) {
             hideLabel
             label="Layout"
             className="w-auto font-bold"
-            value={filters.layout}
-            onChange={setFilter("layout")}
+            value={query.layout}
+            onChange={(e) => go({ layout: e.target.value as ShopListQuery["layout"] })}
           >
             <option value="">Layout</option>
             {LAYOUT_OPTIONS.map((l) => (
@@ -190,8 +209,8 @@ export function ShopsTable({ shops, tabCounts }: ShopList) {
             hideLabel
             label="Plan"
             className="w-auto font-bold"
-            value={filters.plan}
-            onChange={setFilter("plan")}
+            value={query.plan}
+            onChange={(e) => go({ plan: e.target.value })}
           >
             <option value="">Plan</option>
             {plans.map((p) => (
@@ -202,30 +221,94 @@ export function ShopsTable({ shops, tabCounts }: ShopList) {
           </SelectField>
         </div>
 
-        {selected.size > 0 ? (
+        {canEdit && selected.size > 0 ? (
           <div className="flex flex-wrap items-center gap-2.5 border-b border-line-soft bg-[color-mix(in_srgb,var(--color-accent)_10%,white)] px-4 py-2.5">
-            <span role="status" className="font-extrabold">
+            <span className="font-extrabold">
               {selected.size} {selected.size === 1 ? "shop" : "shops"} selected
             </span>
-            {/* TODO(slice 4): bulk change of theme, layout and font; export */}
-            <Button>Change theme</Button>
-            <Button>Change layout</Button>
-            <Button>Change font</Button>
-            <Button>Export</Button>
+            <SelectField
+              block
+              hideLabel
+              label="Change theme to"
+              className="w-auto font-bold"
+              value={choice.theme}
+              onChange={(e) => setChoice((c) => ({ ...c, theme: e.target.value }))}
+            >
+              <option value="">Change theme</option>
+              {THEME_OPTIONS.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </SelectField>
+            <SelectField
+              block
+              hideLabel
+              label="Change layout to"
+              className="w-auto font-bold"
+              value={choice.layout}
+              onChange={(e) => setChoice((c) => ({ ...c, layout: e.target.value }))}
+            >
+              <option value="">Change layout</option>
+              {LAYOUT_OPTIONS.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
+                </option>
+              ))}
+            </SelectField>
+            <SelectField
+              block
+              hideLabel
+              label="Change font to"
+              className="w-auto font-bold"
+              value={choice.font}
+              onChange={(e) => setChoice((c) => ({ ...c, font: e.target.value }))}
+            >
+              <option value="">Change font</option>
+              {FONT_OPTIONS.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
+              ))}
+            </SelectField>
+            <Button
+              variant="primary"
+              disabled={nothingChosen || pending}
+              onClick={applyBulk}
+              className="disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Apply to {selected.size}
+            </Button>
             <Button variant="ghost" onClick={() => setSelected(new Set())}>
               Clear
             </Button>
           </div>
         ) : null}
 
+        <div role="status" className={message ? "border-b border-line-soft px-4 py-2.5 font-bold" : "sr-only"}>
+          {message ? (
+            <span className={message.ok ? "" : "text-chip-over-fg"}>{message.text}</span>
+          ) : null}
+        </div>
+
         <DataTable
           minWidth={900}
           head={
             <>
-              <Th className="w-11 pl-4">
-                <span className="sr-only">Select</span>
-              </Th>
-              <Th>Shop</Th>
+              {canEdit ? (
+                <Th className="w-11 pl-4">
+                  <label className="-my-2 flex size-11 cursor-pointer items-center justify-center">
+                    <input
+                      type="checkbox"
+                      className="size-5 accent-accent"
+                      checked={allOnPage}
+                      onChange={toggleAll}
+                      aria-label="Select all shops on this page"
+                    />
+                  </label>
+                </Th>
+              ) : null}
+              <Th className={canEdit ? "" : "pl-4"}>Shop</Th>
               <Th>Look</Th>
               <Th>Code</Th>
               <Th>Plan</Th>
@@ -237,34 +320,36 @@ export function ShopsTable({ shops, tabCounts }: ShopList) {
             </>
           }
         >
-          {visible.length === 0 ? (
+          {shops.length === 0 ? (
             <tr>
-              <Td colSpan={8} className="py-8 text-center text-muted">
+              <Td colSpan={columns} className="py-8 text-center text-muted">
                 No shops match. Clear the search or a filter.
               </Td>
             </tr>
           ) : (
-            visible.map((s) => (
+            shops.map((s) => (
               <tr key={s.id}>
-                <Td className="pl-4">
-                  <label className="-my-2 flex size-11 cursor-pointer items-center justify-center">
-                    <input
-                      type="checkbox"
-                      className="size-5 accent-accent"
-                      checked={selected.has(s.id)}
-                      onChange={() => toggle(s.id)}
-                      aria-label={`Select ${s.name}`}
-                    />
-                  </label>
-                </Td>
-                <Td>
+                {canEdit ? (
+                  <Td className="pl-4">
+                    <label className="-my-2 flex size-11 cursor-pointer items-center justify-center">
+                      <input
+                        type="checkbox"
+                        className="size-5 accent-accent"
+                        checked={selected.has(s.id)}
+                        onChange={() => toggle(s.id)}
+                        aria-label={`Select ${s.name}`}
+                      />
+                    </label>
+                  </Td>
+                ) : null}
+                <Td className={canEdit ? "" : "pl-4"}>
                   <div className="font-bold">{s.name}</div>
                   <div className="text-xs text-muted">
-                    {s.typeLabel} · /s/{s.slug}
+                    {s.typeLabel ? `${s.typeLabel} · ` : ""}/s/{s.slug}
                   </div>
                 </Td>
                 <Td>
-                  <Chip>{lookLabel(s.theme, s.layout)}</Chip>
+                  <Chip>{s.look ? lookLabel(s.look.theme, s.look.layout) : "Not set"}</Chip>
                 </Td>
                 <Td className="font-code text-[13px]">{formatCode(s.code)}</Td>
                 <Td>
@@ -290,12 +375,16 @@ export function ShopsTable({ shops, tabCounts }: ShopList) {
             Showing {from} to {to} of {total}
           </span>
           <div className="flex gap-2">
-            <Button disabled={current === 0} onClick={() => setPage(current - 1)} className="disabled:cursor-not-allowed disabled:opacity-50">
+            <Button
+              disabled={page <= 1 || pending}
+              onClick={() => go({ page: page - 1 })}
+              className="disabled:cursor-not-allowed disabled:opacity-50"
+            >
               Previous
             </Button>
             <Button
-              disabled={current >= pageCount - 1}
-              onClick={() => setPage(current + 1)}
+              disabled={page >= pageCount || pending}
+              onClick={() => go({ page: page + 1 })}
               className="disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next

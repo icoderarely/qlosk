@@ -9,6 +9,7 @@ export type AdminUser = {
   id: string;
   name: string;
   username: string;
+  email: string;
   role: Role;
 };
 
@@ -24,6 +25,7 @@ export async function getCurrentUser(): Promise<AdminUser | null> {
     id: session.user.id,
     name: session.user.name,
     username: session.user.username ?? session.user.name,
+    email: session.user.email,
     role,
   };
 }
