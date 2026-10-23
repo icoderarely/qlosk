@@ -4,15 +4,11 @@ import { Chip } from "../chip";
 import { TextField, FieldRow } from "../form-field";
 import { ICON_DOWNLOAD } from "../icons";
 import { QrSample } from "../qr-sample";
-import { PaymentChip } from "../status-chip";
-import type { PaymentStatus, PlanName } from "@/services/shops";
 import type { TabProps } from "./state";
 
 export type QrPlanInfo = {
   code: string | null;
-  plan: PlanName;
-  renewsOn: string;
-  payment: PaymentStatus;
+  plan: { name: string; renewsOn: string; started: string } | null;
 };
 
 // The placeholder domain used throughout docs/design.
@@ -63,12 +59,12 @@ export function QrPlanTab({ state, set, info }: TabProps & { info: QrPlanInfo })
       <Card className="flex flex-col gap-3.5 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="m-0 text-base font-extrabold">Plan</h2>
-          <PaymentChip status={info.payment} />
+          {/* TODO(slice 9): payment status chip */}
         </div>
         <FieldRow>
-          <PlanFact label="Plan" value={info.plan} />
-          <PlanFact label="Renews" value={info.renewsOn} />
-          <PlanFact label="Started" value="[start date]" />
+          <PlanFact label="Plan" value={info.plan?.name ?? "No plan yet"} />
+          <PlanFact label="Renews" value={info.plan?.renewsOn ?? "Not started"} />
+          <PlanFact label="Started" value={info.plan?.started ?? "Not started"} />
         </FieldRow>
         {/* TODO(slice 9): change plan, send reminder, mark as paid */}
         <div className="flex flex-wrap gap-2.5">
@@ -92,7 +88,7 @@ export function QrPlanTab({ state, set, info }: TabProps & { info: QrPlanInfo })
           If you change this, the old address keeps working and forwards to the new one. The printed
           QR never changes.
         </p>
-        {/* TODO(slice 4): pause and archive */}
+        {/* TODO: pause and archive (no slice owns these yet) */}
         <div className="flex flex-wrap gap-2.5 border-t border-line-soft pt-3.5">
           <Button>Pause this shop</Button>
           <Button variant="danger">Archive shop</Button>

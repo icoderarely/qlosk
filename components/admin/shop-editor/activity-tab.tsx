@@ -1,8 +1,7 @@
-import { Button } from "../button";
 import { Card } from "../card";
 import { FieldRow } from "../form-field";
 import { formatNumber } from "../format";
-import type { MockChange, MockTraffic } from "@/lib/mock/shops";
+import type { ChangeRow, Traffic } from "@/services/shop-editor";
 
 function count(n: number | null): string {
   return n === null ? "—" : formatNumber(n);
@@ -12,8 +11,8 @@ export function ActivityTab({
   changes,
   traffic,
 }: {
-  changes: MockChange[];
-  traffic: MockTraffic;
+  changes: ChangeRow[];
+  traffic: Traffic;
 }) {
   return (
     <>
@@ -23,9 +22,9 @@ export function ActivityTab({
           <p className="m-0 border-t border-line-soft py-3 text-muted">No changes yet.</p>
         ) : (
           <ul className="m-0 list-none p-0">
-            {/* TODO(slice 4): Undo, View and Mark done read the change_log */}
+            {/* TODO(slice 5): Undo, from change_log.undo_payload */}
             {changes.map((c) => (
-              <li key={c.what} className="flex items-center gap-3 border-t border-line-soft py-3">
+              <li key={`${c.when}-${c.what}`} className="flex items-center gap-3 border-t border-line-soft py-3">
                 <span
                   aria-hidden="true"
                   className="size-2.5 flex-none self-start rounded-full bg-accent mt-1.5"
@@ -36,7 +35,6 @@ export function ActivityTab({
                     {c.who} · {c.when}
                   </div>
                 </div>
-                <Button aria-label={`${c.action}: ${c.what}`}>{c.action}</Button>
               </li>
             ))}
           </ul>
@@ -46,7 +44,7 @@ export function ActivityTab({
       <Card className="flex flex-col gap-3.5 p-5">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="m-0 text-base font-extrabold">Traffic, last 30 days</h2>
-          <span className="text-[13px] text-muted">Last scan {traffic.lastScan.toLowerCase()}</span>
+          <span className="text-[13px] text-muted">Last scan: {traffic.lastScan}</span>
         </div>
         <FieldRow>
           <Fact label="Counted scans" value={count(traffic.scans)} />

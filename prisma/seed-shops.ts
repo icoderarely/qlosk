@@ -2,8 +2,8 @@
 // Run with `npm run db:seed:shops`. Safe to run again: shops that exist (same
 // slug) are left alone. Remove them with `npm run db:seed:shops -- --remove`.
 //
-// Every row it writes is marked: shops have notes = 'seed:sample' and the QR
-// codes have batch_id = 'seed-sample'. Plan prices are 0 because prices are set
+// The sample shops are found again by their slugs (listed below) and the QR
+// codes by batch_id = 'seed-sample'. Plan prices are 0 because prices are set
 // in admin (slice 9), not in code. Scan counts are made up, for display only.
 import { randomUUID } from "node:crypto";
 import { Client } from "pg";
@@ -16,7 +16,6 @@ for (const file of [".env.local", ".env"]) {
   }
 }
 
-const MARK = "seed:sample";
 const BATCH = "seed-sample";
 const databaseUrl = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error("DIRECT_URL or DATABASE_URL is not set.");
@@ -70,7 +69,7 @@ try {
 
   if (process.argv.includes("--remove")) {
     await client.query(`DELETE FROM qr_codes WHERE batch_id = $1`, [BATCH]);
-    const res = await client.query(`DELETE FROM shops WHERE notes = $1`, [MARK]);
+    const res = await client.query(`DELETE FROM shops WHERE slug = ANY($1)`, [SHOPS.map((s) => s.slug)]);
     await client.query("COMMIT");
     console.log(`Removed ${res.rowCount} sample shops.`);
   } else {
@@ -102,10 +101,10 @@ try {
       // Newest first in the list matches the order above.
       const createdAt = new Date(now - i * 3600_000);
       await client.query(
-        `INSERT INTO shops (id, slug, name, shop_type, area, city, phone, status, notes,
+        `INSERT INTO shops (id, slug, name, shop_type, area, city, phone, status,
                             plan_id, plan_started_at, plan_ends_at, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13)`,
-        [shopId, s.slug, s.name, s.type, s.area, s.city, s.phone, s.status, MARK,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $12)`,
+        [shopId, s.slug, s.name, s.type, s.area, s.city, s.phone, s.status,
          plan?.id ?? null, started, ends, createdAt],
       );
 

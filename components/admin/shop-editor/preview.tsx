@@ -2,6 +2,7 @@ import { Chip } from "../chip";
 import { PhoneFrame } from "../phone-frame";
 import { ShopPage } from "../../shop-page/shop-page";
 import type { ShopLink } from "../../shop-page/types";
+import { LINK_DEFAULTS } from "@/services/links";
 import type { EditorState } from "./state";
 
 // The real ShopPage, fed from the editor's local state, in the phone frame.
@@ -14,8 +15,8 @@ export function Preview({ state }: { state: EditorState }) {
       id: l.id,
       type: l.type,
       label: l.label,
-      shortLabel: l.shortLabel,
-      hint: l.hint,
+      shortLabel: LINK_DEFAULTS[l.type].shortLabel,
+      hint: LINK_DEFAULTS[l.type].hint,
       href: "#",
     }));
 
@@ -37,6 +38,8 @@ export function Preview({ state }: { state: EditorState }) {
             name: details.name.trim() || "Your shop name",
             tagline: details.tagline || null,
             area: details.areaCity || null,
+            logoUrl: details.logoUrl || null,
+            coverUrl: details.coverUrl || null,
           }}
           links={pageLinks}
           offer={

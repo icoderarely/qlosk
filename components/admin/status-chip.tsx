@@ -1,4 +1,5 @@
-import type { DbShopStatus, PaymentStatus, ShopStatus } from "@/services/shops";
+import type { PaymentStatus, ShopStatus } from "@/lib/mock/shops";
+import type { DbShopStatus } from "@/services/shops";
 import { Chip, type ChipTone } from "./chip";
 
 const SHOP_STATUS: Record<ShopStatus | DbShopStatus, { label: string; tone: ChipTone }> = {

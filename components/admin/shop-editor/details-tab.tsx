@@ -1,9 +1,10 @@
-import { Button } from "../button";
 import { Card, CardHeading } from "../card";
 import { FieldRow, SelectField, TextField, TextareaField } from "../form-field";
-import { ICON_UPLOAD } from "../icons";
 import { initials } from "../../shop-page/links";
 import type { ShopTypeOption } from "@/services/settings";
+import { newLink } from "@/services/shop-editor";
+import type { LinkType } from "../../shop-page/types";
+import { ImageUpload } from "./image-upload";
 import type { TabProps } from "./state";
 
 const SECTION = "flex flex-col gap-4";
@@ -12,8 +13,28 @@ export function DetailsTab({
   state,
   set,
   shopTypes,
-}: TabProps & { shopTypes: ShopTypeOption[] }) {
+  shopId,
+}: TabProps & { shopTypes: ShopTypeOption[]; shopId: string | null }) {
   const d = state.details;
+  // The Google review and Instagram fields are the targets of those buttons, so
+  // they read and write the Buttons tab's list instead of keeping a copy.
+  const targetOf = (type: LinkType) => state.links.find((l) => l.type === type)?.target ?? "";
+  const setTarget = (type: LinkType, target: string) => {
+    const has = state.links.some((l) => l.type === type);
+    if (has) {
+      let done = false;
+      set(
+        "links",
+        state.links.map((l) => {
+          if (l.type !== type || done) return l;
+          done = true;
+          return { ...l, target };
+        }),
+      );
+    } else if (target) {
+      set("links", [...state.links, { ...newLink(type), target }]);
+    }
+  };
   const upd = (patch: Partial<typeof d>) => set("details", { ...d, ...patch });
   const typeLabels = shopTypes.map((t) => t.label);
   if (!typeLabels.includes(d.shopType)) typeLabels.push(d.shopType);
@@ -72,14 +93,14 @@ export function DetailsTab({
             label="Google review link"
             type="url"
             placeholder="[from the Google Business profile]"
-            value={d.googleReview}
-            onChange={(e) => upd({ googleReview: e.target.value })}
+            value={targetOf("google_review")}
+            onChange={(e) => setTarget("google_review", e.target.value)}
           />
           <TextField
             label="Instagram handle or link"
             placeholder="[@handle]"
-            value={d.instagram}
-            onChange={(e) => upd({ instagram: e.target.value })}
+            value={targetOf("instagram")}
+            onChange={(e) => setTarget("instagram", e.target.value)}
           />
         </FieldRow>
         <p className="m-0 text-[13px] text-muted">
@@ -90,33 +111,36 @@ export function DetailsTab({
 
       <Card className={`p-5 ${SECTION}`}>
         <CardHeading title="Logo and cover" />
-        {/* TODO(slice 4): image upload (logo and cover) behind the storage service */}
         <FieldRow>
-          <div className="flex min-w-0 flex-[1_1_240px] items-center gap-3.5">
-            <div
-              aria-hidden="true"
-              className="flex size-[72px] flex-none items-center justify-center rounded-full bg-accent text-2xl font-extrabold text-white"
-            >
-              {initials(d.name)}
-            </div>
-            <div>
-              <div className="font-bold">Logo</div>
-              <Button icon={ICON_UPLOAD} className="mt-1.5">
-                Replace
-              </Button>
-            </div>
-          </div>
-          <div className="flex min-w-0 flex-[1_1_240px] items-center gap-3.5">
-            <div className="flex h-[72px] w-[120px] flex-none items-center justify-center rounded-xl bg-line-soft text-xs font-semibold text-muted">
-              No cover yet
-            </div>
-            <div>
-              <div className="font-bold">Cover photo</div>
-              <Button icon={ICON_UPLOAD} className="mt-1.5">
-                Upload
-              </Button>
-            </div>
-          </div>
+          <ImageUpload
+            kind="logo"
+            label="Logo"
+            shopId={shopId}
+            value={d.logoUrl}
+            onChange={(logoUrl) => upd({ logoUrl })}
+            shape="round"
+            empty={
+              <div
+                aria-hidden="true"
+                className="flex size-full items-center justify-center bg-accent text-2xl font-extrabold text-white"
+              >
+                {initials(d.name)}
+              </div>
+            }
+          />
+          <ImageUpload
+            kind="cover"
+            label="Cover photo"
+            shopId={shopId}
+            value={d.coverUrl}
+            onChange={(coverUrl) => upd({ coverUrl })}
+            shape="wide"
+            empty={
+              <div className="flex size-full items-center justify-center bg-line-soft text-xs font-semibold text-muted">
+                No cover yet
+              </div>
+            }
+          />
         </FieldRow>
       </Card>
 

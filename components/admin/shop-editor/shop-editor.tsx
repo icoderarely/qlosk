@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { publishShopPage, saveShopDraft } from "@/app/admin/shops/editor-actions";
 import { Button, LinkButton } from "../button";
 import { Chip } from "../chip";
 import { ICON_ARROW_LEFT, ICON_EXTERNAL } from "../icons";
 import { StatusChip } from "../status-chip";
 import { TabBar, panelDomId, tabDomId } from "../tab-bar";
-import type { ShopEditorData } from "@/services/shops";
+import type { ShopEditorData } from "@/services/shop-editor";
 import type { ShopTypeOption } from "@/services/settings";
 import { ActivityTab } from "./activity-tab";
 import { ButtonsTab } from "./buttons-tab";
@@ -31,31 +33,73 @@ const TABS: { id: TabId; label: string }[] = [
 const ID_PREFIX = "editor";
 
 // Shop editor for /admin/shops/[id] and /admin/shops/new. Everything typed or
-// picked lives in local state and feeds the real ShopPage preview. Nothing is
-// saved: the buttons in the header carry TODOs for slice 4.
+// picked lives in local state and feeds the real ShopPage preview. Save draft
+// writes the draft page; Publish saves, then copies the draft to the published
+// page.
 export function ShopEditor({
   data,
   shopTypes,
+  canEdit,
 }: {
   data: ShopEditorData;
   shopTypes: ShopTypeOption[];
+  canEdit: boolean;
 }) {
-  const isNew = data.id === null;
-  const [tab, setTab] = useState<TabId>(isNew ? "details" : "look");
-  const [state, setState] = useState<EditorState>({
-    details: data.details,
-    slug: data.slug,
-    links: data.links,
-    look: data.look,
-    buttonColor: null,
-    language: "English",
-    offer: data.offer,
-    banner: data.banner,
-    wifi: data.wifi,
-  });
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [shopId, setShopId] = useState(data.id);
+  const [tab, setTab] = useState<TabId>(data.id === null ? "details" : "buttons");
+  const [state, setState] = useState<EditorState>(data.values);
+  const [saved, setSaved] = useState(() => JSON.stringify(data.values));
+  const [hasUnpublished, setHasUnpublished] = useState(data.hasUnpublished);
+  const [published, setPublished] = useState(data.published);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
-  const set: SetEditor = (key, value) => setState((s) => ({ ...s, [key]: value }));
+  const dirty = JSON.stringify(state) !== saved;
+
+  // Leaving with edits that were never saved loses them, so ask first.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+
+  const set: SetEditor = (key, value) => {
+    setMessage(null);
+    setState((s) => ({ ...s, [key]: value }));
+  };
   const suggestion = shopTypes.find((t) => t.label === state.details.shopType) ?? null;
+  const name = state.details.name.trim() || "New shop";
+
+  function submit(kind: "save" | "publish") {
+    setMessage(null);
+    startTransition(async () => {
+      try {
+        const run = kind === "save" ? saveShopDraft : publishShopPage;
+        const result = await run(shopId, state);
+        if (!result.ok) {
+          setMessage({ ok: false, text: result.error });
+          return;
+        }
+        // Take back what the server cleaned up (slug, button links).
+        const next = { ...state, slug: result.slug, links: result.links };
+        setState(next);
+        setSaved(JSON.stringify(next));
+        setHasUnpublished(result.hasUnpublished);
+        setPublished(result.published);
+        setMessage({ ok: true, text: result.message });
+        if (shopId === null) {
+          setShopId(result.id);
+          router.replace(`/admin/shops/${result.id}`);
+        } else {
+          router.refresh();
+        }
+      } catch {
+        setMessage({ ok: false, text: "You do not have permission to change shops." });
+      }
+    });
+  }
 
   return (
     <>
@@ -70,20 +114,50 @@ export function ShopEditor({
             All shops
           </LinkButton>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="m-0 text-[28px] font-extrabold tracking-[-0.01em]">
-              {data.details.name || "New shop"}
-            </h1>
+            <h1 className="m-0 text-[28px] font-extrabold tracking-[-0.01em]">{name}</h1>
             <StatusChip status={data.status} />
-            <Chip tone="amber">Unpublished changes</Chip>
+            {dirty ? <Chip tone="blue">Unsaved edits</Chip> : null}
+            {!dirty && hasUnpublished ? <Chip tone="amber">Unpublished changes</Chip> : null}
           </div>
         </div>
-        {/* TODO(slice 4): open the live page, save the draft, publish */}
         <div className="flex flex-wrap gap-2.5">
-          <Button icon={ICON_EXTERNAL}>Open live page</Button>
-          <Button>Save draft</Button>
-          <Button variant="primary">Publish changes</Button>
+          {published ? (
+            <LinkButton
+              href={`/s/${state.slug}`}
+              target="_blank"
+              rel="noreferrer"
+              icon={ICON_EXTERNAL}
+            >
+              Open live page
+            </LinkButton>
+          ) : null}
+          {canEdit ? (
+            <>
+              <Button disabled={pending || !dirty} onClick={() => submit("save")} className="disabled:cursor-not-allowed disabled:opacity-50">
+                Save draft
+              </Button>
+              <Button
+                variant="primary"
+                disabled={pending || (!dirty && !hasUnpublished && published)}
+                onClick={() => submit("publish")}
+                className="disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {pending ? "Working" : "Publish changes"}
+              </Button>
+            </>
+          ) : null}
         </div>
       </div>
+
+      <div
+        role={message && !message.ok ? "alert" : "status"}
+        className={message ? `font-bold ${message.ok ? "" : "text-chip-over-fg"}` : "sr-only"}
+      >
+        {message?.text}
+      </div>
+      {!canEdit ? (
+        <p className="m-0 text-[13px] text-muted">You have view-only access, so changes are not saved.</p>
+      ) : null}
 
       <TabBar
         tabs={TABS}
@@ -94,34 +168,30 @@ export function ShopEditor({
       />
 
       <div className="flex flex-wrap items-start gap-5">
-        <div
-          role="tabpanel"
-          id={panelDomId(ID_PREFIX, tab)}
-          aria-labelledby={tabDomId(ID_PREFIX, tab)}
-          className="flex min-w-0 flex-[3_1_520px] flex-col gap-4"
+        <fieldset
+          disabled={!canEdit}
+          className="m-0 min-w-0 flex-[3_1_520px] border-0 p-0"
         >
-          {tab === "details" ? (
-            <DetailsTab state={state} set={set} shopTypes={shopTypes} />
-          ) : null}
-          {tab === "buttons" ? <ButtonsTab state={state} set={set} /> : null}
-          {tab === "look" ? <LookTab state={state} set={set} suggestion={suggestion} /> : null}
-          {tab === "offers" ? <OffersTab state={state} set={set} /> : null}
-          {tab === "qrplan" ? (
-            <QrPlanTab
-              state={state}
-              set={set}
-              info={{
-                code: data.code,
-                plan: data.plan,
-                renewsOn: data.renewsOn,
-                payment: data.payment,
-              }}
-            />
-          ) : null}
-          {tab === "activity" ? (
-            <ActivityTab changes={data.changes} traffic={data.traffic} />
-          ) : null}
-        </div>
+          <div
+            role="tabpanel"
+            id={panelDomId(ID_PREFIX, tab)}
+            aria-labelledby={tabDomId(ID_PREFIX, tab)}
+            className="flex min-w-0 flex-col gap-4"
+          >
+            {tab === "details" ? (
+              <DetailsTab state={state} set={set} shopTypes={shopTypes} shopId={shopId} />
+            ) : null}
+            {tab === "buttons" ? <ButtonsTab state={state} set={set} /> : null}
+            {tab === "look" ? <LookTab state={state} set={set} suggestion={suggestion} /> : null}
+            {tab === "offers" ? <OffersTab state={state} set={set} /> : null}
+            {tab === "qrplan" ? (
+              <QrPlanTab state={state} set={set} info={{ code: data.code, plan: data.plan }} />
+            ) : null}
+            {tab === "activity" ? (
+              <ActivityTab changes={data.changes} traffic={data.traffic} />
+            ) : null}
+          </div>
+        </fieldset>
 
         <Preview state={state} />
       </div>

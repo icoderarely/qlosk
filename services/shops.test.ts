@@ -5,8 +5,6 @@ import {
   bulkUpdateLook,
   describeLookChange,
   filterFromQuery,
-  getNewShopEditor,
-  getShopEditor,
   getShops,
   parseListQuery,
   planNote,
@@ -17,33 +15,6 @@ import {
   type ShopRecord,
   type ShopsStore,
 } from "./shops.ts";
-
-// The admin pages read through these functions, and the mock data is replaced
-// by database queries in a later slice. These tests pin the shape the pages
-// rely on, so that swap cannot change it silently.
-describe("shops service (mock data)", () => {
-  it("returns an editor for a known shop and null for an unknown id", async () => {
-    const velvet = await getShopEditor("1");
-    assert.equal(velvet?.details.name, "Velvet Salon & Spa");
-    assert.deepEqual(velvet?.look, { theme: "blush", layout: "list", font: "editorial" });
-    assert.equal(await getShopEditor("nope"), null);
-  });
-
-  it("gives each caller its own copy, so editing one cannot change the next read", async () => {
-    const a = await getShopEditor("1");
-    a?.links.splice(0, 1);
-    const b = await getShopEditor("1");
-    assert.equal(b?.links.length, 7);
-  });
-
-  it("starts a new shop empty, with no id and no code", async () => {
-    const fresh = await getNewShopEditor();
-    assert.equal(fresh.id, null);
-    assert.equal(fresh.code, null);
-    assert.equal(fresh.details.name, "");
-    assert.equal(fresh.changes.length, 0);
-  });
-});
 
 const UUID = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 
