@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Admin neutrals and accent from docs/design/Colors.dc.html (Teal, current). */
+@theme {
+  --color-ground: #f4f5f7;
+  --color-column: #ebedf1;
+  --color-line: #e3e5ea;
+  --color-line-soft: #eceef2;
+  --color-field: #d5d8df;
+  --color-ink: #11141a;
+  --color-menu: #454b58;
+  --color-muted: #5b6270;
+  --color-accent: #0f6b5c;
+
+  --color-chip-live-fg: #0b5a4c;
+  --color-chip-live-bg: #e1f2ee;
+  --color-chip-wait-fg: #7a4f00;
+  --color-chip-wait-bg: #fff1cf;
+  --color-chip-over-fg: #9b2218;
+  --color-chip-over-bg: #fde6e3;
+  --color-chip-prev-fg: #1d3fa6;
+  --color-chip-prev-bg: #e5ecfd;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-admin: var(--font-manrope), system-ui, sans-serif;
+  --font-code: var(--font-jetbrains), ui-monospace, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: #fff;
+  color: var(--color-ink);
+}
+
+/* Visible focus on every admin control (design: 2px ink, 2px offset). */
+.admin-root :is(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.admin-root button {
+  font-family: inherit;
 }
