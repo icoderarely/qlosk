@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { createTrackingStore } from "@/lib/tracking-store";
 import { trackingKeys } from "@/lib/tracking-env";
-import { clientIp, handleTap } from "@/services/tracking";
+import { clientIp, handleTap, isIgnoredRequest } from "@/services/tracking";
 
 const escapeHtml = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -19,7 +19,11 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/r/[code]/[li
     code,
     linkId,
     request.nextUrl.searchParams.get("t"),
-    { ip: clientIp(request.headers.get("x-forwarded-for")), userAgent: request.headers.get("user-agent") },
+    {
+      ip: clientIp(request.headers.get("x-forwarded-for")),
+      userAgent: request.headers.get("user-agent"),
+      skipLog: isIgnoredRequest(request.method, request.headers),
+    },
     keys,
   );
   const headers = { "cache-control": "no-store", "x-robots-tag": "noindex" };
@@ -36,3 +40,6 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/r/[code]/[li
   }
   return NextResponse.redirect(outcome.target, { status: 302, headers });
 }
+
+// HEAD gets the same answer as GET but is never logged.
+export const HEAD = GET;

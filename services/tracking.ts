@@ -1,9 +1,9 @@
-// Scan and tap logging (spec sections 3 and 7). This slice only records what
-// happened: every event is stored with is_bot = false. Bot checks, the
-// duplicate rule and rate limits arrive in slice 7. Raw IP addresses are never
-// stored: ip_hash is a salted hash and the salt changes every day. No cookies.
-// No Next.js imports.
+// Scan and tap logging with bot filtering (spec sections 3 and 7). Every request
+// is stored; bots are flagged with a reason and kept, never deleted. Raw IP
+// addresses are never stored: ip_hash is a salted hash and the salt changes every
+// day. No cookies. No Next.js imports.
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { isbot } from "isbot";
 import { isValidCode, normalizeCode } from "./qr.ts";
 import { validateTarget } from "./links.ts";
 import type { LinkType } from "../components/shop-page/types.ts";
@@ -80,20 +80,130 @@ export type TapLink = {
   enabled: boolean;
 };
 
+export type BotReason = "crawler" | "no_token" | "duplicate" | "rate_limit" | "spike_review";
+export type Flag = { isBot: false; botReason: null } | { isBot: true; botReason: BotReason };
+
+/** Settings switches for the checks (spec section 7). All on unless turned off. */
+export type FilterSettings = {
+  crawlers: boolean;
+  token: boolean;
+  dedupe: boolean;
+  rateLimit: boolean;
+  spikes: boolean;
+};
+export const DEFAULT_FILTERS: FilterSettings = { crawlers: true, token: true, dedupe: true, rateLimit: true, spikes: true };
+
+export const DUPLICATE_WINDOW_SECONDS = 30;
+export const RATE_LIMIT_PER_MINUTE = 30;
+export const SPIKE_MIN_SCANS_PER_HOUR = 50;
+export const SPIKE_FACTOR = 10;
+
+export type ScanEventInput = { code: string; shopId: string | null; ipHash: string | null; uaFamily: string } & Flag;
+export type TapEventInput = { shopId: string; linkId: string; ipHash: string | null } & Flag;
+
 export type TrackingStore = {
   findCode(code: string): Promise<ScanCode | null>;
-  recordScan(event: { code: string; shopId: string | null; ipHash: string | null; uaFamily: string }): Promise<void>;
+  recordScan(event: ScanEventInput): Promise<void>;
   /** The link, only if it belongs to the shop that holds this (assigned) code. */
   findTapLink(code: string, linkId: string): Promise<TapLink | null>;
-  recordTap(event: { shopId: string; linkId: string; ipHash: string | null }): Promise<void>;
+  recordTap(event: TapEventInput): Promise<void>;
+  /** The switches from Settings; missing ones are on. */
+  filterSettings(): Promise<FilterSettings>;
+  /** Scans and taps from this visitor hash since `since`, flagged or not. */
+  countRecent(ipHash: string, since: Date): Promise<number>;
+  /** Was there already a counted (not flagged) event from this hash on this target since `since`? */
+  hasCountedRecent(kind: "scan" | "tap", ipHash: string, target: string, since: Date): Promise<boolean>;
+  /** Scans for the shop in the last hour (counted or held), and counted scans in the 7 days before that. */
+  spikeStats(shopId: string, now: Date): Promise<{ lastHour: number; weekBefore: number }>;
+  /** Flags the shop's counted scans since `since` as spike_review. */
+  holdScans(shopId: string, since: Date): Promise<void>;
 };
 
 export type ScanOutcome = { kind: "redirect"; slug: string } | { kind: "inactive" };
 
-export type Visitor = { ip: string | null; userAgent: string | null };
+/** `skipLog`: a HEAD or prefetch request, answered but never stored. */
+export type Visitor = { ip: string | null; userAgent: string | null; skipLog?: boolean };
+
+// ---- Checks ------------------------------------------------------------------
+
+// Link-preview fetchers that isbot may not know, or that we want named outright.
+const PREVIEW_AGENTS = /WhatsApp\/|facebookexternalhit|Facebot|Twitterbot|TelegramBot|Slackbot|LinkedInBot|Discordbot|SkypeUriPreview|Pinterestbot|Applebot|Google-InspectionTool|Bytespider/i;
+
+/** Crawlers and link previews. A missing user agent counts: browsers always send one. */
+export function isCrawler(userAgent: string | null): boolean {
+  if (!userAgent || !userAgent.trim()) return true;
+  return isbot(userAgent) || PREVIEW_AGENTS.test(userAgent);
+}
+
+/** HEAD requests and browser prefetches are not visits (spec section 7). */
+export function isIgnoredRequest(method: string, headers: { get(name: string): string | null }): boolean {
+  if (method.toUpperCase() === "HEAD") return true;
+  const purpose = `${headers.get("sec-purpose") ?? ""} ${headers.get("purpose") ?? ""} ${headers.get("x-purpose") ?? ""}`;
+  return (
+    /prefetch|prerender/i.test(purpose) ||
+    headers.get("x-moz") === "prefetch" ||
+    headers.get("next-router-prefetch") !== null ||
+    headers.get("x-middleware-prefetch") !== null
+  );
+}
+
+/** Whether this hourly count is far above the shop's normal rate. */
+export function isSpike(lastHour: number, weekBefore: number): boolean {
+  const normalPerHour = weekBefore / (7 * 24);
+  return lastHour > Math.max(SPIKE_MIN_SCANS_PER_HOUR, normalPerHour * SPIKE_FACTOR);
+}
+
+const OK: Flag = { isBot: false, botReason: null };
+const flag = (botReason: BotReason): Flag => ({ isBot: true, botReason });
+
+// Shared by scans and taps. Cheapest checks first, and the first that fires is
+// the reason stored. Checks that need a visitor hash are skipped without one.
+async function rateAndRepeat(
+  store: TrackingStore,
+  filters: FilterSettings,
+  kind: "scan" | "tap",
+  target: string,
+  ipHash: string | null,
+  now: Date,
+): Promise<Flag> {
+  if (!ipHash) return OK;
+  if (filters.rateLimit) {
+    // Earlier requests only (this one is not stored yet), so reaching the limit means this one is over it.
+    const recent = await store.countRecent(ipHash, new Date(now.getTime() - 60_000));
+    if (recent >= RATE_LIMIT_PER_MINUTE) return flag("rate_limit");
+  }
+  if (filters.dedupe) {
+    const since = new Date(now.getTime() - DUPLICATE_WINDOW_SECONDS * 1000);
+    if (await store.hasCountedRecent(kind, ipHash, target, since)) return flag("duplicate");
+  }
+  return OK;
+}
 
 function visitorHash(v: Visitor, salt: string | null, now: Date): string | null {
   return v.ip && salt ? hashIp(v.ip, salt, dayKey(now)) : null;
+}
+
+async function flagScan(
+  store: TrackingStore,
+  code: string,
+  shopId: string | null,
+  ipHash: string | null,
+  userAgent: string | null,
+  now: Date,
+): Promise<Flag> {
+  const filters = await store.filterSettings();
+  if (filters.crawlers && isCrawler(userAgent)) return flag("crawler");
+  const verdict = await rateAndRepeat(store, filters, "scan", code, ipHash, now);
+  if (verdict.isBot) return verdict;
+  if (filters.spikes && shopId) {
+    const { lastHour, weekBefore } = await store.spikeStats(shopId, now);
+    // lastHour does not include this scan yet.
+    if (isSpike(lastHour + 1, weekBefore)) {
+      await store.holdScans(shopId, new Date(now.getTime() - 3600_000));
+      return flag("spike_review");
+    }
+  }
+  return OK;
 }
 
 // The scan is logged for every well-formed code, assigned or not, so a test scan
@@ -109,15 +219,15 @@ export async function handleScan(
   if (!isValidCode(code)) return { kind: "inactive" };
   const found = await store.findCode(code);
   if (!found) return { kind: "inactive" };
-  try {
-    await store.recordScan({
-      code,
-      shopId: found.status === "assigned" ? found.shopId : null,
-      ipHash: visitorHash(visitor, salt, now),
-      uaFamily: uaFamily(visitor.userAgent),
-    });
-  } catch (error) {
-    console.error("scan not logged", error);
+  if (!visitor.skipLog) {
+    try {
+      const ipHash = visitorHash(visitor, salt, now);
+      const shopId = found.status === "assigned" ? found.shopId : null;
+      const verdict = await flagScan(store, code, shopId, ipHash, visitor.userAgent, now);
+      await store.recordScan({ code, shopId, ipHash, uaFamily: uaFamily(visitor.userAgent), ...verdict });
+    } catch (error) {
+      console.error("scan not logged", error);
+    }
   }
   return found.liveSlug ? { kind: "redirect", slug: found.liveSlug } : { kind: "inactive" };
 }
@@ -126,9 +236,8 @@ export type TapOutcome =
   | { kind: "redirect"; target: string }
   | { kind: "notfound" };
 
-// Taps with a good token are logged. A tap without one still reaches its
-// destination (a customer should never be stuck) but is not counted; slice 7
-// will store those flagged as no_token instead.
+// Every tap is logged. A tap without a good token still reaches its destination
+// (a customer should never be stuck) but is stored flagged no_token.
 export async function handleTap(
   store: TrackingStore,
   rawCode: string,
@@ -147,9 +256,15 @@ export async function handleTap(
   const safe = validateTarget(link.type, link.target);
   if (!safe.ok || !safe.value) return { kind: "notfound" };
 
-  if (verifyTapToken(keys.tokenKey, token, code, linkId, now)) {
+  if (!visitor.skipLog) {
     try {
-      await store.recordTap({ shopId: link.shopId, linkId: link.linkId, ipHash: visitorHash(visitor, keys.salt, now) });
+      const ipHash = visitorHash(visitor, keys.salt, now);
+      const filters = await store.filterSettings();
+      let verdict: Flag = OK;
+      if (filters.crawlers && isCrawler(visitor.userAgent)) verdict = flag("crawler");
+      else if (filters.token && !verifyTapToken(keys.tokenKey, token, code, linkId, now)) verdict = flag("no_token");
+      else verdict = await rateAndRepeat(store, filters, "tap", link.linkId, ipHash, now);
+      await store.recordTap({ shopId: link.shopId, linkId: link.linkId, ipHash, ...verdict });
     } catch (error) {
       console.error("tap not logged", error);
     }

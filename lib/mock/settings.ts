@@ -42,6 +42,7 @@ export const SETTINGS: MockSettings = {
     { id: "crawlers", label: "Ignore crawlers, link previews and prefetch", switchLabel: "Ignore crawlers", enabled: true },
     { id: "token", label: "Count a button tap only if the page was opened first", switchLabel: "Require page token", enabled: true },
     { id: "dedupe", label: "Count the same device once within 30 seconds", switchLabel: "Dedupe", enabled: true },
+    { id: "rateLimit", label: "Flag a device that sends too many requests a minute", switchLabel: "Rate limit", enabled: true },
     { id: "spikes", label: "Hold back sudden spikes for review", switchLabel: "Spike review", enabled: true },
   ],
   domain: { qrBase: "", whatsappSender: "" },

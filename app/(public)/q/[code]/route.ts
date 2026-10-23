@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { createTrackingStore } from "@/lib/tracking-store";
 import { trackingKeys } from "@/lib/tracking-env";
-import { clientIp, handleScan } from "@/services/tracking";
+import { clientIp, handleScan, isIgnoredRequest } from "@/services/tracking";
 
 // What the printed QR code opens (spec section 3): log the scan, then 302 to the
 // shop's page. A code that is not assigned to a live shop shows the "not
@@ -12,7 +12,11 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/q/[code]">) 
   const outcome = await handleScan(
     createTrackingStore(getDb()),
     code,
-    { ip: clientIp(request.headers.get("x-forwarded-for")), userAgent: request.headers.get("user-agent") },
+    {
+      ip: clientIp(request.headers.get("x-forwarded-for")),
+      userAgent: request.headers.get("user-agent"),
+      skipLog: isIgnoredRequest(request.method, request.headers),
+    },
     trackingKeys().salt,
   );
   const to = outcome.kind === "redirect" ? `/s/${outcome.slug}` : "/not-activated";
@@ -21,3 +25,6 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/q/[code]">) 
   response.headers.set("x-robots-tag", "noindex");
   return response;
 }
+
+// HEAD gets the same answer as GET but is never logged (the visitor above says so).
+export const HEAD = GET;
