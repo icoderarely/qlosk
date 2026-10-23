@@ -1,9 +1,8 @@
-import { contrastRatio, MIN_TEXT_CONTRAST } from "@/lib/contrast";
+import { checkButtonColor, contrastReason } from "@/services/look";
 import { Button } from "../button";
 import { Card, CardHeading } from "../card";
 import { Chip } from "../chip";
 import { FONT_PACKS } from "../../shop-page/fonts";
-import { THEMES } from "../../shop-page/themes";
 import type { FontId, LayoutId, ThemeId } from "../../shop-page/types";
 import {
   BUTTON_COLORS,
@@ -20,16 +19,20 @@ import type { TabProps } from "./state";
 
 const SECTION = "flex flex-col gap-3.5 p-5";
 
-// Spec section 5: button text on the button colour must reach 4.5:1.
-function colorAllowed(theme: ThemeId, hex: string): boolean {
-  return contrastRatio(THEMES[theme].btntext, hex) >= MIN_TEXT_CONTRAST;
-}
+const colorAllowed = (theme: ThemeId, hex: string) => checkButtonColor(theme, hex).ok;
 
 export function LookTab({
   state,
   set,
   suggestion,
-}: TabProps & { suggestion: ShopTypeOption | null }) {
+  enabledThemes,
+  enabledLayouts,
+}: TabProps & {
+  suggestion: ShopTypeOption | null;
+  /** From Settings. A look a shop already uses stays visible even if turned off. */
+  enabledThemes: ThemeId[];
+  enabledLayouts: LayoutId[];
+}) {
   const { look, buttonColor, language } = state;
   const suggested = suggestion?.suggested ?? null;
 
@@ -42,7 +45,9 @@ export function LookTab({
   const pickLayout = (layout: LayoutId) => set("look", { ...look, layout });
   const pickFont = (font: FontId) => set("look", { ...look, font });
 
-  const blocked = BUTTON_COLORS.filter((c) => !colorAllowed(look.theme, c.hex));
+  const blocked = BUTTON_COLORS.map((c) => ({ ...c, check: checkButtonColor(look.theme, c.hex) })).filter(
+    (c) => !c.check.ok,
+  );
 
   return (
     <>
@@ -57,7 +62,7 @@ export function LookTab({
           }
         />
         <OptionGrid>
-          {THEME_OPTIONS.map((t) => {
+          {THEME_OPTIONS.filter((t) => enabledThemes.includes(t.id) || t.id === look.theme).map((t) => {
             const sw = themeSwatch(t.id);
             return (
               <OptionCard key={t.id} pressed={look.theme === t.id} onClick={() => pickTheme(t.id)}>
@@ -89,7 +94,7 @@ export function LookTab({
       <Card className={SECTION}>
         <CardHeading title="Layout" description="How the buttons are arranged." />
         <OptionGrid>
-          {LAYOUT_OPTIONS.map((l) => (
+          {LAYOUT_OPTIONS.filter((l) => enabledLayouts.includes(l.id) || l.id === look.layout).map((l) => (
             <OptionCard key={l.id} pressed={look.layout === l.id} onClick={() => pickLayout(l.id)}>
               <svg
                 viewBox="0 0 64 44"
@@ -135,7 +140,6 @@ export function LookTab({
           title="Small tweaks"
           description="Only these can be changed per shop, so every page stays consistent."
         />
-        {/* TODO(slice 4): ShopPage has no props for these two yet, so the preview ignores them */}
         <div>
           <div className="mb-1.5 text-[13px] font-bold" id="btn-color-label">
             Button color
@@ -173,10 +177,13 @@ export function LookTab({
             })}
           </div>
           {blocked.length > 0 ? (
-            <p className="mt-1 mb-0 text-[13px] text-muted">
-              {blocked.map((c) => c.name).join(", ")} can&apos;t be used on {themeName(look.theme)}:
-              the button text would be hard to read.
-            </p>
+            <ul className="mt-1 mb-0 list-none p-0 text-[13px] text-muted">
+              {blocked.map((c) => (
+                <li key={c.hex}>
+                  {c.name} can&apos;t be used on {themeName(look.theme)}: the {contrastReason(c.check)}.
+                </li>
+              ))}
+            </ul>
           ) : null}
         </div>
         <div>
@@ -201,8 +208,7 @@ export function LookTab({
             ))}
           </div>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-soft pt-3.5">
-          <span className="text-muted">Draft saved a minute ago</span>
+        <div className="flex flex-wrap items-center justify-end gap-3 border-t border-line-soft pt-3.5">
           <Button
             disabled={!suggested}
             className="disabled:cursor-not-allowed disabled:opacity-50"

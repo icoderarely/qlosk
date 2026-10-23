@@ -29,6 +29,7 @@ export function ShopPage({
   offer = null,
   wifi = null,
   banner = null,
+  buttonColor = null,
 }: ShopPageProps) {
   const pack = FONT_PACKS[font] ?? FONT_PACKS.clean;
   const Layout = LAYOUTS[layout] ?? ListLayout;
@@ -42,6 +43,8 @@ export function ShopPage({
       className={`shop-page flex min-h-[var(--page-min-h,100dvh)] w-full justify-center bg-sp-bg font-sp-body text-[14px] leading-[1.4] text-sp-text ${pack.className}`}
       style={{
         ...themeStyle(theme),
+        // Hex only, so nothing else can be written into the style.
+        ...(buttonColor && /^#[0-9a-f]{6}$/i.test(buttonColor) ? { "--btn": buttonColor } : {}),
         "--head": pack.head,
         "--body": pack.body,
       } as React.CSSProperties}

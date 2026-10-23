@@ -72,6 +72,8 @@ export type ShopPageProps = {
   offer?: Offer | null;
   wifi?: WifiInfo | null;
   banner?: Banner | null;
+  /** Hex that replaces the theme's button colour. Callers check contrast first. */
+  buttonColor?: string | null;
 };
 
 /** What every layout component receives (ShopPage prepares it). */

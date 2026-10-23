@@ -292,6 +292,14 @@ describe("link rules on save and publish", () => {
     assert.equal(r.links.find((l) => l.type === "instagram")?.target, "https://instagram.com/velvet");
   });
 
+  it("blocks a button colour that fails 4.5:1 on the chosen theme, and says why", async () => {
+    const r = await saveDraft(f.store, null, values({ buttonColor: "#FFB547" }), "a@b.c");
+    assert.equal(r.ok, false);
+    assert.match(!r.ok ? r.error : "", /contrast is \d\.\d:1, below the 4\.5:1/);
+    const ok = await saveDraft(f.store, null, values({ buttonColor: "#9F1D45" }), "a@b.c");
+    assert.equal(ok.ok, true);
+  });
+
   it("rejects a malformed phone number", async () => {
     const r = await saveDraft(f.store, null, values({}, { phone: "call me" }), "a@b.c");
     assert.equal(r.ok, false);

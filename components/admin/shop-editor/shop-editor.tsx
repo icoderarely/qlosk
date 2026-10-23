@@ -9,6 +9,7 @@ import { ICON_ARROW_LEFT, ICON_EXTERNAL } from "../icons";
 import { StatusChip } from "../status-chip";
 import { TabBar, panelDomId, tabDomId } from "../tab-bar";
 import type { ShopEditorData } from "@/services/shop-editor";
+import type { LayoutId, ThemeId } from "../../shop-page/types";
 import type { ShopTypeOption } from "@/services/settings";
 import { ActivityTab } from "./activity-tab";
 import { ButtonsTab } from "./buttons-tab";
@@ -40,10 +41,14 @@ export function ShopEditor({
   data,
   shopTypes,
   canEdit,
+  enabledThemes,
+  enabledLayouts,
 }: {
   data: ShopEditorData;
   shopTypes: ShopTypeOption[];
   canEdit: boolean;
+  enabledThemes: ThemeId[];
+  enabledLayouts: LayoutId[];
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -182,7 +187,15 @@ export function ShopEditor({
               <DetailsTab state={state} set={set} shopTypes={shopTypes} shopId={shopId} />
             ) : null}
             {tab === "buttons" ? <ButtonsTab state={state} set={set} /> : null}
-            {tab === "look" ? <LookTab state={state} set={set} suggestion={suggestion} /> : null}
+            {tab === "look" ? (
+              <LookTab
+                state={state}
+                set={set}
+                suggestion={suggestion}
+                enabledThemes={enabledThemes}
+                enabledLayouts={enabledLayouts}
+              />
+            ) : null}
             {tab === "offers" ? <OffersTab state={state} set={set} /> : null}
             {tab === "qrplan" ? (
               <QrPlanTab state={state} set={set} info={{ code: data.code, plan: data.plan }} />

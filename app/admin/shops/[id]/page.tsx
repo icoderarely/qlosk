@@ -6,7 +6,8 @@ import { requireRole } from "@/lib/require-role";
 import { createEditorStore } from "@/lib/shop-editor-store";
 import { hasRole } from "@/services/admin-roles";
 import { getShopEditor } from "@/services/shop-editor";
-import { getShopTypes } from "@/services/settings";
+import { getSettings, getShopTypes } from "@/services/settings";
+import { LAYOUT_IDS, THEME_IDS } from "@/components/shop-page/types";
 
 export const metadata: Metadata = { title: "Edit shop" };
 
@@ -15,11 +16,21 @@ export default async function Page({ params }: PageProps<"/admin/shops/[id]">) {
   const { id } = await params;
   // A malformed id would make Postgres throw; treat it as not found.
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
-  const [data, shopTypes] = await Promise.all([
+  const [data, shopTypes, settings] = await Promise.all([
     getShopEditor(createEditorStore(getDb()), id),
     getShopTypes(),
+    getSettings(),
   ]);
   if (!data) notFound();
   // key: a new id starts the editor from that shop's data, not the last one's
-  return <ShopEditor key={id} data={data} shopTypes={shopTypes} canEdit={hasRole(user.role, "admin")} />;
+  return (
+    <ShopEditor
+      key={id}
+      data={data}
+      shopTypes={shopTypes}
+      canEdit={hasRole(user.role, "admin")}
+      enabledThemes={THEME_IDS.filter((t) => settings.enabledThemes[t])}
+      enabledLayouts={LAYOUT_IDS.filter((l) => settings.enabledLayouts[l])}
+    />
+  );
 }

@@ -34,6 +34,7 @@ export function Preview({ state }: { state: EditorState }) {
           theme={look.theme}
           layout={look.layout}
           font={look.font}
+          buttonColor={state.buttonColor}
           shop={{
             name: details.name.trim() || "Your shop name",
             tagline: details.tagline || null,

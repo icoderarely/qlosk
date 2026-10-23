@@ -19,6 +19,7 @@ import {
   resolveLinks,
   type LinkDraft,
 } from "./links.ts";
+import { checkButtonColor, contrastReason } from "./look.ts";
 import { checkSlug, freeSlug, slugify } from "./slug.ts";
 import type { DbShopStatus } from "./shops.ts";
 
@@ -457,6 +458,11 @@ async function prepare(
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Check the form.");
   const values = parsed.data as EditorValues;
   if (!values.details.name.trim()) return fail("Enter the shop name.");
+
+  if (values.buttonColor) {
+    const check = checkButtonColor(values.look.theme, values.buttonColor);
+    if (!check.ok) return fail(`That button color cannot be used: the ${contrastReason(check)}.`);
+  }
 
   let slug = values.slug.trim().toLowerCase();
   if (!slug && existing) slug = existing.slug;
