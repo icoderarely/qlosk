@@ -33,8 +33,9 @@ export function CoverLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProp
       </div>
 
       <div className="flex flex-1 flex-col gap-4 px-5 pb-6">
+        {/* The logo is positioned (z-10) so the cover, which is also positioned, cannot paint over it. */}
         <div className="-mt-[38px] flex flex-col gap-1">
-          <Logo shop={shop} className="size-[76px] border-4 border-sp-bg text-[26px]" />
+          <Logo shop={shop} className="relative z-10 size-[76px] border-4 border-sp-bg text-[26px]" />
           <h1 className={`m-0 mt-2 text-[28px] font-bold leading-[1.15] ${HEAD}`}>
             {shop.name}
           </h1>
