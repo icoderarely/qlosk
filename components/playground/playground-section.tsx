@@ -87,7 +87,7 @@ export function PlaygroundSection({
   const name = look.name.trim() || sample.shop.name;
 
   return (
-    <section aria-labelledby="pg-title" className="mx-auto w-full max-w-[1100px] px-4 pb-24 pt-5 lg:pb-5">
+    <section aria-labelledby="pg-title" className="mx-auto w-full max-w-[1100px] px-4 pb-24 pt-5 lg:pb-0">
       <h1 id="pg-title" className="m-0 text-2xl font-bold tracking-tight text-neutral-900">
         Try a look for your shop
       </h1>
@@ -212,18 +212,18 @@ export function PlaygroundSection({
             </Grid>
           </Group>
 
-        </div>
-
-        <div className="flex flex-none flex-col items-center gap-3 lg:sticky lg:top-4 lg:w-[434px]">
           <a
             href={whatsappLink(look, labels, whatsappNumber)}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex min-h-12 w-full max-w-[410px] items-center justify-center rounded-xl bg-[#0B6B3A] px-6 font-bold text-white shadow-lg max-lg:fixed max-lg:inset-x-4 max-lg:bottom-4 max-lg:z-10 max-lg:w-auto max-lg:max-w-none ${FOCUS}`}
+            className={`inline-flex min-h-12 items-center justify-center rounded-xl bg-[#0B6B3A] px-6 font-bold text-white shadow-lg lg:self-start max-lg:fixed max-lg:inset-x-4 max-lg:bottom-4 max-lg:z-10 max-lg:w-auto ${FOCUS}`}
           >
             Get this for my shop
             <span className="sr-only"> (opens WhatsApp with your choices)</span>
           </a>
+        </div>
+
+        <div className="flex flex-none justify-center lg:sticky lg:top-4 lg:w-[434px]">
           <Phone>
             <ShopPage
               theme={look.theme}
@@ -290,7 +290,7 @@ function Phone({ children }: { children: React.ReactNode }) {
       // Side by side on desktop: also fit the height, leaving room for the button.
       const byHeight =
         window.innerWidth >= 1024
-          ? (window.innerHeight - 170) / (SCREEN_H + FRAME_PAD * 2)
+          ? (window.innerHeight - 70) / (SCREEN_H + FRAME_PAD * 2)
           : Infinity;
       setScale(Math.max(0.45, Math.min(1, byWidth, byHeight)));
     };
