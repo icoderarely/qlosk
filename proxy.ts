@@ -1,21 +1,30 @@
-import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import { authConfig } from "@/lib/auth.config";
+import type { NextRequest } from "next/server";
+import { getAuth } from "@/lib/auth";
+import { getDb } from "@/lib/db";
+import { getRole } from "@/services/admin-roles";
 
-// Next.js 16 calls this file "proxy" (it was "middleware"). This is the first
-// gate: no valid session, no /admin. It cannot check the allowlist because it
-// does not touch the database; requireAdmin() does that in pages and actions.
-const { auth } = NextAuth(authConfig);
+// Next.js 16 calls this file "proxy" (it was "middleware"); it runs on Node, so
+// it can validate the session against the database. That gives real 307s:
+//   signed out, /admin/...  -> /admin-login
+//   signed in, /admin-login -> /admin
+// It is a convenience, not the security boundary. Pages, the admin layout and
+// every server action call requireRole() themselves (lib/require-role.ts).
+export async function proxy(request: NextRequest) {
+  const session = await getAuth().api.getSession({ headers: request.headers });
+  const role = session ? await getRole(getDb(), session.user.id) : null;
+  const signedIn = role !== null;
+  const onLogin = request.nextUrl.pathname === "/admin-login";
 
-export const proxy = auth((req) => {
-  if (req.nextUrl.pathname === "/admin/login") return NextResponse.next();
-  if (!req.auth) {
-    const login = new URL("/admin/login", req.nextUrl);
-    return NextResponse.redirect(login);
+  if (onLogin && signedIn) {
+    return NextResponse.redirect(new URL("/admin", request.url));
+  }
+  if (!onLogin && !signedIn) {
+    return NextResponse.redirect(new URL("/admin-login", request.url));
   }
   return NextResponse.next();
-});
+}
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*"],
+  matcher: ["/admin", "/admin/:path*", "/admin-login"],
 };

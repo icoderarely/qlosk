@@ -14,7 +14,7 @@ import {
   isActive,
 } from "./nav";
 
-export type ShellUser = { name: string | null; email: string };
+export type ShellUser = { name: string; username: string };
 
 const NAV_ON =
   "bg-[color-mix(in_srgb,var(--color-accent)_12%,white)] text-accent font-bold";
@@ -29,7 +29,7 @@ export function AdminShell({
 }) {
   const [open, setOpen] = useState(true);
   const pathname = usePathname();
-  const displayName = user.name ?? "Admin";
+  const displayName = user.name;
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
@@ -89,7 +89,7 @@ export function AdminShell({
               </div>
               <div className="min-w-0">
                 <div className="truncate font-bold">{displayName}</div>
-                <div className="truncate text-xs text-muted">{user.email}</div>
+                <div className="truncate text-xs text-muted">{user.username}</div>
               </div>
             </div>
             <form action={logout}>

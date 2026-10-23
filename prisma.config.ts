@@ -17,8 +17,9 @@ export default defineConfig({
     seed: "node prisma/seed.ts",
   },
   datasource: {
-    // Not env("DATABASE_URL"): `prisma generate` runs on postinstall in
-    // builds where the variable may be absent, and env() throws when unset.
-    url: process.env.DATABASE_URL ?? "",
+    // Migrations want the direct (non-pooled) Neon URL. Not env(): `prisma
+    // generate` runs on postinstall where these may be absent, and env()
+    // throws when unset.
+    url: process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "",
   },
 });

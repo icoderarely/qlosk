@@ -1,16 +1,13 @@
 "use server";
 
-import { signIn, signOut } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getAuth } from "@/lib/auth";
 
-// Both actions are open to anyone on purpose: signing in is how a person
-// becomes an admin (the allowlist is enforced in the signIn callback), and
-// signing out needs no privilege. Every other admin action must start with
-// requireAdmin({ write: true }) from @/lib/admin-guard.
-
-export async function signInWithGoogle() {
-  await signIn("google", { redirectTo: "/admin" });
-}
-
+// Logging out needs no role: it only ends the caller's own session, and it
+// works the same for a stale cookie. Every other admin action must start with
+// requireRole("admin") (or "owner") from @/lib/require-role.
 export async function logout() {
-  await signOut({ redirectTo: "/admin/login" });
+  await getAuth().api.signOut({ headers: await headers() });
+  redirect("/admin-login");
 }
