@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { isPublic, lookupPublicPage, redirectFor, routeFor, toPageProps, type PublicStore } from "./public-page.ts";
+import { isPublic, lookupPublicPage, redirectFor, routeFor, withTapLinks, toPageProps, type PublicStore } from "./public-page.ts";
 import { newShopValues, toConfig, type StoredShop } from "./shop-editor.ts";
 
 function shop(extra: Partial<StoredShop> = {}, publish = true): StoredShop {
@@ -156,5 +156,21 @@ describe("routeFor (the HTTP answer the proxy gives)", () => {
     for (const slug of ["draft-only", "gone", "x y", "admin"]) {
       assert.deepEqual(await routeFor(s, slug), { kind: "notfound" }, slug);
     }
+  });
+});
+
+describe("withTapLinks", () => {
+  const sign = (code: string, id: string) => `tok-${code}-${id.slice(-1)}`;
+
+  it("sends buttons through /r with a token when the shop has a code", () => {
+    const props = withTapLinks(toPageProps(shop()), "7KX2M9", sign);
+    const call = props.links.find((l) => l.type === "call")!;
+    assert.equal(call.href, `/r/7KX2M9/${call.id}?t=tok-7KX2M9-1`);
+    assert.equal(props.links.find((l) => l.type === "wifi")?.href, "#");
+  });
+
+  it("links straight to the target when there is no code", () => {
+    const props = withTapLinks(toPageProps(shop()), null, sign);
+    assert.equal(props.links.find((l) => l.type === "call")?.href, "tel:+919820012345");
   });
 });

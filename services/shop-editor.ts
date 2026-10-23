@@ -20,6 +20,7 @@ import {
   type LinkDraft,
 } from "./links.ts";
 import { checkButtonColor, contrastReason } from "./look.ts";
+import { undoableIds, type ChangeEntry, type UndoPayload } from "./undo.ts";
 import { checkSlug, freeSlug, slugify } from "./slug.ts";
 import type { DbShopStatus } from "./shops.ts";
 
@@ -197,7 +198,8 @@ export type EditorStore = {
   find(id: string): Promise<StoredShop | null>;
   /** False when another shop uses the slug now or used it before. */
   slugAvailable(slug: string, exceptShopId: string | null): Promise<boolean>;
-  changes(id: string, take: number): Promise<{ what: string; userEmail: string; at: Date }[]>;
+  /** Newest first, with the undo payload each entry was written with. */
+  changes(id: string, take: number): Promise<ChangeEntry[]>;
   traffic(id: string): Promise<{ scans: number | null; taps: number | null; bots: number | null; lastScan: Date | null }>;
   create(args: {
     slug: string;
@@ -212,7 +214,7 @@ export type EditorStore = {
     internal: InternalFields;
     config: unknown;
     userEmail: string;
-    logs: string[];
+    logs: { what: string; undo?: UndoPayload }[];
   }): Promise<void>;
   publish(args: {
     id: string;
@@ -350,7 +352,7 @@ export function hasUnpublishedChanges(draft: unknown, published: unknown): boole
 
 // ---- Reading -----------------------------------------------------------------
 
-export type ChangeRow = { what: string; who: string; when: string };
+export type ChangeRow = { id: string; what: string; who: string; when: string; canUndo: boolean };
 export type Traffic = { scans: number | null; taps: number | null; bots: number | null; lastScan: string };
 
 export type ShopEditorData = {
@@ -399,7 +401,8 @@ export function newShopData(): ShopEditorData {
 export async function getShopEditor(store: EditorStore, id: string): Promise<ShopEditorData | null> {
   const shop = await store.find(id);
   if (!shop) return null;
-  const [changes, traffic] = await Promise.all([store.changes(id, 20), store.traffic(id)]);
+  const [changes, traffic] = await Promise.all([store.changes(id, 50), store.traffic(id)]);
+  const undoable = undoableIds(changes);
   return {
     id: shop.id,
     status: shop.status,
@@ -414,7 +417,13 @@ export async function getShopEditor(store: EditorStore, id: string): Promise<Sho
     values: readValues(shop),
     published: shop.published != null,
     hasUnpublished: hasUnpublishedChanges(shop.draft, shop.published),
-    changes: changes.map((c) => ({ what: c.what, who: c.userEmail, when: formatWhen(c.at) })),
+    changes: changes.slice(0, 20).map((c) => ({
+      id: c.id,
+      what: c.what,
+      who: c.userEmail,
+      when: formatWhen(c.at),
+      canUndo: undoable.has(c.id),
+    })),
     traffic: {
       scans: traffic.scans,
       taps: traffic.taps,
@@ -526,9 +535,19 @@ async function writeDraft(
   const before = readValues(existing);
   const sections = changedSections(before, p.values);
   const slugChange = p.slug !== existing.slug ? { from: existing.slug, to: p.slug } : null;
-  const logs: string[] = [];
-  if (sections.length > 0) logs.push(`Draft saved: ${sections.join(", ")}`);
-  if (slugChange) logs.push(`Page address changed from ${slugChange.from} to ${slugChange.to}`);
+  const logs: { what: string; undo?: UndoPayload }[] = [];
+  if (sections.length > 0) {
+    const before = existing.draft;
+    logs.push({
+      what: `Draft saved: ${sections.join(", ")}`,
+      // Undo puts the previous draft back.
+      undo:
+        before && typeof before === "object" && !Array.isArray(before)
+          ? { kind: "draft", config: before as Record<string, unknown> }
+          : undefined,
+    });
+  }
+  if (slugChange) logs.push({ what: `Page address changed from ${slugChange.from} to ${slugChange.to}` });
   if (logs.length === 0 && existing.draft != null) return { id: existing.id, changed: false };
 
   await store.saveDraft({ id: existing.id, slugChange, internal, config: p.config, userEmail, logs });

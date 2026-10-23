@@ -62,12 +62,13 @@ export function createEditorStore(db: PrismaClient): EditorStore {
     },
 
     async changes(id, take) {
-      return db.changeLog.findMany({
+      const rows = await db.changeLog.findMany({
         where: { shopId: id },
         orderBy: { at: "desc" },
         take,
-        select: { what: true, userEmail: true, at: true },
+        select: { id: true, what: true, userEmail: true, at: true, undoPayload: true },
       });
+      return rows;
     },
 
     async traffic(id) {
@@ -129,7 +130,12 @@ export function createEditorStore(db: PrismaClient): EditorStore {
         });
         if (logs.length > 0) {
           await tx.changeLog.createMany({
-            data: logs.map((what) => ({ shopId: id, userEmail, what })),
+            data: logs.map((l) => ({
+              shopId: id,
+              userEmail,
+              what: l.what,
+              ...(l.undo ? { undoPayload: l.undo as Prisma.InputJsonObject } : {}),
+            })),
           });
         }
       });

@@ -4,6 +4,7 @@
 import type { ShopPageProps } from "../components/shop-page/types.ts";
 import { LINK_DEFAULTS } from "./links.ts";
 import { checkButtonColor } from "./look.ts";
+import { tapHref } from "./tracking.ts";
 import { readValues, type StoredShop } from "./shop-editor.ts";
 import { checkSlug } from "./slug.ts";
 
@@ -16,7 +17,7 @@ export type PublicStore = {
 };
 
 export type PublicLookup =
-  | { kind: "page"; props: ShopPageProps; title: string; description: string }
+  | { kind: "page"; props: ShopPageProps; code: string | null; title: string; description: string }
   | { kind: "redirect"; slug: string }
   | { kind: "notfound" };
 
@@ -66,6 +67,23 @@ export function toPageProps(shop: StoredShop): ShopPageProps {
   };
 }
 
+/**
+ * When the shop has a QR code, its buttons go through /r/<code>/<linkId> with a
+ * token, so a tap can be counted. Without a code they link straight to the
+ * target. Wi-Fi never links out.
+ */
+export function withTapLinks(
+  props: ShopPageProps,
+  code: string | null,
+  sign: (code: string, linkId: string) => string,
+): ShopPageProps {
+  if (!code) return props;
+  return {
+    ...props,
+    links: props.links.map((l) => (l.type === "wifi" ? l : { ...l, href: tapHref(code, l.id, sign(code, l.id)) })),
+  };
+}
+
 /** Old address -> the shop's current one, or null when `slug` is not an old address. */
 export async function redirectFor(store: PublicStore, slug: string): Promise<string | null> {
   if (checkSlug(slug) !== null) return null;
@@ -85,6 +103,7 @@ export async function lookupPublicPage(store: PublicStore, rawSlug: string): Pro
     return {
       kind: "page",
       props,
+      code: shop.code,
       title: props.shop.name,
       description: props.shop.tagline ?? `${props.shop.name} on one page: call, WhatsApp, directions and more.`,
     };

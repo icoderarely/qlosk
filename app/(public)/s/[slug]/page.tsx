@@ -4,7 +4,9 @@ import { cache, Suspense } from "react";
 import { ShopPage } from "@/components/shop-page/shop-page";
 import { getDb } from "@/lib/db";
 import { createPublicStore } from "@/lib/public-page-store";
-import { lookupPublicPage } from "@/services/public-page";
+import { trackingKeys } from "@/lib/tracking-env";
+import { lookupPublicPage, withTapLinks } from "@/services/public-page";
+import { signTapToken } from "@/services/tracking";
 
 // One lookup per request, shared by the page and its metadata.
 const lookup = cache((slug: string) => lookupPublicPage(createPublicStore(getDb()), slug));
@@ -30,5 +32,9 @@ async function Shop({ params }: { params: PageProps<"/s/[slug]">["params"] }) {
   const result = await lookup((await params).slug);
   if (result.kind === "redirect") permanentRedirect(`/s/${result.slug}`);
   if (result.kind === "notfound") notFound();
-  return <ShopPage {...result.props} />;
+  // Made per request, after the data read, so the time is request time.
+  const { tokenKey } = trackingKeys();
+  const now = new Date();
+  const props = withTapLinks(result.props, result.code, (code, linkId) => signTapToken(tokenKey, code, linkId, now));
+  return <ShopPage {...props} />;
 }

@@ -21,6 +21,7 @@ function fakeStore() {
   const shops = new Map<string, StoredShop>();
   const history: { shopId: string; oldSlug: string }[] = [];
   const log: string[] = [];
+  const undo: unknown[] = [];
   let next = 0;
   const blank = (id: string, slug: string, c: ShopColumns): StoredShop => ({
     id, slug, name: c.name, tagline: c.tagline, shopType: c.shopType, area: null, city: null,
@@ -58,7 +59,8 @@ function fakeStore() {
         if (i >= 0) history.splice(i, 1);
         history.push({ shopId: id, oldSlug: slugChange.from });
       }
-      log.push(...logs);
+      log.push(...logs.map((l) => l.what));
+      undo.push(...logs.map((l) => l.undo ?? null));
     },
     async publish({ id, config, columns, links }) {
       const s = shops.get(id)!;
@@ -67,7 +69,7 @@ function fakeStore() {
       log.push("Published page");
     },
   };
-  return { store, shops, history, log };
+  return { store, shops, history, log, undo };
 }
 
 // Fixed button ids, so two calls to values() describe the same buttons.

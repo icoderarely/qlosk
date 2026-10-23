@@ -1,3 +1,9 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { undoShopChange } from "@/app/admin/shops/editor-actions";
+import { Button } from "../button";
 import { Card } from "../card";
 import { FieldRow } from "../form-field";
 import { formatNumber } from "../format";
@@ -8,23 +14,47 @@ function count(n: number | null): string {
 }
 
 export function ActivityTab({
+  shopId,
   changes,
   traffic,
+  canEdit,
 }: {
+  shopId: string | null;
   changes: ChangeRow[];
   traffic: Traffic;
+  canEdit: boolean;
 }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+
+  function undo(changeId: string) {
+    if (!shopId) return;
+    setMessage(null);
+    startTransition(async () => {
+      try {
+        const r = await undoShopChange(shopId, changeId);
+        setMessage(r.ok ? { ok: true, text: "Change undone." } : { ok: false, text: r.error });
+        if (r.ok) router.refresh();
+      } catch {
+        setMessage({ ok: false, text: "You do not have permission to undo changes." });
+      }
+    });
+  }
+
   return (
     <>
       <Card>
         <h2 className="m-0 mb-1.5 text-base font-extrabold">Recent changes</h2>
+        <div role="status" className={message ? "pb-2 text-[13px] font-bold" : "sr-only"}>
+          {message ? <span className={message.ok ? "" : "text-chip-over-fg"}>{message.text}</span> : null}
+        </div>
         {changes.length === 0 ? (
           <p className="m-0 border-t border-line-soft py-3 text-muted">No changes yet.</p>
         ) : (
           <ul className="m-0 list-none p-0">
-            {/* TODO(slice 5): Undo, from change_log.undo_payload */}
             {changes.map((c) => (
-              <li key={`${c.when}-${c.what}`} className="flex items-center gap-3 border-t border-line-soft py-3">
+              <li key={c.id} className="flex items-center gap-3 border-t border-line-soft py-3">
                 <span
                   aria-hidden="true"
                   className="size-2.5 flex-none self-start rounded-full bg-accent mt-1.5"
@@ -35,6 +65,11 @@ export function ActivityTab({
                     {c.who} · {c.when}
                   </div>
                 </div>
+                {canEdit && c.canUndo ? (
+                  <Button disabled={pending} aria-label={`Undo: ${c.what}`} onClick={() => undo(c.id)} className="disabled:cursor-not-allowed disabled:opacity-50">
+                    Undo
+                  </Button>
+                ) : null}
               </li>
             ))}
           </ul>

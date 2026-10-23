@@ -17,7 +17,7 @@ import { DetailsTab } from "./details-tab";
 import { LookTab } from "./look-tab";
 import { OffersTab } from "./offers-tab";
 import { Preview } from "./preview";
-import { QrPlanTab } from "./qr-plan-tab";
+import { QrPlanTab, type QrChoices } from "./qr-plan-tab";
 import type { EditorState, SetEditor } from "./state";
 
 type TabId = "details" | "buttons" | "look" | "offers" | "qrplan" | "activity";
@@ -43,12 +43,14 @@ export function ShopEditor({
   canEdit,
   enabledThemes,
   enabledLayouts,
+  qrChoices,
 }: {
   data: ShopEditorData;
   shopTypes: ShopTypeOption[];
   canEdit: boolean;
   enabledThemes: ThemeId[];
   enabledLayouts: LayoutId[];
+  qrChoices: QrChoices;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -61,6 +63,21 @@ export function ShopEditor({
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const dirty = JSON.stringify(state) !== saved;
+
+  // The page data is reloaded after a save, an Undo or a status change. When it
+  // changes and there are no unsaved edits, take it (an Undo changes the draft);
+  // with unsaved edits, keep what is on screen.
+  const serverJson = JSON.stringify(data.values);
+  const [seenServer, setSeenServer] = useState(serverJson);
+  if (seenServer !== serverJson) {
+    setSeenServer(serverJson);
+    setHasUnpublished(data.hasUnpublished);
+    setPublished(data.published);
+    if (!dirty) {
+      setState(data.values);
+      setSaved(serverJson);
+    }
+  }
 
   // Leaving with edits that were never saved loses them, so ask first.
   useEffect(() => {
@@ -198,10 +215,18 @@ export function ShopEditor({
             ) : null}
             {tab === "offers" ? <OffersTab state={state} set={set} /> : null}
             {tab === "qrplan" ? (
-              <QrPlanTab state={state} set={set} info={{ code: data.code, plan: data.plan }} />
+              (
+              <QrPlanTab
+                state={state}
+                set={set}
+                info={{ shopId, status: data.status, code: data.code, plan: data.plan }}
+                choices={qrChoices}
+                canEdit={canEdit}
+              />
+            )
             ) : null}
             {tab === "activity" ? (
-              <ActivityTab changes={data.changes} traffic={data.traffic} />
+              <ActivityTab shopId={shopId} changes={data.changes} traffic={data.traffic} canEdit={canEdit} />
             ) : null}
           </div>
         </fieldset>

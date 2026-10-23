@@ -19,6 +19,7 @@ export default async function Page() {
       data={newShopData()}
       shopTypes={shopTypes}
       canEdit
+      qrChoices={{ stock: [], shops: [] }}
       enabledThemes={THEME_IDS.filter((t) => settings.enabledThemes[t])}
       enabledLayouts={LAYOUT_IDS.filter((l) => settings.enabledLayouts[l])}
     />
