@@ -1,41 +1,52 @@
 import type { Metadata } from "next";
-import { Button, LinkButton } from "@/components/admin/button";
+import { ActionLink } from "@/components/admin/action-link";
+import { LinkButton } from "@/components/admin/button";
 import { Card } from "@/components/admin/card";
 import { DataTable, Td, Th } from "@/components/admin/data-table";
-import { formatCode, formatScans } from "@/components/admin/format";
-import { ICON_CHEVRON_DOWN, ICON_PLUS } from "@/components/admin/icons";
+import { formatCode, formatNumber, formatScans } from "@/components/admin/format";
+import { ICON_PLUS } from "@/components/admin/icons";
 import { PageHeader } from "@/components/admin/page-header";
+import { RangePicker } from "@/components/admin/range-picker";
 import { ScansChart } from "@/components/admin/scans-chart";
 import { StatCard, StatRow } from "@/components/admin/stat-card";
 import { StatusChip } from "@/components/admin/status-chip";
+import { getDb } from "@/lib/db";
 import { requireRole } from "@/lib/require-role";
-import { getOverview } from "@/services/stats";
+import { createStatsStore } from "@/lib/stats-store";
+import { getOverview, parseRange } from "@/services/stats";
 
 export const metadata: Metadata = { title: "Overview" };
 
-export default async function Page() {
-  await requireRole("viewer");
-  const overview = await getOverview();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const user = await requireRole("viewer");
+  const range = parseRange((await searchParams).range);
+  const overview = await getOverview(createStatsStore(getDb()), range);
+  const canEdit = user.role !== "viewer";
 
   return (
     <>
       <PageHeader
         title="Overview"
-        subtitle="Everything across your shops, last 30 days."
+        subtitle={`Everything across your shops, last ${range} days. Numbers are updated nightly.`}
         actions={
           <>
-            {/* TODO(slice 8): date range picker */}
-            <Button iconAfter={ICON_CHEVRON_DOWN}>Last 30 days</Button>
-            <LinkButton href="/admin/shops/new" variant="primary" icon={ICON_PLUS}>
-              New shop
-            </LinkButton>
+            <RangePicker value={range} />
+            {canEdit ? (
+              <LinkButton href="/admin/shops/new" variant="primary" icon={ICON_PLUS}>
+                New shop
+              </LinkButton>
+            ) : null}
           </>
         }
       />
 
       <StatRow>
         {overview.kpis.map((k) => (
-          <StatCard key={k.label} label={k.label} value={k.value} note={k.note} tone={k.tone} />
+          <StatCard key={k.label} label={k.label} value={formatNumber(Number(k.value))} note={k.note} tone={k.tone} />
         ))}
       </StatRow>
 
@@ -45,10 +56,13 @@ export default async function Page() {
             <h2 className="m-0 text-base font-extrabold">Scans per day</h2>
             <span className="text-[13px] text-muted">Counted scans, all shops</span>
           </div>
-          <ScansChart series={overview.scansSeries} axis={overview.scansAxis} />
+          <ScansChart series={overview.scansSeries} axis={overview.scansAxis} days={overview.range} />
         </Card>
         <Card aria-label="Most used buttons" className="flex flex-[1_1_300px] flex-col gap-3.5 p-5">
           <h2 className="m-0 text-base font-extrabold">Most used buttons</h2>
+          {overview.buttons.length === 0 ? (
+            <p className="m-0 text-muted">No button taps in this period yet.</p>
+          ) : null}
           {overview.buttons.map((b) => (
             <div key={b.label} className="flex flex-col gap-1.5">
               <div className="flex justify-between font-semibold">
@@ -56,10 +70,7 @@ export default async function Page() {
                 <span className="text-muted">{b.percent}%</span>
               </div>
               <div className="h-2 rounded-full bg-line-soft">
-                <div
-                  className="h-full rounded-full bg-accent"
-                  style={{ width: `${b.percent}%` }}
-                />
+                <div className="h-full rounded-full bg-accent" style={{ width: `${b.percent}%` }} />
               </div>
             </div>
           ))}
@@ -69,17 +80,19 @@ export default async function Page() {
       <div className="flex flex-wrap items-start gap-4">
         <Card aria-label="Needs attention" className="flex-[1_1_340px] p-5">
           <h2 className="m-0 mb-2 text-base font-extrabold">Needs attention</h2>
-          {/* TODO(slice 8): each action sends the reminder or opens the shop */}
+          {overview.attention.length === 0 ? <p className="m-0 text-muted">Nothing needs attention.</p> : null}
           {overview.attention.map((a) => (
             <div
-              key={a.title}
+              key={`${a.title}-${a.detail}`}
               className="flex items-center justify-between gap-3 border-t border-line-soft py-3"
             >
               <div className="min-w-0">
                 <div className="font-bold">{a.title}</div>
                 <div className="text-[13px] text-muted">{a.detail}</div>
               </div>
-              <Button aria-label={`${a.action}: ${a.title}, ${a.detail}`}>{a.action}</Button>
+              <ActionLink href={a.href} external={a.external} label={`${a.action}: ${a.title}, ${a.detail}`}>
+                {a.action}
+              </ActionLink>
             </div>
           ))}
         </Card>
@@ -89,30 +102,33 @@ export default async function Page() {
             <h2 className="m-0 text-base font-extrabold">Recent shops</h2>
             <LinkButton href="/admin/shops">View all shops</LinkButton>
           </div>
-          <DataTable
-            minWidth={540}
-            head={
-              <>
-                <Th>Shop</Th>
-                <Th>Code</Th>
-                <Th>Plan</Th>
-                <Th className="text-right">Scans, 30 days</Th>
-                <Th>Status</Th>
-              </>
-            }
-          >
-            {overview.recentShops.map((r) => (
-              <tr key={r.id}>
-                <Td className="font-bold">{r.name}</Td>
-                <Td className="font-code text-[13px]">{formatCode(r.code)}</Td>
-                <Td>{r.plan}</Td>
-                <Td className="text-right font-semibold">{formatScans(r.scans)}</Td>
-                <Td>
-                  <StatusChip status={r.status} />
-                </Td>
-              </tr>
-            ))}
-          </DataTable>
+          {overview.recentShops.length === 0 ? <p className="m-0 text-muted">No shops yet.</p> : null}
+          {overview.recentShops.length > 0 ? (
+            <DataTable
+              minWidth={540}
+              head={
+                <>
+                  <Th>Shop</Th>
+                  <Th>Code</Th>
+                  <Th>Plan</Th>
+                  <Th className="text-right">Scans, {overview.range} days</Th>
+                  <Th>Status</Th>
+                </>
+              }
+            >
+              {overview.recentShops.map((r) => (
+                <tr key={r.id}>
+                  <Td className="font-bold">{r.name}</Td>
+                  <Td className="font-code text-[13px]">{formatCode(r.code)}</Td>
+                  <Td>{r.plan}</Td>
+                  <Td className="text-right font-semibold">{formatScans(r.scans)}</Td>
+                  <Td>
+                    <StatusChip status={r.status} />
+                  </Td>
+                </tr>
+              ))}
+            </DataTable>
+          ) : null}
         </Card>
       </div>
     </>

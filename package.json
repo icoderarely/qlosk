@@ -14,7 +14,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
     "db:seed": "node prisma/seed.ts",
-    "db:seed:shops": "node prisma/seed-shops.ts"
+    "db:seed:shops": "node prisma/seed-shops.ts",
+    "db:seed:events": "node prisma/seed-events.ts"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",

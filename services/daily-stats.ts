@@ -12,8 +12,12 @@ export type DayRow = {
   taps: number;
   botScans: number;
   botTaps: number;
+  /** Part of botScans: scans held for review (spike_review). */
+  heldScans: number;
   /** Counted taps per link id. */
   tapsByLink: Record<string, number>;
+  /** Flagged scans and taps by bot_reason. */
+  flagReasons: Record<string, number>;
 };
 
 export type RollupStore = {
@@ -50,4 +54,12 @@ export async function rebuildDailyStats(
     shops += rows.length;
   }
   return { days: list, shops };
+}
+
+/** Rebuilds exactly these India days (YYYY-MM-DD), for when an admin's decision changes old events. */
+export async function rebuildDays(store: RollupStore, days: string[]): Promise<void> {
+  for (const day of [...new Set(days)]) {
+    const { from, to } = dayRange(day);
+    await store.replaceDay(day, await store.aggregate(from, to));
+  }
 }
