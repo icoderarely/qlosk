@@ -87,17 +87,14 @@ export function PlaygroundSection({
   const name = look.name.trim() || sample.shop.name;
 
   return (
-    <section aria-labelledby="pg-title" className="mx-auto w-full max-w-[1100px] px-4 py-8">
-      <h1 id="pg-title" className="m-0 text-3xl font-bold tracking-tight text-neutral-900">
+    <section aria-labelledby="pg-title" className="mx-auto w-full max-w-[1100px] px-4 pb-24 pt-5 lg:pb-5">
+      <h1 id="pg-title" className="m-0 text-2xl font-bold tracking-tight text-neutral-900">
         Try a look for your shop
       </h1>
-      <p className="mt-2 max-w-[60ch] text-neutral-700">
-        Pick a shop type, then a theme, layout and font. The phone shows your page as customers
-        would see it. The sample shop is made up.
-      </p>
 
-      <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start">
-        <div className="flex min-w-0 flex-1 flex-col gap-7">
+      <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="flex min-w-0 flex-1 flex-col gap-5">
+          <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
           <Group title="Shop type">
             <div className="flex flex-wrap gap-2">
               {SHOP_TYPE_IDS.map((id) => (
@@ -118,7 +115,7 @@ export function PlaygroundSection({
             </div>
           </Group>
 
-          <div>
+          <div className="min-w-0 flex-[1_1_220px]">
             <label htmlFor="pg-name" className="mb-1.5 block text-sm font-bold text-neutral-900">
               Your shop name
             </label>
@@ -129,12 +126,13 @@ export function PlaygroundSection({
               maxLength={MAX_NAME_LENGTH}
               placeholder={sample.shop.name}
               onChange={(e) => update({ name: cleanName(e.target.value) })}
-              className={`box-border min-h-11 w-full max-w-md rounded-[10px] border border-neutral-400 bg-white px-3 text-neutral-900 placeholder:text-neutral-600 ${FOCUS}`}
+              className={`box-border min-h-11 w-full rounded-[10px] border border-neutral-400 bg-white px-3 text-neutral-900 placeholder:text-neutral-600 ${FOCUS}`}
             />
+          </div>
           </div>
 
           <Group title="Theme">
-            <Grid>
+            <Grid fiveAcross>
               {themes.map((t) => {
                 const sw = themeSwatch(t.id);
                 const on = look.theme === t.id;
@@ -156,7 +154,6 @@ export function PlaygroundSection({
                       <span className="h-2 rounded" style={{ background: sw.card, border: `1px solid ${sw.line}` }} />
                     </span>
                     <span className="font-bold">{t.name}{on ? <span className="sr-only"> (selected)</span> : null}</span>
-                    <span className="-mt-1 text-xs text-neutral-700">{t.note}</span>
                   </button>
                 );
               })}
@@ -164,7 +161,7 @@ export function PlaygroundSection({
           </Group>
 
           <Group title="Layout">
-            <Grid>
+            <Grid fiveAcross>
               {layouts.map((l) => {
                 const on = look.layout === l.id;
                 return (
@@ -180,7 +177,6 @@ export function PlaygroundSection({
                       <path d={l.d1} fill="#16181D" />
                     </svg>
                     <span className="font-bold">{l.name}{on ? <span className="sr-only"> (selected)</span> : null}</span>
-                    <span className="-mt-1 text-xs text-neutral-700">{l.note}</span>
                   </button>
                 );
               })}
@@ -202,7 +198,7 @@ export function PlaygroundSection({
                   >
                     <span className={pack.className} aria-hidden="true">
                       <span
-                        className="block text-[28px] leading-[1.4]"
+                        className="block text-[22px] leading-[1.3]"
                         style={{ fontFamily: pack.head, fontWeight: f.id === "rounded" ? 800 : 700 }}
                       >
                         Aa Gg
@@ -216,23 +212,18 @@ export function PlaygroundSection({
             </Grid>
           </Group>
 
-          <div>
-            <a
-              href={whatsappLink(look, labels, whatsappNumber)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`inline-flex min-h-12 items-center justify-center rounded-xl bg-[#0B6B3A] px-6 font-bold text-white ${FOCUS}`}
-            >
-              Get this for my shop
-              <span className="sr-only"> (opens WhatsApp)</span>
-            </a>
-            <p className="mt-2 text-sm text-neutral-700">
-              Opens WhatsApp with a message that names your choices.
-            </p>
-          </div>
         </div>
 
-        <div className="flex flex-none justify-center lg:sticky lg:top-6 lg:w-[434px]">
+        <div className="flex flex-none flex-col items-center gap-3 lg:sticky lg:top-4 lg:w-[434px]">
+          <a
+            href={whatsappLink(look, labels, whatsappNumber)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex min-h-12 w-full max-w-[410px] items-center justify-center rounded-xl bg-[#0B6B3A] px-6 font-bold text-white shadow-lg max-lg:fixed max-lg:inset-x-4 max-lg:bottom-4 max-lg:z-10 max-lg:w-auto max-lg:max-w-none ${FOCUS}`}
+          >
+            Get this for my shop
+            <span className="sr-only"> (opens WhatsApp with your choices)</span>
+          </a>
           <Phone>
             <ShopPage
               theme={look.theme}
@@ -260,9 +251,25 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function Grid({ min = 130, children }: { min?: number; children: React.ReactNode }) {
+function Grid({
+  min = 130,
+  fiveAcross = false,
+  children,
+}: {
+  min?: number;
+  /** Five options on one line from the sm breakpoint up. */
+  fiveAcross?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="grid gap-2.5" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))` }}>
+    <div
+      className={`grid gap-2.5 ${fiveAcross ? "grid-cols-2 sm:grid-cols-5" : ""}`}
+      style={
+        fiveAcross
+          ? undefined
+          : { gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))` }
+      }
+    >
       {children}
     </div>
   );
@@ -277,11 +284,24 @@ function Phone({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const fit = () => setScale(Math.min(1, el.clientWidth / (SCREEN_W + FRAME_PAD * 2)));
+    const full = SCREEN_W + FRAME_PAD * 2;
+    const fit = () => {
+      const byWidth = el.clientWidth / full;
+      // Side by side on desktop: also fit the height, leaving room for the button.
+      const byHeight =
+        window.innerWidth >= 1024
+          ? (window.innerHeight - 170) / (SCREEN_H + FRAME_PAD * 2)
+          : Infinity;
+      setScale(Math.max(0.45, Math.min(1, byWidth, byHeight)));
+    };
+    window.addEventListener("resize", fit);
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", fit);
+    };
   }, []);
 
   const w = (SCREEN_W + FRAME_PAD * 2) * scale;
