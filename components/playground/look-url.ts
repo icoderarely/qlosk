@@ -11,6 +11,7 @@ import {
 import { SHOP_TYPE_IDS, type ShopTypeId } from "./samples.ts";
 
 export const MAX_NAME_LENGTH = 40;
+export const MAX_TAGLINE_LENGTH = 80;
 
 export type PlaygroundLook = {
   theme: ThemeId;
@@ -19,6 +20,8 @@ export type PlaygroundLook = {
   type: ShopTypeId;
   /** Typed shop name. Empty means "use the sample name". */
   name: string;
+  /** Typed tagline. Empty means "use the sample tagline". */
+  tagline: string;
 };
 
 export const DEFAULT_LOOK: PlaygroundLook = {
@@ -27,6 +30,7 @@ export const DEFAULT_LOOK: PlaygroundLook = {
   font: "clean",
   type: "salon",
   name: "",
+  tagline: "",
 };
 
 type Params = Record<string, string | string[] | undefined>;
@@ -67,11 +71,16 @@ export function parseLook(
     layout: pick(one(params, "layout"), layouts, suggested?.layout ?? DEFAULT_LOOK.layout),
     font: pick(one(params, "font"), FONT_IDS, DEFAULT_LOOK.font),
     name: cleanName(one(params, "name") ?? ""),
+    tagline: cleanTagline(one(params, "tagline") ?? ""),
   };
 }
 
 export function cleanName(raw: string): string {
   return raw.replace(/\s+/g, " ").trimStart().slice(0, MAX_NAME_LENGTH);
+}
+
+export function cleanTagline(raw: string): string {
+  return raw.replace(/\s+/g, " ").trimStart().slice(0, MAX_TAGLINE_LENGTH);
 }
 
 export function lookToQuery(look: PlaygroundLook): string {
@@ -83,6 +92,8 @@ export function lookToQuery(look: PlaygroundLook): string {
   });
   const name = look.name.trim();
   if (name) q.set("name", name);
+  const tagline = look.tagline.trim();
+  if (tagline) q.set("tagline", tagline);
   return q.toString();
 }
 

@@ -10,7 +10,7 @@ import {
 
 describe("playground look URL", () => {
   it("reopens the same look from a copied URL", () => {
-    const look = { theme: "nightfall", layout: "cover", font: "editorial", type: "gym", name: "Iron Works" } as const;
+    const look = { theme: "nightfall", layout: "cover", font: "editorial", type: "gym", name: "Iron Works", tagline: "Strong every day" } as const;
     const params = Object.fromEntries(new URLSearchParams(lookToQuery(look)));
     assert.deepEqual(parseLook(params), look);
   });

@@ -14,6 +14,8 @@ import {
   DEFAULT_LOOK,
   MAX_NAME_LENGTH,
   cleanName,
+  cleanTagline,
+  MAX_TAGLINE_LENGTH,
   lookToQuery,
   whatsappLink,
   type PlaygroundLook,
@@ -85,6 +87,7 @@ export function PlaygroundSection({
     type: sample.label,
   };
   const name = look.name.trim() || sample.shop.name;
+  const tagline = look.tagline.trim() || sample.shop.tagline || null;
 
   return (
     <section aria-labelledby="pg-title" className="mx-auto w-full max-w-[1100px] px-4 pb-24 pt-5 lg:pb-0">
@@ -126,6 +129,21 @@ export function PlaygroundSection({
               maxLength={MAX_NAME_LENGTH}
               placeholder={sample.shop.name}
               onChange={(e) => update({ name: cleanName(e.target.value) })}
+              className={`box-border min-h-11 w-full rounded-[10px] border border-neutral-400 bg-white px-3 text-neutral-900 placeholder:text-neutral-600 ${FOCUS}`}
+            />
+          </div>
+
+          <div className="min-w-0 flex-[1_1_220px]">
+            <label htmlFor="pg-tagline" className="mb-1.5 block text-sm font-bold text-neutral-900">
+              Your tagline
+            </label>
+            <input
+              id="pg-tagline"
+              type="text"
+              value={look.tagline}
+              maxLength={MAX_TAGLINE_LENGTH}
+              placeholder={sample.shop.tagline ?? undefined}
+              onChange={(e) => update({ tagline: cleanTagline(e.target.value) })}
               className={`box-border min-h-11 w-full rounded-[10px] border border-neutral-400 bg-white px-3 text-neutral-900 placeholder:text-neutral-600 ${FOCUS}`}
             />
           </div>
@@ -230,7 +248,7 @@ export function PlaygroundSection({
               theme={look.theme}
               layout={look.layout}
               font={look.font}
-              shop={{ ...sample.shop, name }}
+              shop={{ ...sample.shop, name, tagline }}
               links={sample.links}
               offer={sample.offer}
               wifi={sample.wifi}
