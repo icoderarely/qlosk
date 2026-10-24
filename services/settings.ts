@@ -31,15 +31,21 @@ export type ShopTypeOption = {
   suggested: SuggestedLook | null;
 };
 
+/** Dropdown choice for a business that fits none of the types. */
+export const OTHER_SHOP_TYPE = "Other";
+
 // The shop types are fixed; the suggested look for each is what Settings edits.
 // These are the starting suggestions, used until someone changes them.
 export const DEFAULT_SHOP_TYPES: ShopTypeOption[] = [
   { label: "Salon and spa", plural: "salons", suggested: { theme: "blush", layout: "list" } },
   { label: "Clinic", plural: "clinics", suggested: { theme: "daylight", layout: "list" } },
   { label: "Gym", plural: "gyms", suggested: { theme: "nightfall", layout: "index" } },
+  { label: "Restaurant", plural: "restaurants", suggested: { theme: "marigold", layout: "tiles" } },
   { label: "Cafe and bakery", plural: "cafes and bakeries", suggested: { theme: "marigold", layout: "tiles" } },
   { label: "Jeweller", plural: "jewellers", suggested: { theme: "graphite", layout: "cover" } },
   { label: "Boutique", plural: "boutiques", suggested: null },
+  // Anything else: the editor asks for the kind of business and saves that text.
+  { label: OTHER_SHOP_TYPE, plural: "shops", suggested: null },
 ];
 
 export const FILTER_ROWS: { id: keyof FilterSettings; label: string; switchLabel: string }[] = [

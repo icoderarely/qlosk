@@ -61,7 +61,7 @@ export function LookTab({
             ) : undefined
           }
         />
-        <OptionGrid>
+        <OptionGrid row>
           {THEME_OPTIONS.filter((t) => enabledThemes.includes(t.id) || t.id === look.theme).map((t) => {
             const sw = themeSwatch(t.id);
             return (
@@ -93,7 +93,7 @@ export function LookTab({
 
       <Card className={SECTION}>
         <CardHeading title="Layout" description="How the buttons are arranged." />
-        <OptionGrid>
+        <OptionGrid row>
           {LAYOUT_OPTIONS.filter((l) => enabledLayouts.includes(l.id) || l.id === look.layout).map((l) => (
             <OptionCard key={l.id} pressed={look.layout === l.id} onClick={() => pickLayout(l.id)}>
               <svg

@@ -35,15 +35,18 @@ export function OptionCard({
 
 export function OptionGrid({
   min = 150,
+  row = false,
   children,
 }: {
   min?: number;
+  /** One line that scrolls sideways instead of wrapping onto more rows. */
+  row?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div
-      className="grid gap-3"
-      style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))` }}
+      className={row ? "grid auto-cols-[minmax(150px,1fr)] grid-flow-col gap-3 overflow-x-auto p-0.5" : "grid gap-3"}
+      style={row ? undefined : { gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))` }}
     >
       {children}
     </div>

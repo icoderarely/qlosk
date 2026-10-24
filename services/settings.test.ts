@@ -24,9 +24,11 @@ const SUGGESTIONS = {
   "Salon and spa": { theme: "blush", layout: "list" },
   Clinic: { theme: "daylight", layout: "list" },
   Gym: { theme: "nightfall", layout: "index" },
+  Restaurant: { theme: "marigold", layout: "tiles" },
   "Cafe and bakery": { theme: "marigold", layout: "tiles" },
   Jeweller: { theme: "graphite", layout: "cover" },
   Boutique: null,
+  Other: null,
 };
 const form = (extra: Record<string, unknown> = {}) => ({
   themes: ALL_THEMES,

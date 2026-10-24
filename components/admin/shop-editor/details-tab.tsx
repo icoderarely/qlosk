@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { Card, CardHeading } from "../card";
 import { FieldRow, SelectField, TextField, TextareaField } from "../form-field";
 import { initials } from "../../shop-page/links";
-import type { ShopTypeOption } from "@/services/settings";
+import { OTHER_SHOP_TYPE, type ShopTypeOption } from "@/services/settings";
 import { newLink } from "@/services/shop-editor";
 import type { LinkType } from "../../shop-page/types";
 import { ImageUpload } from "./image-upload";
@@ -36,8 +37,11 @@ export function DetailsTab({
     }
   };
   const upd = (patch: Partial<typeof d>) => set("details", { ...d, ...patch });
-  const typeLabels = shopTypes.map((t) => t.label);
-  if (!typeLabels.includes(d.shopType)) typeLabels.push(d.shopType);
+  // A type that is not in the list is the owner's own words: the dropdown shows
+  // Other and a text field holds what they wrote.
+  const listed = shopTypes.some((t) => t.label === d.shopType && t.label !== OTHER_SHOP_TYPE);
+  const [otherPicked, setOtherPicked] = useState(false);
+  const isOther = otherPicked || !listed;
 
   return (
     <>
@@ -48,13 +52,31 @@ export function DetailsTab({
           <TextField label="Tagline" value={d.tagline} onChange={(e) => upd({ tagline: e.target.value })} />
         </FieldRow>
         <FieldRow>
-          <SelectField label="Shop type" value={d.shopType} onChange={(e) => upd({ shopType: e.target.value })}>
-            {typeLabels.map((t) => (
-              <option key={t}>{t}</option>
+          <SelectField
+            label="Shop type"
+            value={isOther ? OTHER_SHOP_TYPE : d.shopType}
+            onChange={(e) => {
+              const v = e.target.value;
+              setOtherPicked(v === OTHER_SHOP_TYPE);
+              upd({ shopType: v === OTHER_SHOP_TYPE ? "" : v });
+            }}
+          >
+            {shopTypes.map((t) => (
+              <option key={t.label}>{t.label}</option>
             ))}
           </SelectField>
           <TextField label="Area and city" value={d.areaCity} onChange={(e) => upd({ areaCity: e.target.value })} />
         </FieldRow>
+        {isOther ? (
+          <TextField
+            block
+            label="What kind of business is it?"
+            placeholder="[for example: pharmacy, tutor, repair shop]"
+            maxLength={60}
+            value={d.shopType}
+            onChange={(e) => upd({ shopType: e.target.value })}
+          />
+        ) : null}
         <TextField
           block
           label="Full address"
