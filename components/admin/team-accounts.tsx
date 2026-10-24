@@ -13,8 +13,8 @@ import { Chip } from "./chip";
 import { SelectField, TextField } from "./form-field";
 import { ICON_PLUS } from "./icons";
 import type { TeamMember } from "@/services/team";
+import { notify } from "./notify";
 
-type Notice = { ok: boolean; text: string } | null;
 type Open = { kind: "add" } | { kind: "reset" | "remove"; id: string } | null;
 
 function Row({ children }: { children: React.ReactNode }) {
@@ -26,13 +26,11 @@ function Row({ children }: { children: React.ReactNode }) {
 export function TeamAccounts({ members, canManage }: { members: TeamMember[]; canManage: boolean }) {
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState<Open>(null);
-  const [notice, setNotice] = useState<Notice>(null);
 
   function run(action: () => Promise<{ ok: true; message: string } | { ok: false; error: string }>, close = true) {
-    setNotice(null);
     startTransition(async () => {
       const result = await action();
-      setNotice(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
+      notify(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
       if (result.ok && close) setOpen(null);
     });
   }
@@ -50,9 +48,6 @@ export function TeamAccounts({ members, canManage }: { members: TeamMember[]; ca
           ) : null
         }
       />
-      <p role="status" className={`m-0 min-h-5 text-[13px] font-semibold ${notice?.ok === false ? "text-chip-over-fg" : "text-chip-live-fg"}`}>
-        {notice?.text}
-      </p>
 
       {open?.kind === "add" ? (
         <form

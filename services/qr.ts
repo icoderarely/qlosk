@@ -96,6 +96,8 @@ export type QrStore = {
   /** Back to stock. Only for Undo of an assignment: the code must still belong to `shopId`. */
   release(args: { code: string; shopId: string; userEmail: string }): Promise<Decision>;
   retire(args: { code: string; userEmail: string }): Promise<Decision>;
+  /** Removes these codes, but only the ones still unassigned. Returns how many went. */
+  deleteUnassigned(codes: string[]): Promise<number>;
   find(code: string): Promise<QrRecord | null>;
 };
 
@@ -180,6 +182,23 @@ export async function reassignCode(store: QrStore, rawCode: string, toShopId: st
 
 export async function retireCode(store: QrStore, rawCode: string, userEmail: string): Promise<Decision> {
   return store.retire({ code: normalizeCode(rawCode), userEmail });
+}
+
+export type DeleteResult = { ok: true; count: number } | { ok: false; error: string };
+
+// Only codes in stock can be deleted. An assigned code is on a shop's printed
+// QR, and a retired one stays so it is never handed out again.
+export async function deleteCodes(store: QrStore, rawCodes: unknown): Promise<DeleteResult> {
+  if (!Array.isArray(rawCodes) || rawCodes.some((c) => typeof c !== "string")) {
+    return { ok: false, error: "Choose the codes to delete." };
+  }
+  const codes = [...new Set((rawCodes as string[]).map(normalizeCode))];
+  if (codes.length === 0) return { ok: false, error: "Choose the codes to delete." };
+  if (codes.length > MAX_BATCH) return { ok: false, error: `Delete at most ${MAX_BATCH} codes at a time.` };
+  if (!codes.every(isValidCode)) return { ok: false, error: "One of those is not a valid code." };
+  const count = await store.deleteUnassigned(codes);
+  if (count === 0) return { ok: false, error: "Only unassigned codes can be deleted. Nothing was deleted." };
+  return { ok: true, count };
 }
 
 /** "12 minutes ago", for the Last scan column. */

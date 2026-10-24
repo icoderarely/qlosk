@@ -10,6 +10,7 @@ import { TextField, TextareaField } from "./form-field";
 import { ICON_PLUS } from "./icons";
 import { PageHeader } from "./page-header";
 import { ONBOARDING_STAGES, STAGE_INFO, type BoardCard, type OnboardingData } from "@/services/onboarding";
+import { notify } from "./notify";
 
 type Notice = { ok: boolean; text: string } | null;
 
@@ -129,13 +130,11 @@ export function OnboardingBoard({ data, canEdit }: { data: OnboardingData; canEd
   const { today, columns } = data;
   const [pending, startTransition] = useTransition();
   const [adding, setAdding] = useState(false);
-  const [notice, setNotice] = useState<Notice>(null);
 
   function move(card: BoardCard, stage: string) {
-    setNotice(null);
     startTransition(async () => {
       const result = await moveShopStage(card.id, stage);
-      setNotice(
+      notify(
         result.ok
           ? { ok: true, text: `${card.name} moved to ${STAGE_INFO[stage as keyof typeof STAGE_INFO].title}.` }
           : { ok: false, text: result.error },
@@ -161,14 +160,10 @@ export function OnboardingBoard({ data, canEdit }: { data: OnboardingData; canEd
         <NewLeadForm
           onDone={(n) => {
             setAdding(false);
-            setNotice(n);
+            notify(n);
           }}
         />
       ) : null}
-
-      <p role="status" className={`m-0 min-h-5 text-[13px] font-semibold ${notice?.ok === false ? "text-chip-over-fg" : "text-chip-live-fg"}`}>
-        {notice?.text}
-      </p>
 
       <Card aria-label="Today" className="flex flex-wrap items-center gap-x-5 gap-y-3 px-5 py-4">
         <h2 className="m-0 text-[15px] font-extrabold">Today</h2>

@@ -180,6 +180,11 @@ export function createQrStore(db: PrismaClient): QrStore {
       });
     },
 
+    async deleteUnassigned(codes) {
+      const r = await db.qrCode.deleteMany({ where: { code: { in: codes }, status: "unassigned", shopId: null } });
+      return r.count;
+    },
+
     async retire({ code, userEmail }) {
       return db.$transaction(async (tx) => {
         const first = await tx.qrCode.findUnique({ where: { code }, select: { shopId: true } });

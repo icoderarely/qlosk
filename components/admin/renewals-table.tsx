@@ -7,20 +7,19 @@ import { Card } from "./card";
 import { DataTable, Td, Th } from "./data-table";
 import { PaymentChip } from "./status-chip";
 import type { RenewalRow } from "@/services/billing";
+import { notify } from "./notify";
 
 // Mark as paid renews the plan, so it asks first: the first click turns the
 // button into "Confirm paid", a second click does it, Cancel backs out.
 export function RenewalsTable({ rows, canEdit }: { rows: RenewalRow[]; canEdit: boolean }) {
   const [pending, startTransition] = useTransition();
   const [confirming, setConfirming] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   function pay(row: RenewalRow) {
     setConfirming(null);
-    setMessage(null);
     startTransition(async () => {
       const result = await markShopPaid(row.shopId);
-      setMessage(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
+      notify(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
     });
   }
 
@@ -28,9 +27,6 @@ export function RenewalsTable({ rows, canEdit }: { rows: RenewalRow[]; canEdit: 
     <Card aria-label="Renewals" className="flex-[2_1_560px] overflow-hidden p-0">
       <div className="border-b border-line-soft px-5 py-4">
         <h2 className="m-0 text-base font-extrabold">Renewals</h2>
-        <p role="status" className={`m-0 min-h-5 text-[13px] font-semibold ${message?.ok === false ? "text-chip-over-fg" : "text-chip-live-fg"}`}>
-          {message?.text}
-        </p>
       </div>
       {rows.length === 0 ? <p className="m-0 px-5 py-4 text-muted">No shops on a plan yet.</p> : null}
       {rows.length > 0 ? (

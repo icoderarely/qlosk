@@ -1,24 +1,23 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { reviewUnusualTraffic } from "@/app/admin/reports/actions";
 import { Button } from "./button";
 import { Card } from "./card";
 import { Chip } from "./chip";
 import type { Unusual } from "@/services/stats";
+import { notify } from "./notify";
 
 // One card per shop with held scans. Count them puts the scans back into the
 // numbers; Mark as bots keeps them flagged. Both keep the events. A viewer
 // sees the card but no buttons.
 export function SpikeReviewCard({ item, total, canEdit }: { item: Unusual; total: number; canEdit: boolean }) {
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   function decide(decision: "count" | "mark_bots") {
-    setMessage(null);
     startTransition(async () => {
       const result = await reviewUnusualTraffic(item.shopId, decision);
-      setMessage(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
+      notify(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
     });
   }
 
@@ -42,9 +41,6 @@ export function SpikeReviewCard({ item, total, canEdit }: { item: Unusual; total
       ) : (
         <p className="m-0 text-[13px] text-muted">Only an admin can decide.</p>
       )}
-      <p role="status" className={`m-0 text-[13px] font-semibold ${message?.ok === false ? "text-chip-over-fg" : "text-chip-live-fg"}`}>
-        {message?.text}
-      </p>
     </Card>
   );
 }

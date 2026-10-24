@@ -10,6 +10,7 @@ import { TextField, FieldRow, SelectField } from "../form-field";
 import { ICON_DOWNLOAD } from "../icons";
 import { QrSample } from "../qr-sample";
 import type { TabProps } from "./state";
+import { notify } from "../notify";
 
 export type QrChoices = {
   /** Codes in stock. */
@@ -40,22 +41,20 @@ export function QrPlanTab({
   const [pending, startTransition] = useTransition();
   const [pick, setPick] = useState("");
   const [confirm, setConfirm] = useState<"retire" | "archive" | null>(null);
-  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   // Runs one server action, shows its answer, and reloads the page data.
   function run(action: () => Promise<{ ok: true; message?: string } | { ok: false; error: string }>) {
-    setMessage(null);
     startTransition(async () => {
       try {
         const r = await action();
-        setMessage(r.ok ? { ok: true, text: r.message ?? "Done." } : { ok: false, text: r.error });
+        notify(r.ok ? { ok: true, text: r.message ?? "Done." } : { ok: false, text: r.error });
         if (r.ok) {
           setPick("");
           setConfirm(null);
           router.refresh();
         }
       } catch {
-        setMessage({ ok: false, text: "You do not have permission to change this shop." });
+        notify({ ok: false, text: "You do not have permission to change this shop." });
       }
     });
   }
@@ -158,9 +157,6 @@ export function QrPlanTab({
               ) : null}
             </>
           )}
-          <div role="status" className={message ? "text-[13px] font-bold" : "sr-only"}>
-            {message ? <span className={message.ok ? "" : "text-chip-over-fg"}>{message.text}</span> : null}
-          </div>
         </div>
       </Card>
 

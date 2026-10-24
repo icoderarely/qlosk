@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { undoShopChange } from "@/app/admin/shops/editor-actions";
 import { Button } from "../button";
 import { Card } from "../card";
 import { FieldRow } from "../form-field";
 import { formatNumber } from "../format";
 import type { ChangeRow, Traffic } from "@/services/shop-editor";
+import { notify } from "../notify";
 
 function count(n: number | null): string {
   return n === null ? "—" : formatNumber(n);
@@ -26,18 +27,16 @@ export function ActivityTab({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   function undo(changeId: string) {
     if (!shopId) return;
-    setMessage(null);
     startTransition(async () => {
       try {
         const r = await undoShopChange(shopId, changeId);
-        setMessage(r.ok ? { ok: true, text: "Change undone." } : { ok: false, text: r.error });
+        notify(r.ok ? { ok: true, text: "Change undone." } : { ok: false, text: r.error });
         if (r.ok) router.refresh();
       } catch {
-        setMessage({ ok: false, text: "You do not have permission to undo changes." });
+        notify({ ok: false, text: "You do not have permission to undo changes." });
       }
     });
   }
@@ -46,9 +45,6 @@ export function ActivityTab({
     <>
       <Card>
         <h2 className="m-0 mb-1.5 text-base font-extrabold">Recent changes</h2>
-        <div role="status" className={message ? "pb-2 text-[13px] font-bold" : "sr-only"}>
-          {message ? <span className={message.ok ? "" : "text-chip-over-fg"}>{message.text}</span> : null}
-        </div>
         {changes.length === 0 ? (
           <p className="m-0 border-t border-line-soft py-3 text-muted">No changes yet.</p>
         ) : (

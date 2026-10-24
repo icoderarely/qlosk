@@ -1,4 +1,5 @@
 import { JetBrains_Mono, Manrope } from "next/font/google";
+import { Toaster } from "sonner";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -19,6 +20,7 @@ export function AdminRoot({ children }: { children: React.ReactNode }) {
       className={`${manrope.variable} ${jetbrains.variable} admin-root min-h-dvh bg-ground font-admin text-[14px] leading-[1.45] text-ink`}
     >
       {children}
+      <Toaster position="bottom-right" duration={3000} richColors closeButton />
     </div>
   );
 }

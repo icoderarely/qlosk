@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { assignQrCode, reassignQrCode, retireQrCode } from "@/app/admin/qr/actions";
+import { assignQrCode, deleteQrCodes, reassignQrCode, retireQrCode } from "@/app/admin/qr/actions";
 import { Button, DownloadButton } from "./button";
 import { Card } from "./card";
 import { Chip } from "./chip";
 import { DataTable, Td, Th } from "./data-table";
 import { SelectField, TextField } from "./form-field";
+import { QrPreviewDialog, QrThumb, type QrPreviewData } from "./qr-preview";
 import { Segmented } from "./segmented";
 import { formatAgo, type QrListQuery, type QrOverview, type QrRow, type QrStatus } from "@/services/qr";
+import { notify } from "./notify";
 
 type Filter = QrListQuery["status"];
 
@@ -30,10 +32,15 @@ export function QrCodesTable({
   overview,
   shops,
   canEdit,
+  qrSvgs,
+  qrBase,
 }: {
   overview: QrOverview;
   shops: { id: string; name: string }[];
   canEdit: boolean;
+  /** Code to QR image (SVG text), for the codes on this page. Empty when no QR address is set. */
+  qrSvgs: Record<string, string>;
+  qrBase: string | null;
 }) {
   const { rows, counts, query, page, pageCount, total } = overview;
   const router = useRouter();
@@ -41,12 +48,52 @@ export function QrCodesTable({
   const [pending, startTransition] = useTransition();
   const [search, setSearch] = useState(query.q);
   const [open, setOpen] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, startDelete] = useTransition();
+  const [preview, setPreview] = useState<QrPreviewData | null>(null);
   const now = new Date();
+
+  function previewOf(r: QrRow): QrPreviewData | null {
+    const svg = qrSvgs[r.code];
+    if (!svg || !qrBase) return null;
+    return { code: r.code, shopName: r.shopName, shopId: r.shopId, url: `${qrBase}/q/${r.code}`, svg };
+  }
+
+  // Only codes in stock can be deleted, so only those get a checkbox.
+  const deletable = rows.filter((r) => r.status === "unassigned").map((r) => r.code);
+  const allSelected = deletable.length > 0 && deletable.every((c) => selected.has(c));
+
+  function toggle(code: string) {
+    setConfirmDelete(false);
+    const next = new Set(selected);
+    if (!next.delete(code)) next.add(code);
+    setSelected(next);
+  }
+
+  function toggleAll() {
+    setConfirmDelete(false);
+    setSelected(allSelected ? new Set() : new Set(deletable));
+  }
+
+  function deleteSelected() {
+    startDelete(async () => {
+      try {
+        const r = await deleteQrCodes([...selected]);
+        notify(r.ok ? { ok: true, text: r.message } : { ok: false, text: r.error });
+        if (r.ok) setSelected(new Set());
+      } catch {
+        notify({ ok: false, text: "You do not have permission to delete codes." });
+      }
+      setConfirmDelete(false);
+      router.refresh();
+    });
+  }
 
   function go(change: Partial<QrListQuery>) {
     setOpen(null);
-    setMessage(null);
+    setSelected(new Set());
+    setConfirmDelete(false);
     startTransition(() => router.push(listHref(pathname, { ...query, page: 1, ...change })));
   }
 
@@ -84,16 +131,53 @@ export function QrCodesTable({
         </form>
       </div>
 
-      <div role="status" className={message ? "border-b border-line-soft px-4 py-2.5 font-bold" : "sr-only"}>
-        {message ? <span className={message.ok ? "" : "text-chip-over-fg"}>{message.text}</span> : null}
-      </div>
+      {canEdit && selected.size > 0 ? (
+        <div className="flex flex-wrap items-center gap-3 border-b border-line-soft bg-head px-4 py-2.5">
+          <span className="font-bold">
+            {selected.size} selected
+          </span>
+          {confirmDelete ? (
+            <>
+              <span className="font-bold">
+                Delete {selected.size} {selected.size === 1 ? "code" : "codes"} for good?
+              </span>
+              <Button variant="danger" disabled={deleting} onClick={deleteSelected}>
+                {deleting ? "Deleting" : "Yes, delete"}
+              </Button>
+              <Button variant="ghost" disabled={deleting} onClick={() => setConfirmDelete(false)}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+                Delete selected
+              </Button>
+              <Button variant="ghost" onClick={() => setSelected(new Set())}>
+                Clear selection
+              </Button>
+            </>
+          )}
+        </div>
+      ) : null}
 
       <DataTable
         minWidth={640}
         aria-label="QR codes"
         head={
           <>
-            <Th className="pl-4">Code</Th>
+            {canEdit ? (
+              <Th className="w-11 pl-4">
+                <Check
+                  label="Select all unassigned codes on this page"
+                  checked={allSelected}
+                  disabled={deletable.length === 0}
+                  onChange={toggleAll}
+                />
+              </Th>
+            ) : null}
+            <Th className={canEdit ? "" : "pl-4"}>QR</Th>
+            <Th>Code</Th>
             <Th>Status</Th>
             <Th>Shop</Th>
             <Th>Last scan</Th>
@@ -105,7 +189,7 @@ export function QrCodesTable({
       >
         {rows.length === 0 ? (
           <tr>
-            <Td colSpan={5} className="py-8 text-center text-muted">
+            <Td colSpan={7} className="py-8 text-center text-muted">
               No codes match.
             </Td>
           </tr>
@@ -117,13 +201,16 @@ export function QrCodesTable({
               now={now}
               canEdit={canEdit}
               shops={shops}
+              preview={previewOf(c)}
+              onPreview={setPreview}
+              selected={selected.has(c.code)}
+              onSelect={() => toggle(c.code)}
               open={open === c.code}
               onToggle={() => {
-                setMessage(null);
                 setOpen(open === c.code ? null : c.code);
               }}
               onDone={(m) => {
-                setMessage(m);
+                notify(m);
                 if (m.ok) setOpen(null);
                 router.refresh();
               }}
@@ -145,6 +232,7 @@ export function QrCodesTable({
           </Button>
         </div>
       </div>
+      <QrPreviewDialog data={preview} onClose={() => setPreview(null)} />
     </Card>
   );
 }
@@ -154,6 +242,10 @@ function CodeRow({
   now,
   canEdit,
   shops,
+  preview,
+  onPreview,
+  selected,
+  onSelect,
   open,
   onToggle,
   onDone,
@@ -162,6 +254,10 @@ function CodeRow({
   now: Date;
   canEdit: boolean;
   shops: { id: string; name: string }[];
+  preview: QrPreviewData | null;
+  onPreview: (d: QrPreviewData) => void;
+  selected: boolean;
+  onSelect: () => void;
   open: boolean;
   onToggle: () => void;
   onDone: (m: { ok: boolean; text: string }) => void;
@@ -192,7 +288,21 @@ function CodeRow({
   return (
     <>
       <tr>
-        <Td className="pl-4 font-code text-[13px]">{row.code}</Td>
+        {canEdit ? (
+          <Td className="w-11 pl-4">
+            <Check
+              label={`Select code ${row.code}`}
+              title={row.status === "unassigned" ? undefined : "Only unassigned codes can be deleted"}
+              checked={selected}
+              disabled={row.status !== "unassigned"}
+              onChange={onSelect}
+            />
+          </Td>
+        ) : null}
+        <Td className={canEdit ? "" : "pl-4"}>
+          {preview ? <QrThumb data={preview} onOpen={() => onPreview(preview)} /> : <span className="text-muted">-</span>}
+        </Td>
+        <Td className="font-code text-[13px]">{row.code}</Td>
         <Td>
           <Chip tone={TONE[row.status]}>{LABEL[row.status]}</Chip>
         </Td>
@@ -228,7 +338,7 @@ function CodeRow({
       </tr>
       {open ? (
         <tr>
-          <Td colSpan={5} className="bg-head px-4 py-3">
+          <Td colSpan={7} className="bg-head px-4 py-3">
             <div className="flex flex-wrap items-end gap-3">
               <div className="min-w-[220px] flex-[1_1_260px]">
                 <SelectField
@@ -278,5 +388,33 @@ function CodeRow({
         </tr>
       ) : null}
     </>
+  );
+}
+
+// A 44px tap area around the box; the visible label is for screen readers.
+function Check({
+  label,
+  title,
+  checked,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  title?: string;
+  checked: boolean;
+  disabled?: boolean;
+  onChange: () => void;
+}) {
+  return (
+    <label title={title} className="-m-3 flex h-11 w-11 cursor-pointer items-center justify-center has-[:disabled]:cursor-not-allowed">
+      <input
+        type="checkbox"
+        aria-label={label}
+        checked={checked}
+        disabled={disabled}
+        onChange={onChange}
+        className="h-[18px] w-[18px] cursor-pointer accent-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2"
+      />
+    </label>
   );
 }

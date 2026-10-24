@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { requireRole } from "@/lib/require-role";
 import { createQrStore } from "@/lib/qr-store";
-import { assignCode, generateBatch, reassignCode, retireCode } from "@/services/qr";
+import { assignCode, deleteCodes, generateBatch, reassignCode, retireCode } from "@/services/qr";
 
 // Thin on purpose: role check first, then the service. A viewer's call throws
 // in requireRole before anything is read or written.
@@ -59,4 +59,12 @@ export async function retireQrCode(code: unknown): Promise<QrActionResult> {
   if (!result.ok) return result;
   refresh();
   return { ok: true, message: "Code retired. It will never be used again." };
+}
+
+export async function deleteQrCodes(codes: unknown): Promise<QrActionResult> {
+  await requireRole("admin");
+  const result = await deleteCodes(createQrStore(getDb()), codes);
+  if (!result.ok) return result;
+  refresh();
+  return { ok: true, message: `Deleted ${result.count} ${result.count === 1 ? "code" : "codes"}.` };
 }

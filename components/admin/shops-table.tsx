@@ -16,6 +16,7 @@ import { Segmented } from "./segmented";
 import { StatusChip } from "./status-chip";
 import { SelectField, TextField } from "./form-field";
 import { SHOP_TABS, type ShopList, type ShopListQuery, type ShopListTab } from "@/services/shops";
+import { notify } from "./notify";
 
 const TAB_LABELS: Record<ShopListTab, string> = {
   all: "All",
@@ -51,13 +52,11 @@ export function ShopsTable({ list, canEdit }: { list: ShopList; canEdit: boolean
   const [search, setSearch] = useState(query.q);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [choice, setChoice] = useState<BulkChoice>(NO_CHOICE);
-  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   // Changing the list clears the selection, so a bulk action never reaches
   // shops that are no longer on screen.
   function go(change: Partial<ShopListQuery>) {
     setSelected(new Set());
-    setMessage(null);
     const next = { ...query, page: 1, ...change };
     startTransition(() => router.push(listHref(pathname, next)));
   }
@@ -87,17 +86,17 @@ export function ShopsTable({ list, canEdit }: { list: ShopList; canEdit: boolean
           font: choice.font || undefined,
         });
         if (result.ok) {
-          setMessage({
+          notify({
             ok: true,
             text: `Updated ${result.updated} ${result.updated === 1 ? "shop" : "shops"}.`,
           });
           setSelected(new Set());
           setChoice(NO_CHOICE);
         } else {
-          setMessage({ ok: false, text: result.error });
+          notify({ ok: false, text: result.error });
         }
       } catch {
-        setMessage({ ok: false, text: "You do not have permission to change shops." });
+        notify({ ok: false, text: "You do not have permission to change shops." });
       }
     });
   }
@@ -284,12 +283,6 @@ export function ShopsTable({ list, canEdit }: { list: ShopList; canEdit: boolean
             </Button>
           </div>
         ) : null}
-
-        <div role="status" className={message ? "border-b border-line-soft px-4 py-2.5 font-bold" : "sr-only"}>
-          {message ? (
-            <span className={message.ok ? "" : "text-chip-over-fg"}>{message.text}</span>
-          ) : null}
-        </div>
 
         <DataTable
           minWidth={900}

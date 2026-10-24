@@ -9,6 +9,7 @@ import { LAYOUT_OPTIONS, THEME_OPTIONS } from "./look-options";
 import { Switch } from "./switch";
 import { LAYOUT_IDS, THEME_IDS, type LayoutId, type ThemeId } from "../shop-page/types";
 import type { SettingsData, SuggestedLook } from "@/services/settings";
+import { notify } from "./notify";
 
 function Row({ children }: { children: React.ReactNode }) {
   return <div className="flex items-center justify-between gap-3 border-t border-line-soft py-2.5">{children}</div>;
@@ -59,7 +60,6 @@ export function SettingsForm({
     Object.fromEntries(settings.shopTypes.map((t) => [t.label, t.suggested])),
   );
   const [domain, setDomain] = useState(settings.domain);
-  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const enabledLayouts = LAYOUT_OPTIONS.filter((l) => layouts[l.id]);
 
@@ -74,7 +74,6 @@ export function SettingsForm({
   }
 
   function save() {
-    setMessage(null);
     startTransition(async () => {
       const result = await saveAllSettings({
         themes,
@@ -83,7 +82,7 @@ export function SettingsForm({
         suggestions,
         ...(isOwner ? { domain } : {}),
       });
-      setMessage(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
+      notify(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
     });
   }
 
@@ -209,9 +208,6 @@ export function SettingsForm({
         <p className="m-0 text-[13px] text-muted">
           The QR address base is on every printed code. Keep this domain renewed for as long as any plan is active.
           Codes already printed keep their old address.{isOwner ? "" : " Only the owner can change these two."}
-        </p>
-        <p role="status" className={`m-0 min-h-5 text-[13px] font-semibold ${message?.ok === false ? "text-chip-over-fg" : "text-chip-live-fg"}`}>
-          {message?.text}
         </p>
         {canEdit ? (
           <div className="flex flex-wrap gap-2.5 border-t border-line-soft pt-3.5">

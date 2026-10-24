@@ -2,23 +2,24 @@
 
 import { useState, useTransition } from "react";
 import { generateQrBatch } from "@/app/admin/qr/actions";
-import { Button } from "./button";
+import { Button, buttonClass } from "./button";
 import { Card } from "./card";
-import { TextField } from "./form-field";
+import { SelectField, TextField } from "./form-field";
+import { Icon } from "./icon";
+import { ICON_DOWNLOAD } from "./icons";
+import { notify } from "./notify";
 
 export function GenerateBatch({ canEdit }: { canEdit: boolean }) {
-  const [count, setCount] = useState("50");
+  const [count, setCount] = useState("5");
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   function submit() {
-    setMessage(null);
     startTransition(async () => {
       try {
         const r = await generateQrBatch(Number(count));
-        setMessage(r.ok ? { ok: true, text: r.message } : { ok: false, text: r.error });
+        notify(r.ok ? { ok: true, text: r.message } : { ok: false, text: r.error });
       } catch {
-        setMessage({ ok: false, text: "You do not have permission to make codes." });
+        notify({ ok: false, text: "You do not have permission to make codes." });
       }
     });
   }
@@ -36,13 +37,25 @@ export function GenerateBatch({ canEdit }: { canEdit: boolean }) {
         onChange={(e) => setCount(e.target.value)}
         disabled={!canEdit}
       />
-      {/* TODO(slice 6): sticker size, and download the batch as a PDF */}
       <Button variant="primary" disabled={!canEdit || pending} onClick={submit} className="disabled:cursor-not-allowed disabled:opacity-50">
         {pending ? "Making codes" : "Generate codes"}
       </Button>
-      <div role="status" className={message ? "font-bold" : "sr-only"}>
-        {message ? <span className={message.ok ? "" : "text-chip-over-fg"}>{message.text}</span> : null}
-      </div>
+      {/* A plain GET form: the browser downloads the PDF the route sends back. */}
+      <form
+        action="/admin/print/sheet"
+        method="get"
+        className="flex flex-col gap-3 border-t border-line pt-3.5"
+      >
+        <SelectField label="Sticker size" name="size" defaultValue="card">
+          <option value="card">4x6 card</option>
+          <option value="a5">A5 standee</option>
+          <option value="small">Small sticker</option>
+        </SelectField>
+        <button type="submit" className={buttonClass("secondary", "")}>
+          <Icon d={ICON_DOWNLOAD} />
+          Print sheet (PDF)
+        </button>
+      </form>
       <p className="m-0 text-[13px] text-muted">
         Codes avoid look-alike letters. Until a code is assigned, scanning it shows a friendly page
         that says it is not activated yet, with your WhatsApp contact.

@@ -6,11 +6,11 @@ import { buttonClass } from "./button";
 import { Card } from "./card";
 import { TextField } from "./form-field";
 import type { BillingData } from "@/services/billing";
+import { notify } from "./notify";
 
 export function PlanPricesForm({ prices, canEdit }: { prices: BillingData["prices"]; canEdit: boolean }) {
   const [pending, startTransition] = useTransition();
   const [values, setValues] = useState(Object.fromEntries(prices.map((p) => [p.id, p.rupees])));
-  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   return (
     <Card aria-label="Plan prices" className="flex flex-[1_1_320px] flex-col gap-3.5 p-5">
@@ -18,10 +18,9 @@ export function PlanPricesForm({ prices, canEdit }: { prices: BillingData["price
         className="flex flex-col gap-3.5"
         onSubmit={(e) => {
           e.preventDefault();
-          setMessage(null);
           startTransition(async () => {
             const result = await savePlanPrices(values);
-            setMessage(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
+            notify(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
           });
         }}
       >
@@ -42,9 +41,6 @@ export function PlanPricesForm({ prices, canEdit }: { prices: BillingData["price
         <p className="m-0 text-[13px] text-muted">
           After a plan ends, the page stays fully live for 15 more days, then shows only the shop name, a Call
           button and Directions.
-        </p>
-        <p role="status" className={`m-0 min-h-5 text-[13px] font-semibold ${message?.ok === false ? "text-chip-over-fg" : "text-chip-live-fg"}`}>
-          {message?.text}
         </p>
         {canEdit ? (
           <button type="submit" disabled={pending} className={buttonClass("primary")}>
