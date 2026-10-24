@@ -6,6 +6,16 @@ import { ICON_EYE } from "../icons";
 import { Switch } from "../switch";
 import type { TabProps } from "./state";
 
+// Password managers (1Password, LastPass, Bitwarden) fill these fields on their
+// own, which the editor would count as an edit. These are the attributes they
+// document for staying out.
+const NO_AUTOFILL = {
+  "data-1p-ignore": true,
+  "data-lpignore": "true",
+  "data-bwignore": "true",
+  "data-form-type": "other",
+} as const;
+
 export function OffersTab({ state, set }: TabProps) {
   const { offer, banner, wifi } = state;
   const [showPassword, setShowPassword] = useState(false);
@@ -27,11 +37,13 @@ export function OffersTab({ state, set }: TabProps) {
         <FieldRow>
           <TextField
             label="Title"
+            autoComplete="off"
             value={offer.title}
             onChange={(e) => set("offer", { ...offer, title: e.target.value })}
           />
           <TextField
             label="Code"
+            autoComplete="off"
             className="font-code text-[13px]"
             value={offer.code}
             onChange={(e) => set("offer", { ...offer, code: e.target.value })}
@@ -40,6 +52,7 @@ export function OffersTab({ state, set }: TabProps) {
         <FieldRow>
           <TextField
             label="Small print"
+            autoComplete="off"
             value={offer.note}
             onChange={(e) => set("offer", { ...offer, note: e.target.value })}
           />
@@ -67,6 +80,7 @@ export function OffersTab({ state, set }: TabProps) {
         <FieldRow>
           <TextField
             label="Message"
+            autoComplete="off"
             placeholder="[festival greeting]"
             value={banner.message}
             onChange={(e) => set("banner", { ...banner, message: e.target.value })}
@@ -96,6 +110,8 @@ export function OffersTab({ state, set }: TabProps) {
           <TextField
             label="Network name"
             placeholder="[guest network]"
+            autoComplete="off"
+            {...NO_AUTOFILL}
             value={wifi.network}
             onChange={(e) => set("wifi", { ...wifi, network: e.target.value })}
           />
@@ -104,7 +120,8 @@ export function OffersTab({ state, set }: TabProps) {
               <TextField
                 label="Password"
                 type={showPassword ? "text" : "password"}
-                autoComplete="off"
+                autoComplete="new-password"
+                {...NO_AUTOFILL}
                 value={wifi.password}
                 onChange={(e) => set("wifi", { ...wifi, password: e.target.value })}
               />
