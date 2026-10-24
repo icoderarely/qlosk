@@ -1,36 +1,25 @@
 import { BRAND_NAME } from "@/lib/brand";
 
-// Placeholder logo until the real one arrives. Replace the contents of this file
-// (or swap the <svg> for an <Image>) and every place that shows our mark updates:
-// the admin sidebar, the sign-in page and the shop page header.
-// The glyph draws in currentColor; the caller sets the size and the colours.
+// The qlosk logo (same artwork as assets/images/qlosk.svg and app/icon.svg).
+// It is a full-colour tile with its own background, so callers only set the size.
 export function BrandMark({ className = "size-5", title }: { className?: string; title?: string }) {
   return (
     <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      viewBox="0 0 48 48"
       role={title ? "img" : undefined}
       aria-label={title}
       aria-hidden={title ? undefined : true}
       className={className}
     >
-      <path d="M12 21v-8M12 13L6.5 8.5M12 13l5.5-4.5M12 13V4" />
-      <circle cx="12" cy="3.5" r="1.5" fill="currentColor" />
-      <circle cx="5.5" cy="8" r="1.5" fill="currentColor" />
-      <circle cx="18.5" cy="8" r="1.5" fill="currentColor" />
+      <rect width="48" height="48" rx="14" fill="#FBF1B5" />
+      <rect x="9" y="9" width="26" height="26" rx="9" fill="none" stroke="#0D1F1B" strokeWidth="6" />
+      <rect x="18" y="18" width="8" height="8" rx="2" fill="#0D1F1B" />
+      <rect x="28.5" y="28.5" width="12" height="12" rx="3.2" fill="#0D1F1B" stroke="#FBF1B5" strokeWidth="3" />
     </svg>
   );
 }
 
-/** The mark in our accent square, for the admin screens. */
-export function BrandTile({ className = "size-[30px] rounded-[9px]" }: { className?: string }) {
-  return (
-    <span className={`flex flex-none items-center justify-center bg-accent text-white ${className}`} role="img" aria-label={BRAND_NAME}>
-      <BrandMark className="size-[60%]" />
-    </span>
-  );
+/** The logo at a given size, for the admin screens. */
+export function BrandTile({ className = "size-[30px]" }: { className?: string }) {
+  return <BrandMark className={`flex-none ${className}`} title={BRAND_NAME} />;
 }

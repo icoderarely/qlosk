@@ -7,6 +7,27 @@ export function waHref(number: string, message: string): string {
 
 export const WA_HELLO = "Hi, I would like a QR page for my shop.";
 
+/** Where on the site a WhatsApp button sits. The message tells us which one was tapped. */
+export type WaSource = "navbar" | "menu" | "hero" | "pricing" | "pricing-all" | "closing" | "footer" | "privacy" | "terms" | "refunds";
+
+const WA_FROM: Record<WaSource, string> = {
+  navbar: "Hi, I tapped \"Let's go\" in the top bar of your website. I would like a QR page for my shop.",
+  menu: "Hi, I opened the menu on your website. I would like a QR page for my shop.",
+  hero: "Hi, I saw your homepage. I would like a QR page for my shop.",
+  pricing: "Hi, what are your plans and prices?",
+  "pricing-all": "Hi, what are your plans and prices?",
+  closing: "Hi, I read your whole website and I am ready. I would like a QR page for my shop.",
+  footer: "Hi, I have a question about your QR pages.",
+  privacy: "Hi, I have a question about your Privacy Policy.",
+  terms: "Hi, I have a question about your Terms.",
+  refunds: "Hi, I have a question about your Refund policy.",
+};
+
+/** wa.me link whose message says which button on the site it came from. */
+export function waFrom(number: string, source: WaSource): string {
+  return waHref(number, WA_FROM[source]);
+}
+
 // 24x24 stroke paths from docs/design/LandingV2.dc.html.
 export const PATHS = {
   arrowRight: "M5 12h14M13 6l6 6-6 6",
@@ -39,9 +60,10 @@ export function Ic({ d, className = "" }: { d: IconName; className?: string }) {
 }
 
 /** A drawn QR look-alike for the page art. It is not a scannable code. */
-export function QrArt({ size, label }: { size: number; label: string }) {
+// `variant` turns the same art so a row of them reads as different codes.
+export function QrArt({ size, label, variant = 0 }: { size: number; label: string; variant?: 0 | 1 | 2 | 3 }) {
   return (
-    <svg className="l-qr" viewBox="0 0 96 96" width={size} height={size} role="img" aria-label={label}>
+    <svg className={variant ? `l-qr l-qr-v${variant}` : "l-qr"} viewBox="0 0 96 96" width={size} height={size} role="img" aria-label={label}>
       <g className="l-qr-stroke">
         <rect x="6" y="6" width="28" height="28" />
         <rect x="62" y="6" width="28" height="28" />

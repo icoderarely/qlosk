@@ -1,17 +1,23 @@
+import type { CSSProperties } from "react";
 import { QrArt } from "./parts";
 
-const STICKERS = [
-  { label: "Review us", n: 1, style: { left: 0, top: 10, rotate: "-8deg" } },
-  { label: "Instagram", n: 2, style: { right: 0, top: 0, rotate: "6deg" } },
-  { label: "WhatsApp", n: 3, style: { left: 30, top: 86, rotate: "4deg" } },
-  { label: "Wi-Fi", n: 4, style: { right: 6, top: 100, rotate: "-5deg" } },
-  { label: "Menu", n: 5, style: { left: 6, top: 168, rotate: "7deg" } },
-  { label: "Maps", n: 6, style: { right: 20, top: 176, rotate: "-6deg" } },
+// Start positions around the centre card, in cqw (1% of the stage width), plus a tilt.
+// They merge into the one code on a loop; without motion they stay as a still diagram.
+const CODES = [
+  { label: "Review us", n: 1, x: -36, y: -33, r: -8, v: 0 },
+  { label: "Instagram", n: 2, x: 36, y: -35, r: 6, v: 1 },
+  { label: "WhatsApp", n: 3, x: -39, y: 0, r: 4, v: 2 },
+  { label: "Wi-Fi", n: 4, x: 39, y: 2, r: -5, v: 3 },
+  { label: "Menu", n: 5, x: -35, y: 34, r: 7, v: 1 },
+  { label: "Maps", n: 6, x: 35, y: 34, r: -6, v: 2 },
 ] as const;
+
+// Little squares that twinkle behind the stage, in % of its width.
+const PIXELS = [[6, 14], [92, 10], [14, 88], [88, 84], [50, 3], [3, 52], [97, 48], [62, 96], [30, 6], [76, 94]] as const;
 
 export function Problem() {
   return (
-    <section className="l-sec l-dark" aria-labelledby="problem-title">
+    <section className="l-sec l-dark l-problem" aria-labelledby="problem-title">
       <div className="l-wrap l-two">
         <div className="l-col">
           <span className="l-kick l-butter">The problem</span>
@@ -22,22 +28,41 @@ export function Problem() {
           </p>
         </div>
         <div className="l-solve">
-          <div className="l-stickers" aria-hidden="true">
-            {STICKERS.map(({ label, n, style: { rotate, ...place } }) => (
-              <span
-                key={label}
-                className="l-sticker"
-                style={{ ...place, background: `var(--st${n}-bg)`, color: `var(--st${n}-fg)`, transform: `rotate(${rotate})` }}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-          <svg className="l-ic l-solve-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" /></svg>
-          <div className="l-onecode">
-            <div style={{ margin: "0 auto", width: 150 }}><QrArt size={150} label="One QR code" /></div>
-            <div className="l-serif" style={{ fontSize: 20, marginTop: 8 }}>Scan once</div>
-            <div className="l-muted" style={{ fontSize: 13 }}>Everything is here</div>
+          <div className="l-merge">
+            <div className="l-bgfx" aria-hidden="true">
+              <i className="l-orbit l-orbit-1" />
+              <i className="l-orbit l-orbit-2" />
+              <i className="l-ripple" />
+              {PIXELS.map(([x, y], i) => (
+                <i key={i} className="l-px" style={{ left: `${x}%`, top: `${y}%`, "--d": i } as CSSProperties} />
+              ))}
+            </div>
+            <div className="l-mcodes" aria-hidden="true">
+              {CODES.map(({ label, n, x, y, r, v }, i) => (
+                <div
+                  key={label}
+                  className="l-mtile"
+                  style={
+                    {
+                      "--x": `${x}cqw`,
+                      "--y": `${y}cqw`,
+                      "--r": `${r}deg`,
+                      "--i": i,
+                      background: `var(--st${n}-bg)`,
+                      color: `var(--st${n}-fg)`,
+                    } as CSSProperties
+                  }
+                >
+                  <QrArt size={60} label="" variant={v} />
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="l-onecode">
+              <div className="l-onecode-qr"><QrArt size={150} label="One QR code" /></div>
+              <div className="l-serif l-onecode-t">Scan once</div>
+              <div className="l-muted l-onecode-s">Everything is here</div>
+            </div>
           </div>
         </div>
       </div>

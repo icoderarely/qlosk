@@ -15,7 +15,7 @@ const LINKS = [
 
 // Full width at the top; the CSS in landing.css shrinks it as the page scrolls
 // (scroll-driven animation, where supported). The only state is the mobile menu.
-export function Navbar({ whatsappHref }: { whatsappHref: string }) {
+export function Navbar({ whatsappHref, menuWhatsappHref }: { whatsappHref: string; menuWhatsappHref: string }) {
   const [open, setOpen] = useState(false);
   const burger = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLElement>(null);
@@ -43,7 +43,7 @@ export function Navbar({ whatsappHref }: { whatsappHref: string }) {
     <div className="l-navwrap">
       <header className="l-navbar">
         <a href="#top" className="l-brand" aria-label={`${BRAND_NAME}, back to top`}>
-          <span className="l-mark"><BrandMark className="size-5" /></span>
+          <span className="l-mark"><BrandMark className="size-full" /></span>
           <span className="l-serif l-brandname">{BRAND_NAME}</span>
         </a>
         <nav className="l-links" aria-label="Main">
@@ -71,7 +71,7 @@ export function Navbar({ whatsappHref }: { whatsappHref: string }) {
           {LINKS.map((l) => (
             <a key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.menu}</a>
           ))}
-          <a className="l-btn l-btn-b" href={whatsappHref} onClick={() => setOpen(false)}>Message us on WhatsApp</a>
+          <a className="l-btn l-btn-b" href={menuWhatsappHref} onClick={() => setOpen(false)}>Message us on WhatsApp</a>
         </nav>
       ) : null}
     </div>

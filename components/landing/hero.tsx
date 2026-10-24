@@ -13,7 +13,7 @@ export function Hero({ whatsappHref, fromPrice }: { whatsappHref: string; fromPr
         <div className="l-wrap">
           <div className="l-hero">
             <div className="l-hero-copy">
-              <span className="l-badge"><i />Done for you · set up on WhatsApp</span>
+              <span className="l-badge"><i />We set it up for you. Just message us on WhatsApp</span>
               <h1 id="hero-title" className="l-serif l-h1">
                 One QR for your <em className="l-em">whole shop.</em>
               </h1>

@@ -1,5 +1,5 @@
 import { showsMultiMonthStrike, type PricingCard } from "@/services/plans";
-import { Ic, SectionHead, waHref } from "./parts";
+import { Ic, SectionHead, waFrom, waHref } from "./parts";
 
 type Copy = { sub: string; points: string[]; cta: string; ask: string };
 
@@ -42,7 +42,7 @@ export function Pricing({ plans, whatsappNumber }: { plans: PricingCard[]; whats
         />
         {cards.length === 0 ? (
           <p className="l-fine" style={{ margin: "0 auto" }}>
-            <a className="l-btn l-btn-k" href={waHref(whatsappNumber, "Hi, what are your plans and prices?")}>
+            <a className="l-btn l-btn-k" href={waFrom(whatsappNumber, "pricing-all")}>
               Message us for today&rsquo;s prices
             </a>
           </p>
@@ -77,7 +77,7 @@ export function Pricing({ plans, whatsappNumber }: { plans: PricingCard[]; whats
                   </ul>
                   <a
                     className={`l-btn ${hi ? "l-btn-b" : "l-btn-s"}`}
-                    href={waHref(whatsappNumber, `Hi, I would like ${copy.ask} for my shop.`)}
+                    href={waHref(whatsappNumber, `Hi, I tapped the pricing section on your website. I would like ${copy.ask} for my shop.`)}
                   >
                     {copy.cta}
                   </a>

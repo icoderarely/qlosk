@@ -63,7 +63,7 @@ export function TopBar({ overlay = false }: { overlay?: boolean }) {
   return (
     <div className={`flex items-center justify-between px-5 pt-5 ${overlay ? "absolute inset-x-0 top-0 z-10" : ""}`}>
       <span className={CHIP_BTN} role="img" aria-label={BRAND_NAME}>
-        <BrandMark className="size-5" />
+        <BrandMark className="size-7" />
       </span>
       <ShareButton className={`${CHIP_BTN} cursor-pointer`} />
     </div>

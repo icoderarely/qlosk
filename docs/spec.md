@@ -267,4 +267,4 @@ Design source: `docs/design/LandingV2.dc.html`. Copy its layout, spacing, colors
 - All WhatsApp links use the number from settings; the playground button includes the chosen theme, layout and font in the message.
 - Accessibility: one `h1`, real buttons and links, visible focus, 44 px targets, `prefers-reduced-motion` turns off the nav animation and hover lifts.
 - Performance: hero and fonts load first; the five gallery phones and the playground preview render on the server; no layout shift when fonts load.
-- Placeholders to replace before launch: brand name, logo, support email, city, WhatsApp number, legal pages.
+- Placeholders to replace before launch: city, WhatsApp number, legal pages.

@@ -1,4 +1,5 @@
 import { cacheLife } from "next/cache";
+import { WHATSAPP_NUMBER } from "@/lib/brand";
 import { LAYOUT_IDS, THEME_IDS } from "@/components/shop-page/types";
 import { landingPlans, type PricingCard } from "@/services/plans";
 import { DEFAULT_SHOP_TYPES } from "@/services/settings";
@@ -20,7 +21,7 @@ export async function loadLandingData(): Promise<LandingData> {
   cacheLife("minutes");
   try {
     const [settings, plans] = await Promise.all([loadSettings(), landingPlans(createPricingStore())]);
-    return { ...playgroundOptions(settings), whatsappNumber: settings.domain.whatsappSender, plans };
+    return { ...playgroundOptions(settings), whatsappNumber: WHATSAPP_NUMBER, plans };
   } catch (error) {
     console.error("Landing page data could not be loaded", error);
     const all = <K extends string>(ids: readonly K[]) => Object.fromEntries(ids.map((id) => [id, true])) as Record<K, boolean>;
@@ -29,6 +30,6 @@ export async function loadLandingData(): Promise<LandingData> {
       enabledLayouts: all(LAYOUT_IDS),
       shopTypes: DEFAULT_SHOP_TYPES,
     });
-    return { ...options, whatsappNumber: "", plans: [] };
+    return { ...options, whatsappNumber: WHATSAPP_NUMBER, plans: [] };
   }
 }

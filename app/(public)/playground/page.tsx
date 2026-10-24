@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { WHATSAPP_NUMBER } from "@/lib/brand";
 import { Suspense } from "react";
 import { PlaygroundSection } from "@/components/playground/playground-section";
 import { parseLook } from "@/components/playground/look-url";
@@ -39,7 +40,7 @@ async function Playground({
       enabledThemes={themes}
       enabledLayouts={layouts}
       suggestions={suggestions}
-      whatsappNumber={settings.domain.whatsappSender}
+      whatsappNumber={WHATSAPP_NUMBER}
     />
   );
 }

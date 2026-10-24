@@ -100,8 +100,8 @@ html:has(.l-root) { scroll-padding-top: 96px; }
 }
 @keyframes l-shrink { to { width: min(1200px, 100%); height: 60px; } }
 .l-brand { display: flex; align-items: center; gap: 10px; color: var(--white); min-height: 44px; }
-.l-mark { width: 34px; height: 34px; border-radius: 11px; background: var(--butter); display: flex; align-items: center; justify-content: center; color: var(--ink2); flex: none; }
-.l-mark svg { width: 20px; height: 20px; }
+.l-mark { width: 34px; height: 34px; display: flex; flex: none; }
+.l-mark svg { width: 100%; height: 100%; }
 .l-brandname { font-size: 22px; }
 .l-links { display: flex; gap: 22px; }
 .l-root .l-link { color: var(--on-dark-link); font-weight: 600; font-size: 15px; padding: 10px 4px; min-height: 44px; display: inline-flex; align-items: center; white-space: nowrap; }
@@ -152,11 +152,19 @@ html:has(.l-root) { scroll-padding-top: 96px; }
 .l-two { display: flex; flex-wrap: wrap; gap: 48px; align-items: center; }
 .l-two > * { flex: 1 1 420px; min-width: 0; }
 .l-col { display: flex; flex-direction: column; gap: 22px; }
-.l-stickers { position: relative; width: 250px; height: 230px; flex: none; }
-.l-sticker { position: absolute; border-radius: 16px; padding: 14px 18px; font-weight: 800; box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.45); white-space: nowrap; }
-.l-solve { display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; }
-.l-solve-arrow { width: 44px; height: 44px; color: var(--butter); }
-.l-onecode { background: var(--white); color: var(--ink); border-radius: 26px; padding: 22px 22px 18px; width: 200px; text-align: center; box-shadow: 0 30px 50px -25px rgba(0, 0, 0, 0.6); flex: none; }
+.l-solve { display: flex; align-items: center; justify-content: center; }
+/* One stage: six codes around the centre card. cqw keeps it in proportion at any width. */
+.l-merge { container-type: inline-size; position: relative; width: min(100%, 420px); aspect-ratio: 1; }
+.l-mtile, .l-onecode { position: absolute; inset: 0; margin: auto; height: fit-content; }
+.l-mtile { width: 26cqw; padding: 2.4cqw 2.4cqw 2.8cqw; border-radius: 3.6cqw; display: flex; flex-direction: column; align-items: center; gap: 1.6cqw; font-weight: 800; font-size: clamp(11px, 3.4cqw, 14px); line-height: 1.1; text-align: center; box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.45); translate: var(--x) var(--y); rotate: var(--r); }
+.l-mtile .l-qr { width: 100%; height: auto; background: var(--white); border-radius: 1.6cqw; padding: 1cqw; }
+.l-qr-v1 { transform: rotate(90deg); }
+.l-qr-v2 { transform: scaleX(-1); }
+.l-qr-v3 { transform: rotate(180deg); }
+.l-onecode { z-index: 1; background: var(--white); color: var(--ink); border-radius: 6cqw; padding: 5cqw 5cqw 4cqw; width: 46cqw; text-align: center; box-shadow: 0 30px 50px -25px rgba(0, 0, 0, 0.6); }
+.l-onecode .l-qr { width: 100%; height: auto; }
+.l-onecode-t { font-size: clamp(16px, 5cqw, 21px); margin-top: 1.6cqw; }
+.l-onecode-s { font-size: clamp(12px, 3.2cqw, 13px); }
 
 /* looks gallery */
 .l-looks { display: flex; justify-content: center; gap: 22px; align-items: flex-end; }
@@ -227,7 +235,19 @@ html:has(.l-root) { scroll-padding-top: 96px; }
 .l-wa-bubble { background: var(--report-bg); border-radius: 18px; padding: 18px; }
 .l-chart { width: 100%; height: auto; display: block; }
 .l-chart-axis { stroke: var(--report-axis); stroke-width: 1; }
-.l-chart-bar { fill: var(--accent); }
+.l-chart-bar { fill: var(--accent); transform-box: fill-box; transform-origin: 50% 100%; }
+.l-report-view { display: flex; justify-content: center; }
+/* Chart fills up the first time the card is mostly on screen (see in-view.tsx). */
+@keyframes l-grow { from { transform: scaleY(0); } }
+@keyframes l-up { from { opacity: 0; translate: 0 8px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .l-report-view[data-state="armed"] :is(.l-chart-bar, .l-chart-txt, .l-wa-pills .l-pill) { opacity: 0; }
+  .l-report-view[data-state="armed"] .l-chart-bar { transform: scaleY(0); }
+  .l-report-view[data-state="in"] .l-chart-bar { animation: l-grow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) calc(0.25s + var(--i) * 0.18s) both; }
+  .l-report-view[data-state="in"] .l-chart-txt { animation: l-up 0.5s ease 0.9s both; }
+  .l-report-view[data-state="in"] .l-wa-pills .l-pill { animation: l-up 0.5s ease 1.2s both; }
+  .l-report-view[data-state="in"] .l-wa-pills .l-pill:nth-child(2) { animation-delay: 1.35s; }
+}
 .l-chart-txt { font-size: 12px; fill: var(--mut); font-weight: 600; text-anchor: middle; }
 .l-wa-pills { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .l-wa-pills .l-pill { font-size: 13px; padding: 6px 12px; }
@@ -285,6 +305,94 @@ html:has(.l-root) { scroll-padding-top: 96px; }
 .l-iphone::before { content: ""; position: absolute; z-index: 3; top: calc(var(--pad) + var(--fw) * 0.03); left: 50%; width: calc(var(--fw) * 0.27); height: calc(var(--fw) * 0.08); transform: translateX(-50%); background: #000; border-radius: 999px; pointer-events: none; }
 .l-iphone::after { content: ""; position: absolute; left: -3px; top: calc(var(--fw) * 0.3); width: 3px; height: calc(var(--fw) * 0.09); border-radius: 2px 0 0 2px; background: var(--ink2); box-shadow: 0 calc(var(--fw) * 0.12) 0 var(--ink2), calc(var(--fw) + 3px) calc(var(--fw) * 0.1) 0 var(--ink2); }
 
+/* Motion. Only opacity, translate and scale, so nothing shifts the layout. The individual
+   `translate` and `scale` properties are used so existing `transform` rotations stay intact. */
+@keyframes l-rise { from { opacity: 0; translate: 0 18px; } }
+@keyframes l-fade { from { opacity: 0; } }
+@keyframes l-bob { 50% { translate: 0 -8px; } }
+@keyframes l-pulse { 50% { scale: 1.04; } }
+@media (prefers-reduced-motion: no-preference) {
+  /* hero entrance, once on load */
+  .l-hero-copy > * { animation: l-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .l-hero-copy > :nth-child(2) { animation-delay: 0.08s; }
+  .l-hero-copy > :nth-child(3) { animation-delay: 0.16s; }
+  .l-hero-copy > :nth-child(4) { animation-delay: 0.24s; }
+  .l-hero-copy > :nth-child(5) { animation-delay: 0.32s; }
+  .l-hero-art { animation: l-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both; }
+  /* hero floating cards and rings, slow and out of step */
+  .l-float-qr { animation: l-bob 6s ease-in-out infinite; }
+  .l-float-wa { animation: l-bob 7s ease-in-out -2s infinite; }
+  .l-float-rv { animation: l-bob 5.5s ease-in-out -4s infinite; }
+  .l-ring1 { animation: l-pulse 8s ease-in-out infinite; }
+  .l-ring2 { animation: l-pulse 8s ease-in-out -4s infinite; }
+  /* buttons */
+  .l-root .l-btn:active { transform: scale(0.97); }
+  .l-root .l-btn .l-ic { transition: translate 0.15s ease; }
+  .l-root :is(.l-btn-b, .l-btn-k):hover .l-ic { translate: 3px 0; }
+  /* FAQ answer fades in when it opens */
+  .l-faqitem [role="region"]:not([hidden]) .l-faqa { animation: l-fade 0.3s ease; }
+}
+/* Many codes merge into one, on a 9s loop. Tiles start scattered (the still diagram), pull into
+   the centre card, which pulses and shows a scan beam, then they scatter again. */
+@keyframes l-converge {
+  0%, 12% { translate: var(--x) var(--y); rotate: var(--r); scale: 1; opacity: 1; }
+  32% { translate: 0 0; rotate: 0deg; scale: 0.3; opacity: 0; }
+  68% { translate: 0 0; rotate: 0deg; scale: 0.3; opacity: 0; }
+  88%, 100% { translate: var(--x) var(--y); rotate: var(--r); scale: 1; opacity: 1; }
+}
+@keyframes l-settle {
+  0%, 28% { scale: 1; box-shadow: 0 0 0 0 rgba(251, 241, 181, 0.5), 0 30px 50px -25px rgba(0, 0, 0, 0.6); }
+  38% { scale: 1.06; box-shadow: 0 0 0 16px rgba(251, 241, 181, 0.28), 0 30px 50px -25px rgba(0, 0, 0, 0.6); }
+  48%, 100% { scale: 1; box-shadow: 0 0 0 30px rgba(251, 241, 181, 0), 0 30px 50px -25px rgba(0, 0, 0, 0.6); }
+}
+@keyframes l-cap { 0%, 30% { opacity: 0.35; } 40%, 70% { opacity: 1; } 90%, 100% { opacity: 0.35; } }
+@keyframes l-beam { 0%, 34% { translate: 0 -10%; opacity: 0; } 38% { opacity: 1; } 62% { translate: 0 110%; opacity: 1; } 66%, 100% { translate: 0 110%; opacity: 0; } }
+@keyframes l-ripple { 0%, 30% { scale: 0.4; opacity: 0; } 34% { opacity: 0.55; } 60%, 100% { scale: 1.5; opacity: 0; } }
+@keyframes l-spin { to { rotate: 360deg; } }
+@keyframes l-twinkle { 0%, 100% { opacity: 0.08; scale: 0.7; } 50% { opacity: 0.7; scale: 1.2; } }
+@keyframes l-gridpan { to { translate: 48px 48px; } }
+@keyframes l-drift { to { translate: 12% -8%; scale: 1.15; } }
+.l-onecode-qr { position: relative; overflow: hidden; border-radius: 2cqw; }
+.l-onecode-qr::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14%; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 55%, transparent)); border-bottom: 2px solid var(--accent); opacity: 0; }
+.l-bgfx { position: absolute; inset: 0; pointer-events: none; }
+.l-orbit { position: absolute; inset: 4%; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.2); }
+.l-orbit-2 { inset: -6%; border-style: solid; border-color: rgba(255, 255, 255, 0.09); }
+.l-orbit::after { content: ""; position: absolute; top: -4px; left: 50%; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--butter); box-shadow: 0 0 12px var(--butter); }
+.l-ripple { position: absolute; inset: 14%; border-radius: 50%; border: 2px solid var(--butter); opacity: 0; }
+.l-px { position: absolute; width: 8px; height: 8px; border-radius: 2px; background: var(--butter); opacity: 0.2; }
+.l-problem { position: relative; overflow: hidden; }
+.l-problem > .l-wrap { position: relative; z-index: 1; }
+.l-problem::before { content: ""; position: absolute; inset: -48px; background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 48px 48px; -webkit-mask-image: radial-gradient(ellipse 70% 80% at 72% 50%, #000, transparent 75%); mask-image: radial-gradient(ellipse 70% 80% at 72% 50%, #000, transparent 75%); }
+.l-problem::after { content: ""; position: absolute; width: 640px; height: 640px; right: -120px; top: 50%; margin-top: -320px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent), transparent 65%); }
+@media (prefers-reduced-motion: no-preference) {
+  .l-mtile { animation: l-converge 9s ease-in-out calc(var(--i) * 0.07s) infinite; }
+  .l-onecode { animation: l-settle 9s ease-in-out infinite; }
+  .l-onecode-t, .l-onecode-s { animation: l-cap 9s ease-in-out infinite; }
+  .l-onecode-qr::after { animation: l-beam 9s linear infinite; }
+  .l-ripple { animation: l-ripple 9s ease-out infinite; }
+  .l-orbit-1 { animation: l-spin 40s linear infinite; }
+  .l-orbit-2 { animation: l-spin 70s linear reverse infinite; }
+  .l-px { animation: l-twinkle 3.6s ease-in-out calc(var(--d) * -0.5s) infinite; }
+  .l-problem::before { animation: l-gridpan 14s linear infinite; }
+  .l-problem::after { animation: l-drift 12s ease-in-out infinite alternate; }
+}
+
+/* Scroll reveal: items fade up as they enter the viewport. Without scroll-driven animation
+   support, or with reduced motion, they simply stay visible. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .l-head, .l-card, .l-tile, .l-plan, .l-looks, .l-faqband .l-wrap {
+      animation: l-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+    /* cascade across a row */
+    :is(.l-steps, .l-feat, .l-plans) > :nth-child(4n + 2) { animation-range: entry 6% entry 41%; }
+    :is(.l-steps, .l-feat, .l-plans) > :nth-child(4n + 3) { animation-range: entry 12% entry 47%; }
+    :is(.l-steps, .l-feat, .l-plans) > :nth-child(4n + 4) { animation-range: entry 18% entry 53%; }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .l-root .l-btn, .l-lift { transition: none; }
   .l-root .l-btn:hover, .l-lift:hover { transform: none; }
@@ -336,9 +444,6 @@ html:has(.l-root) { scroll-padding-top: 96px; }
   .l-strip-row { justify-content: flex-start; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
   .l-pill { padding: 8px 14px; font-size: 14px; }
   .l-two { gap: 32px; }
-  .l-stickers { transform: scale(0.86); transform-origin: center; }
-  .l-solve { gap: 12px; }
-  .l-solve > svg { transform: rotate(90deg); }
   .l-looks { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding: 8px 4px 10px; gap: 16px; scrollbar-width: none; }
   .l-mini { width: 150px; }
   .l-mframe { --fw: 150px; width: 150px; border-radius: 24px; }

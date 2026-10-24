@@ -1,4 +1,6 @@
+import type { CSSProperties } from "react";
 import { BRAND_NAME } from "@/lib/brand";
+import { InView } from "./in-view";
 import { Ic } from "./parts";
 
 const TICKS = ["Scans and button taps", "Your top button and best day", "Sent on the 1st, nothing to log in to"];
@@ -27,7 +29,7 @@ export function Report() {
             ))}
           </ul>
         </div>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <InView className="l-report-view">
           <figure className="l-wa" style={{ margin: 0 }}>
             <figcaption className="l-wa-head">
               <span className="l-wa-dot"><Ic d="whatsapp" /></span>
@@ -41,8 +43,8 @@ export function Report() {
               <div className="l-muted" style={{ fontSize: 13, marginBottom: 12 }}>Sample data, for illustration</div>
               <svg className="l-chart" viewBox="0 0 360 150" role="img" aria-label="Sample bar chart of scans for each week of the month. Sample data.">
                 <path className="l-chart-axis" d="M10 120H350" />
-                {BARS.map((b) => (
-                  <rect key={b.week} className="l-chart-bar" x={b.x} y={b.y} width="50" height={b.h} rx="8" />
+                {BARS.map((b, i) => (
+                  <rect key={b.week} className="l-chart-bar" style={{ "--i": i } as CSSProperties} x={b.x} y={b.y} width="50" height={b.h} rx="8" />
                 ))}
                 {BARS.map((b) => (
                   <text key={b.week} className="l-chart-txt" x={b.x + 25} y="140">{b.week}</text>
@@ -54,7 +56,7 @@ export function Report() {
               </div>
             </div>
           </figure>
-        </div>
+        </InView>
       </div>
     </section>
   );

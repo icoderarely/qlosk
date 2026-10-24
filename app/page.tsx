@@ -11,7 +11,7 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { Looks } from "@/components/landing/looks";
 import { MadeFor } from "@/components/landing/made-for";
 import { Navbar } from "@/components/landing/navbar";
-import { WA_HELLO, waHref } from "@/components/landing/parts";
+import { waFrom } from "@/components/landing/parts";
 import { cheapestMonth } from "@/services/plans";
 import { Pricing } from "@/components/landing/pricing";
 import { Problem } from "@/components/landing/problem";
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
 // playground and the FAQ accordion.
 export default async function Home() {
   const data = await loadLandingData();
-  const hello = waHref(data.whatsappNumber, WA_HELLO);
+  const wa = (source: Parameters<typeof waFrom>[1]) => waFrom(data.whatsappNumber, source);
   const cheapest = cheapestMonth(data.plans);
 
   return (
     <div className={`l-root ${LANDING_FONTS}`}>
-      <Navbar whatsappHref={hello} />
+      <Navbar whatsappHref={wa("navbar")} menuWhatsappHref={wa("menu")} />
       <main>
-        <Hero whatsappHref={hello} fromPrice={cheapest?.perMonth ?? null} />
+        <Hero whatsappHref={wa("hero")} fromPrice={cheapest?.perMonth ?? null} />
         <MadeFor />
         <Problem />
         <Looks suggestions={data.suggestions} />
@@ -52,9 +52,9 @@ export default async function Home() {
         <Pricing plans={data.plans} whatsappNumber={data.whatsappNumber} />
         <Trust />
         <Faq />
-        <ClosingCta whatsappHref={hello} />
+        <ClosingCta whatsappHref={wa("closing")} />
       </main>
-      <Footer whatsappHref={hello} />
+      <Footer whatsappHref={wa("footer")} />
     </div>
   );
 }

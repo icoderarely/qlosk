@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
 import { WhatsAppLogo } from "./parts";
 import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 
-// Privacy, Terms and Refunds have no pages yet, so they point to the top (spec: placeholders before launch).
+// Anchors start with "/" so the footer also works on the legal pages.
 export function Footer({ whatsappHref }: { whatsappHref: string }) {
   return (
     <footer className="l-foot">
@@ -10,7 +11,7 @@ export function Footer({ whatsappHref }: { whatsappHref: string }) {
         <div className="l-foot-top">
           <div className="l-foot-about">
             <div className="l-brand">
-              <span className="l-mark"><BrandMark className="size-5" /></span>
+              <span className="l-mark"><BrandMark className="size-full" /></span>
               <span className="l-serif l-brandname">{BRAND_NAME}</span>
             </div>
             <p>One QR for your whole shop. Built for local shops in India.</p>
@@ -19,22 +20,22 @@ export function Footer({ whatsappHref }: { whatsappHref: string }) {
           <div className="l-footcols">
             <nav className="l-footcol" aria-label="Product">
               <b>Product</b>
-              <a href="#how">How it works</a>
-              <a href="#try">Try a look</a>
-              <a href="#features">Features</a>
-              <a href="#pricing">Pricing</a>
+              <Link href="/#how">How it works</Link>
+              <Link href="/#try">Try a look</Link>
+              <Link href="/#features">Features</Link>
+              <Link href="/#pricing">Pricing</Link>
             </nav>
             <nav className="l-footcol" aria-label="Help">
               <b>Help</b>
-              <a href="#faq">FAQ</a>
+              <Link href="/#faq">FAQ</Link>
               <a href={whatsappHref}>WhatsApp us</a>
               <a href={SUPPORT_EMAIL.includes("@") ? `mailto:${SUPPORT_EMAIL}` : "#top"}>{SUPPORT_EMAIL}</a>
             </nav>
             <nav className="l-footcol" aria-label="Legal">
               <b>Legal</b>
-              <a href="#top">Privacy</a>
-              <a href="#top">Terms</a>
-              <a href="#top">Refunds</a>
+              <Link href="/privacy">Privacy</Link>
+              <Link href="/terms">Terms</Link>
+              <Link href="/refunds">Refunds</Link>
             </nav>
           </div>
         </div>
