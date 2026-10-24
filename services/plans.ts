@@ -106,6 +106,9 @@ export type PricingCard = {
   price: string;
   /** "/ month", "/ 6 months", "/ year". */
   per: string;
+  /** What one month costs on this plan, in whole rupees: "₹167". */
+  perMonth: string;
+  perMonthPaise: number;
   /** Struck-out regular price. Null unless the plan has a higher compare-at price. */
   was: string | null;
   /** Under the price, such as "₹167 a month · save 44%". Empty when there is nothing true to say. */
@@ -136,8 +139,9 @@ function perLabel(months: number): string {
 export function pricingCard(row: PricingRow): PricingCard | null {
   if (row.pricePaise <= 0) return null;
   const struck = row.compareAtPaise !== null && row.compareAtPaise > row.pricePaise ? row.compareAtPaise : null;
+  const perMonthPaise = Math.round(row.pricePaise / row.months / 100) * 100;
   const parts: string[] = [];
-  if (row.months > 1) parts.push(`${formatRupees(Math.round(row.pricePaise / row.months / 100) * 100)} a month`);
+  if (row.months > 1) parts.push(`${formatRupees(perMonthPaise)} a month`);
   if (struck !== null) {
     parts.push(row.months > 1 ? `save ${Math.round((1 - row.pricePaise / struck) * 100)}%` : "Launch price");
   }
@@ -146,6 +150,8 @@ export function pricingCard(row: PricingRow): PricingCard | null {
     title: planTitle(row.months),
     price: formatRupees(row.pricePaise),
     per: perLabel(row.months),
+    perMonth: formatRupees(perMonthPaise),
+    perMonthPaise,
     was: struck === null ? null : formatRupees(struck),
     note: parts.join(" · "),
     bestValue: row.months === 12,
@@ -165,4 +171,9 @@ export async function landingPlans(store: PricingStore): Promise<PricingCard[]> 
 /** The note under the cards applies only when a 6 month or 1 year card shows a struck price. */
 export function showsMultiMonthStrike(cards: PricingCard[]): boolean {
   return cards.some((c) => c.months > 1 && c.was !== null);
+}
+
+/** The cheapest month on offer, for "From ₹167 a month". Null when no plan has a price. */
+export function cheapestMonth(cards: PricingCard[]): PricingCard | null {
+  return cards.reduce<PricingCard | null>((best, c) => (best === null || c.perMonthPaise < best.perMonthPaise ? c : best), null);
 }

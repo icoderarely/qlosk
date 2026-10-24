@@ -1,5 +1,6 @@
 import { BrandMark } from "@/components/brand-mark";
-import { BRAND_CITY, BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
+import { WhatsAppLogo } from "./parts";
+import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 
 // Privacy, Terms and Refunds have no pages yet, so they point to the top (spec: placeholders before launch).
 export function Footer({ whatsappHref }: { whatsappHref: string }) {
@@ -13,6 +14,7 @@ export function Footer({ whatsappHref }: { whatsappHref: string }) {
               <span className="l-serif l-brandname">{BRAND_NAME}</span>
             </div>
             <p>One QR for your whole shop. Built for local shops in India.</p>
+            <a className="l-btn l-btn-b" href={whatsappHref}><WhatsAppLogo />Chat on WhatsApp</a>
           </div>
           <div className="l-footcols">
             <nav className="l-footcol" aria-label="Product">
@@ -38,7 +40,7 @@ export function Footer({ whatsappHref }: { whatsappHref: string }) {
         </div>
         <div className="l-foot-base">
           <span>© {BRAND_NAME}. All rights reserved.</span>
-          <span>{BRAND_CITY}</span>
+          <span>Made with <span aria-hidden="true">♥</span><span className="l-sr">love</span> in India</span>
         </div>
       </div>
     </footer>

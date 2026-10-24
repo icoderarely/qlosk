@@ -348,7 +348,7 @@ function Grid({
 // so the server-rendered preview is already the right size and nothing shifts.
 function LandingPhone({ children }: { children: React.ReactNode }) {
   return (
-    <div className="l-pframe">
+    <div className="l-pframe l-iphone">
       <div
         role="group"
         aria-label="Preview of the shop page"

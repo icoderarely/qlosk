@@ -12,6 +12,7 @@ import { Looks } from "@/components/landing/looks";
 import { MadeFor } from "@/components/landing/made-for";
 import { Navbar } from "@/components/landing/navbar";
 import { WA_HELLO, waHref } from "@/components/landing/parts";
+import { cheapestMonth } from "@/services/plans";
 import { Pricing } from "@/components/landing/pricing";
 import { Problem } from "@/components/landing/problem";
 import { Report } from "@/components/landing/report";
@@ -34,13 +35,13 @@ export const metadata: Metadata = {
 export default async function Home() {
   const data = await loadLandingData();
   const hello = waHref(data.whatsappNumber, WA_HELLO);
-  const monthly = data.plans.find((p) => p.months === 1);
+  const cheapest = cheapestMonth(data.plans);
 
   return (
     <div className={`l-root ${LANDING_FONTS}`}>
       <Navbar whatsappHref={hello} />
       <main>
-        <Hero whatsappHref={hello} fromPrice={monthly?.price ?? null} />
+        <Hero whatsappHref={hello} fromPrice={cheapest?.perMonth ?? null} />
         <MadeFor />
         <Problem />
         <Looks suggestions={data.suggestions} />

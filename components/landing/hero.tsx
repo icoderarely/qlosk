@@ -36,7 +36,7 @@ export function Hero({ whatsappHref, fromPrice }: { whatsappHref: string; fromPr
               <div className="l-art">
                 <div className="l-ring1" />
                 <div className="l-ring2" />
-                <div className="l-hphone">
+                <div className="l-hphone l-iphone">
                   <div className="l-hscreen" inert>
                     <div className="l-hinner">
                       <ShopPage

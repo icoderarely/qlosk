@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   addMonths,
   graceEnds,
+  cheapestMonth,
   isReduced,
   landingPlans,
   pricingCard,
@@ -160,5 +161,19 @@ describe("landing pricing cards", () => {
     assert.deepEqual(cards.map((c) => c.months), [1, 6, 12]);
     assert.equal(showsMultiMonthStrike(cards), true);
     assert.equal(showsMultiMonthStrike(cards.filter((c) => c.months === 1)), false);
+  });
+});
+
+describe("cheapestMonth", () => {
+  it("is the plan with the lowest monthly rate, not the lowest price", async () => {
+    const cards = await landingPlans({
+      standardPlans: async () => [
+        { id: "1", months: 1, pricePaise: 29900, compareAtPaise: 39900 },
+        { id: "6", months: 6, pricePaise: 119900, compareAtPaise: 179400 },
+        { id: "12", months: 12, pricePaise: 199900, compareAtPaise: 358800 },
+      ],
+    });
+    assert.equal(cheapestMonth(cards)?.perMonth, "₹167");
+    assert.equal(cheapestMonth([]), null);
   });
 });

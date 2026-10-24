@@ -34,7 +34,7 @@ export function Looks({ suggestions }: { suggestions: Suggestions }) {
             const layout = LAYOUT_OPTIONS.find((l) => l.id === look.layout)?.name ?? look.layout;
             return (
               <li key={type} className="l-mini">
-                <div className="l-mframe" aria-hidden="true">
+                <div className="l-mframe l-iphone" aria-hidden="true">
                   <div className="l-mscreen" inert>
                     <div className="l-minner">
                       <ShopPage
