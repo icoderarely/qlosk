@@ -15,7 +15,7 @@ ADMIN_PASSWORD=       # a long password, used only by the seed script
 
 Run the seed script once, then delete `ADMIN_PASSWORD` from `.env.local`. When you deploy, set the same variables in Vercel with `BETTER_AUTH_URL` set to the live domain, use a different, long password for production, and run the seed once against the production database.
 
-Later slices add: `STORAGE_*` (R2 or Blob), `QR_BASE_URL`, `IP_HASH_SALT`, `CRON_SECRET`, `WHATSAPP_NUMBER`. Claude Code will tell you when a slice needs one.
+Later slices add: `CLOUDINARY_URL`, `QR_BASE_URL`, `IP_HASH_SALT`, `CRON_SECRET`, `WHATSAPP_NUMBER`. Claude Code will tell you when a slice needs one.
 
 ## 1. Does the first prompt build the whole admin panel?
 

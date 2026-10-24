@@ -33,7 +33,7 @@ One Next.js app does everything for v1. Business logic lives in `services/` with
 | ORM | Prisma | Typed queries, easy migrations |
 | Admin auth | Better Auth, username and password | Sign-up is closed; accounts are created by the owner only |
 | Validation | zod | Shared by forms and route handlers |
-| Files | Cloudflare R2 or Vercel Blob | Logos and covers; behind one storage service |
+| Files | Cloudinary | Logos and covers; behind one storage service |
 | Hosting | Vercel | Cron jobs for daily stats and reminders |
 | Payments | Razorpay (later) | After v1 |
 

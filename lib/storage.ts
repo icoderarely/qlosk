@@ -1,28 +1,31 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { put } from "@vercel/blob";
+import { v2 as cloudinary } from "cloudinary";
 import type { ImageStore } from "@/services/storage";
 
-// Vercel Blob when BLOB_READ_WRITE_TOKEN is set. In development without it,
-// files go to public/uploads (git-ignored) so uploads work offline. Production
-// without a token fails loudly rather than losing files on a read-only disk.
+// Cloudinary when CLOUDINARY_URL is set (the SDK reads it from the environment).
+// In development without it, files go to public/uploads (git-ignored) so uploads
+// work offline. Production without it fails loudly rather than losing files on a
+// read-only disk.
 export function createImageStore(): ImageStore {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (token) {
+  if (process.env.CLOUDINARY_URL) {
     return {
-      async put(key, bytes, contentType) {
-        const blob = await put(key, Buffer.from(bytes), {
-          access: "public",
-          contentType,
-          addRandomSuffix: false,
-          token,
+      async put(key, bytes) {
+        const publicId = key.replace(/\.[^./]+$/, "");
+        const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+          cloudinary.uploader
+            .upload_stream(
+              { public_id: publicId, resource_type: "image", overwrite: false, secure: true },
+              (error, uploaded) => (uploaded ? resolve(uploaded) : reject(error ?? new Error("Upload failed."))),
+            )
+            .end(Buffer.from(bytes));
         });
-        return blob.url;
+        return result.secure_url;
       },
     };
   }
   if (process.env.NODE_ENV === "production") {
-    throw new Error("BLOB_READ_WRITE_TOKEN is not set. See .env.example.");
+    throw new Error("CLOUDINARY_URL is not set. See .env.example.");
   }
   return {
     async put(key, bytes) {
