@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Landing page v2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&amp;family=DM+Sans:wght@400;500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.l-root{--paper:#FBF8F2;--ink:#11201C;--ink2:#0D1F1B;--mut:#55635E;--line:#E7E1D4;--butter:#FBF1B5;--deep:color-mix(in srgb, var(--accent) 62%, #000000);--mint:color-mix(in srgb, var(--accent) 11%, #ffffff);font-family:'Manrope',system-ui,sans-serif;font-size:16px;line-height:1.55;color:var(--ink);background:var(--paper);overflow-x:hidden}
+.l-root *{box-sizing:border-box}
+.l-root a{color:inherit;text-decoration:none}
+.l-root button,.l-root input{font-family:inherit;font-size:16px}
+.l-root a:focus-visible,.l-root button:focus-visible,.l-root input:focus-visible{outline:3px solid #E9C94A;outline-offset:2px}
+.l-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.l-wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+.l-serif{font-family:'Fraunces',Georgia,serif;font-weight:700;letter-spacing:-0.02em}
+.l-h1{margin:0;font-size:clamp(40px,6.2vw,78px);line-height:1.02}
+.l-h2{margin:0;font-size:clamp(30px,4.2vw,52px);line-height:1.08}
+.l-h3{margin:0;font-size:20px;line-height:1.25;font-weight:800}
+.l-lead{font-size:clamp(16px,1.6vw,20px);color:var(--mut);margin:0}
+.l-kick{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent)}
+.l-kick::before{content:'';width:22px;height:2px;background:currentColor;border-radius:2px}
+.l-sec{padding:112px 0}
+.l-head{max-width:680px;display:flex;flex-direction:column;gap:18px;margin-bottom:52px}
+.l-head-c{margin-left:auto;margin-right:auto;text-align:center;align-items:center}
+.l-ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* buttons: specificity beats .l-root a */
+.l-root .l-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;font-weight:800;border:2px solid transparent;cursor:pointer;white-space:nowrap;transition:transform .15s ease, box-shadow .15s ease}
+.l-root .l-btn:hover{transform:translateY(-1px)}
+.l-root .l-btn-p{background:var(--accent);color:#FFFFFF;box-shadow:0 12px 26px -12px var(--accent)}
+.l-root .l-btn-s{background:#FFFFFF;color:var(--ink);border-color:var(--line)}
+.l-root .l-btn-b{background:var(--butter);color:#1B1A10;box-shadow:0 12px 28px -12px rgba(0,0,0,.45)}
+.l-root .l-btn-g{background:rgba(255,255,255,.08);color:#FFFFFF;border-color:rgba(255,255,255,.32)}
+.l-root .l-btn-k{background:var(--ink2);color:#FFFFFF}
+
+.l-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px}
+.l-lift{transition:transform .2s ease, box-shadow .2s ease}
+.l-lift:hover{transform:translateY(-3px);box-shadow:0 22px 40px -26px rgba(17,32,28,.45)}
+
+/* nav */
+.l-navwrap{position:sticky;top:0;z-index:60;height:0;display:flex;justify-content:center;padding:0 16px}
+.l-navbar{margin-top:18px;width:min(1180px,100%);height:70px;border-radius:26px;background:var(--ink2);color:#F3F8F6;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 24px;gap:16px;box-shadow:0 18px 40px -18px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.06)}
+.l-navbar.l-compact{width:min(780px,100%);height:60px}
+@supports (animation-timeline: scroll()){
+  .l-navbar{animation:l-shrink linear both;animation-timeline:scroll(root);animation-range:0px 180px}
+  .l-navbar.l-compact{animation:none}
+}
+@keyframes l-shrink{to{width:min(780px,100%);height:60px}}
+.l-brand{display:flex;align-items:center;gap:10px;color:#FFFFFF}
+.l-mark{width:34px;height:34px;border-radius:11px;background:var(--butter);display:flex;align-items:center;justify-content:center;color:var(--ink2);flex:none}
+.l-links{display:flex;gap:22px}
+.l-root .l-link{color:#CFE0DA;font-weight:600;font-size:15px;padding:10px 4px;white-space:nowrap}
+.l-root .l-link:hover{color:#FFFFFF}
+.l-navend{display:flex;align-items:center;gap:8px}
+.l-root .l-go{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;border-radius:18px;background:var(--butter);color:#1B1A10;font-weight:800;font-size:14px;letter-spacing:0.09em;text-transform:uppercase;white-space:nowrap}
+.l-burger{display:none;width:46px;height:46px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#FFFFFF;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.l-menu{display:none}
+
+/* hero */
+.l-herobox{position:relative;overflow:hidden;border-radius:44px;background:radial-gradient(900px 520px at 85% 18%, color-mix(in srgb, var(--accent) 50%, #86D8C5) 0%, transparent 60%),linear-gradient(165deg, var(--accent) 0%, var(--deep) 100%);color:#FFFFFF;padding:150px 0 96px}
+.l-herobox::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.12) 1px, transparent 1.4px);background-size:26px 26px;-webkit-mask-image:linear-gradient(180deg, transparent, #000 40%, transparent);mask-image:linear-gradient(180deg, transparent, #000 40%, transparent);pointer-events:none}
+.l-hero{display:flex;flex-wrap:wrap;align-items:center;gap:56px 40px;position:relative}
+.l-hero-copy{flex:1 1 480px;display:flex;flex-direction:column;gap:28px;align-items:flex-start;min-width:0}
+.l-hero-art{flex:1 1 420px;display:flex;justify-content:center;min-width:0}
+.l-art{position:relative;width:440px;height:730px;flex:none}
+.l-ring1{position:absolute;left:50%;top:50%;width:560px;height:560px;margin:-300px 0 0 -280px;border-radius:999px;border:1px solid rgba(255,255,255,.16)}
+.l-ring2{position:absolute;left:50%;top:50%;width:400px;height:400px;margin:-240px 0 0 -200px;border-radius:999px;background:rgba(255,255,255,.07)}
+.l-hphone{position:absolute;left:50%;top:0;width:324px;height:700px;margin-left:-162px;padding:6px;background:var(--ink2);border-radius:44px;box-shadow:0 50px 70px -30px rgba(0,0,0,.6);transform:rotate(2deg)}
+.l-float{position:absolute;background:#fff;border-radius:18px;box-shadow:0 20px 40px -20px rgba(0,0,0,.45);color:var(--ink2)}
+.l-badge{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);font-weight:700;font-size:14px;color:#E6F2EE}
+.l-checks{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 22px;color:#CFE5DF;font-weight:600;font-size:15px}
+.l-checks li{display:flex;align-items:center;gap:8px}
+.l-ctas{display:flex;flex-wrap:wrap;gap:12px}
+
+/* strip */
+.l-strip{padding:26px 0}
+.l-strip-row{display:flex;flex-wrap:nowrap;gap:12px;align-items:center;justify-content:center;overflow-x:auto;scrollbar-width:none}
+.l-strip-row::-webkit-scrollbar{display:none}
+.l-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:700;white-space:nowrap;flex:none}
+.l-pill-more{background:var(--ink2);border-color:var(--ink2);color:#FFFFFF}
+
+/* problem */
+.l-dark{background:var(--ink2);color:#F3F8F6}
+.l-two{display:flex;flex-wrap:wrap;gap:48px;align-items:center}
+.l-two > *{flex:1 1 420px;min-width:0}
+.l-stickers{position:relative;width:250px;height:230px;flex:none}
+.l-sticker{position:absolute;border-radius:16px;padding:14px 18px;font-weight:800;box-shadow:0 8px 18px -8px rgba(0,0,0,.45);white-space:nowrap}
+.l-solve{display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap}
+.l-onecode{background:#fff;color:var(--ink);border-radius:26px;padding:22px 22px 18px;width:200px;text-align:center;box-shadow:0 30px 50px -25px rgba(0,0,0,.6);flex:none}
+
+/* looks gallery */
+.l-looks{display:flex;justify-content:center;gap:22px;align-items:flex-end}
+.l-mini{flex:none;width:180px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.l-mini:nth-child(even){transform:translateY(-28px)}
+.l-mframe{width:180px;padding:4px;background:var(--ink2);border-radius:28px;box-shadow:0 30px 40px -24px rgba(17,32,28,.55)}
+.l-mscreen{width:172px;height:379px;overflow:hidden;border-radius:24px}
+.l-mlabel{font-weight:800;font-size:14px;text-align:center;line-height:1.3}
+.l-mlabel span{display:block;font-weight:600;color:var(--mut);font-size:13px}
+
+/* steps */
+.l-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.l-step{display:flex;flex-direction:column;gap:14px}
+.l-num{font-family:'Fraunces',Georgia,serif;font-weight:700;font-size:44px;line-height:1;color:var(--accent)}
+.l-step p{margin:0;color:var(--mut)}
+.l-step-hi{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.l-step-hi .l-num{color:var(--butter)}
+.l-step-hi p{color:#D6EBE6}
+
+/* playground */
+.l-try{display:flex;flex-wrap:wrap;gap:44px;align-items:flex-start}
+.l-try-ctl{flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:26px}
+.l-try-view{flex:1 1 380px;display:flex;justify-content:center;position:sticky;top:104px;min-width:0}
+.l-pframe{width:372px;flex:none;padding:7px;background:var(--ink2);border-radius:48px;box-shadow:0 40px 70px -30px rgba(17,32,28,.55)}
+.l-pscreen{width:358px;height:794px;overflow:hidden;border-radius:41px}
+.l-lab{display:block;font-size:13px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--mut);margin:0 0 10px}
+.l-chips{display:flex;flex-wrap:wrap;gap:10px}
+.l-chip{min-height:46px;padding:0 20px;border-radius:999px;border:2px solid var(--line);background:#fff;font-weight:700;cursor:pointer;color:var(--ink);flex:none}
+.l-chip-on{background:var(--ink2);border-color:var(--ink2);color:#FFFFFF}
+.l-fields{display:flex;flex-wrap:wrap;gap:16px}
+.l-fields > div{flex:1 1 220px;min-width:0}
+.l-in{width:100%;min-height:52px;padding:0 16px;border-radius:14px;border:2px solid var(--line);background:#fff;color:var(--ink)}
+.l-optgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.l-optgrid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.l-opt{background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:8px;color:var(--ink);min-height:44px;min-width:0}
+.l-opt-on{border-color:var(--ink2);box-shadow:0 0 0 3px color-mix(in srgb, var(--ink2) 12%, transparent)}
+.l-optnote{font-size:13px;color:var(--mut);margin-top:-6px}
+.l-root .l-btn-wide{width:100%;min-height:60px;font-size:18px}
+
+/* features */
+.l-feat{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.l-tile{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px}
+.l-tile p{margin:0;color:var(--mut)}
+.l-tic{width:46px;height:46px;border-radius:14px;background:var(--mint);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.l-tile-hi{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.l-tile-hi p{color:#D6EBE6}
+.l-tile-hi .l-tic{background:rgba(255,255,255,.16);color:#FFFFFF}
+
+/* report */
+.l-mintbg{background:var(--mint)}
+.l-ticks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;font-weight:600}
+.l-ticks li{display:flex;gap:12px}
+
+/* pricing */
+.l-plans{display:grid;grid-template-columns:1fr 1.08fr 1fr;gap:20px;align-items:center;max-width:1120px;margin:0 auto}
+.l-plan{display:flex;flex-direction:column;gap:16px}
+.l-plan ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.l-plan li{display:flex;gap:10px}
+.l-was{color:var(--mut);font-weight:700;font-size:18px;text-decoration-thickness:2px}
+.l-price{font-size:54px;line-height:1}
+.l-per{font-weight:600;color:var(--mut)}
+.l-save{display:inline-block;margin-top:8px;font-weight:800;font-size:14px;color:var(--accent);background:var(--mint);padding:4px 10px;border-radius:999px}
+.l-plan-hi{background:var(--ink2);border-color:var(--ink2);color:#F3F8F6;padding:36px 30px;position:relative;box-shadow:0 40px 60px -34px rgba(13,31,27,.7)}
+.l-plan-hi .l-was,.l-plan-hi .l-per{color:#9FB7B0}
+.l-plan-hi .l-save{background:rgba(251,241,181,.14);color:var(--butter)}
+.l-plan-tag{position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:var(--butter);color:#1B1A10;font-weight:800;font-size:13px;padding:6px 16px;border-radius:999px;white-space:nowrap}
+
+/* misc */
+.l-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.l-faq{width:100%;text-align:left;background:transparent;border:0;padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;cursor:pointer;color:var(--ink);font-weight:800;font-size:18px;min-height:44px}
+.l-cta{position:relative;overflow:hidden;border-radius:44px;padding:72px;color:#FFFFFF;background:linear-gradient(165deg, var(--accent) 0%, var(--deep) 100%);display:flex;flex-wrap:wrap;gap:28px 40px;align-items:center;justify-content:space-between}
+.l-foot{background:#0B1613;color:#BFD3CD;padding:56px 0 32px}
+.l-root .l-foot a{color:#BFD3CD}
+.l-root .l-foot a:hover{color:#FFFFFF}
+.l-footcols{display:flex;flex-wrap:wrap;gap:36px 64px}
+.l-footcol{display:flex;flex-direction:column;gap:10px}
+
+@media (max-width:1024px){
+  .l-feat{grid-template-columns:repeat(2,1fr)}
+  .l-steps{grid-template-columns:repeat(2,1fr)}
+  .l-looks{justify-content:flex-start;overflow-x:auto;padding:36px 4px 10px;scrollbar-width:none}
+}
+@media (max-width:900px){
+  .l-sec{padding:80px 0}
+  .l-links{display:none}
+  .l-burger{display:flex}
+  .l-menu{display:flex;position:absolute;top:96px;left:16px;right:16px;flex-direction:column;gap:4px;background:var(--ink2);border-radius:24px;padding:12px;box-shadow:0 24px 50px -20px rgba(0,0,0,.6)}
+  .l-root .l-menu a{display:flex;align-items:center;min-height:52px;padding:0 16px;border-radius:14px;color:#E6F2EE;font-weight:700;font-size:17px}
+  .l-root .l-menu a.l-btn-b{justify-content:center;margin-top:6px;color:#1B1A10}
+  .l-herobox{padding:120px 0 64px;border-radius:32px}
+  .l-plans{grid-template-columns:1fr;max-width:460px;gap:28px}
+  .l-plan-hi{order:-1}
+  .l-try-view{position:static;order:-1;flex-basis:100%}
+  .l-grid3{grid-template-columns:1fr}
+  .l-cta{padding:44px 32px;border-radius:32px}
+}
+@media (max-width:600px){
+  .l-wrap{padding:0 20px}
+  .l-sec{padding:60px 0}
+  .l-head{margin-bottom:32px;gap:14px}
+  .l-card{padding:20px;border-radius:20px}
+  .l-navbar{padding:0 8px 0 16px;height:62px;border-radius:22px}
+  .l-root .l-go{min-height:42px;padding:0 14px;font-size:12px;border-radius:14px}
+  .l-burger{width:42px;height:42px;border-radius:14px}
+  .l-herobox{padding:104px 0 32px;border-radius:28px}
+  .l-hero{gap:28px}
+  .l-hero-copy{gap:20px}
+  .l-art{transform:scale(.74);transform-origin:top center;margin-bottom:-190px}
+  .l-ring1,.l-float{display:none}
+  .l-ctas{width:100%}
+  .l-root .l-ctas .l-btn{flex:1 1 100%}
+  .l-checks{font-size:14px;gap:8px 16px}
+  .l-strip{padding:18px 0}
+  .l-strip-row{justify-content:flex-start;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+  .l-pill{padding:8px 14px;font-size:14px}
+  .l-two{gap:32px}
+  .l-stickers{transform:scale(.86);transform-origin:center}
+  .l-solve{gap:12px}
+  .l-solve > svg{transform:rotate(90deg)}
+  .l-mini{width:150px}
+  .l-mframe{width:150px;border-radius:24px}
+  .l-mscreen{width:142px;height:313px;border-radius:20px}
+  .l-mscreen > div{transform:scale(.364) !important}
+  .l-steps{grid-template-columns:1fr;gap:12px}
+  .l-step{flex-direction:row;align-items:flex-start;gap:16px;padding:18px}
+  .l-num{font-size:32px;min-width:28px}
+  .l-step .l-h3{font-size:17px}
+  .l-step p{font-size:15px}
+  .l-try{gap:28px}
+  .l-try-ctl{gap:20px}
+  .l-art,.l-pframe{flex:none}
+  .l-pframe{transform:scale(.86);transform-origin:top center;margin-bottom:-113px}
+  .l-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .l-chip{min-height:44px;padding:0 16px}
+  .l-optgrid,.l-optgrid-3{display:flex;overflow-x:auto;gap:8px;scrollbar-width:none;padding-bottom:2px}
+  .l-optgrid > .l-opt{flex:0 0 96px;padding:8px;border-radius:14px}
+  .l-optnote{display:none}
+  .l-feat{gap:12px}
+  .l-tile{padding:16px;border-radius:18px;gap:8px}
+  .l-tile .l-h3{font-size:16px}
+  .l-tile p{font-size:14px}
+  .l-tic{width:40px;height:40px;border-radius:12px}
+  .l-price{font-size:46px}
+  .l-faq{font-size:16px;padding:18px 0}
+  .l-cta{padding:36px 22px;border-radius:28px}
+  .l-footcols{gap:28px 40px}
+}
+</style>
+</helmet>
+
+<div class="l-root" style="--accent:{{accent}}">
+
+  <!-- NAV -->
+  <div class="l-navwrap">
+    <header class="{{navCls}}">
+      <a href="#top" class="l-brand">
+        <span class="l-mark"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h2v2h-2z M18 14v.01 M14 19h2 M18 18v2"/></svg></span>
+        <span class="l-serif" style="font-size:22px">Your Brand</span>
+      </a>
+      <nav class="l-links" aria-label="Main">
+        <a class="l-link" href="#how">How it works</a>
+        <a class="l-link" href="#try">Looks</a>
+        <a class="l-link" href="#pricing">Pricing</a>
+        <a class="l-link" href="#faq">FAQ</a>
+      </nav>
+      <div class="l-navend">
+        <a class="l-go" href="{{waHello}}">Let's go</a>
+        <button type="button" class="l-burger" onClick="{{toggleMenu}}" aria-expanded="{{menuExpanded}}" aria-controls="l-menu" aria-label="{{menuLabel}}">
+          <sc-if value="{{menuClosed}}" hint-placeholder-val="{{ true }}"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></sc-if>
+          <sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></sc-if>
+        </button>
+      </div>
+    </header>
+    <sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+      <nav id="l-menu" class="l-menu" aria-label="Mobile">
+        <a href="#how" onClick="{{closeMenu}}">How it works</a>
+        <a href="#try" onClick="{{closeMenu}}">Try a look</a>
+        <a href="#features" onClick="{{closeMenu}}">Features</a>
+        <a href="#pricing" onClick="{{closeMenu}}">Pricing</a>
+        <a href="#faq" onClick="{{closeMenu}}">FAQ</a>
+        <a class="l-btn l-btn-b" href="{{waHello}}">Message us on WhatsApp</a>
+      </nav>
+    </sc-if>
+  </div>
+
+  <!-- HERO -->
+  <section id="top" style="padding:12px 12px 0">
+    <div class="l-herobox">
+      <div class="l-wrap">
+        <div class="l-hero">
+          <div class="l-hero-copy">
+            <span class="l-badge"><span style="width:8px;height:8px;border-radius:999px;background:var(--butter)"></span>Done for you · set up on WhatsApp</span>
+            <h1 class="l-serif l-h1" style="color:#FFFFFF">One QR for your <em style="color:var(--butter);font-style:italic">whole shop.</em></h1>
+            <p class="l-lead" style="max-width:520px;color:#CFE5DF">Customers scan once and get Call, WhatsApp, Google review, Wi-Fi, Maps and your latest offer. We build the page, print the standee and send you a report every month.</p>
+            <div class="l-ctas">
+              <a class="l-btn l-btn-b" href="#try">Try a look for my shop <svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              <a class="l-btn l-btn-g" href="{{waHello}}">Chat on WhatsApp</a>
+            </div>
+            <ul class="l-checks">
+              <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--butter)"><path d="M5 12l5 5L20 7"/></svg>No app to install</li>
+              <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--butter)"><path d="M5 12l5 5L20 7"/></svg>Setup included</li>
+              <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--butter)"><path d="M5 12l5 5L20 7"/></svg>From ₹299 a month</li>
+            </ul>
+          </div>
+          <div class="l-hero-art">
+            <div class="l-art">
+              <div class="l-ring1"></div>
+              <div class="l-ring2"></div>
+              <div class="l-hphone">
+                <div style="width:312px;height:688px;overflow:hidden;border-radius:38px">
+                  <div style="width:390px;height:860px;transform:scale(0.8);transform-origin:top left">
+                    <dc-import name="ShopPage" theme="graphite" layout="list" font="editorial" hint-size="390px,860px"></dc-import>
+                  </div>
+                </div>
+              </div>
+              <div class="l-float" style="left:-8px;bottom:70px;padding:14px;width:158px;transform:rotate(-5deg)">
+                <svg viewBox="0 0 96 96" width="130" height="130" role="img" aria-label="Sample QR code" style="display:block"><g style="fill:none;stroke:#0D1F1B;stroke-width:6"><rect x="6" y="6" width="28" height="28"/><rect x="62" y="6" width="28" height="28"/><rect x="6" y="62" width="28" height="28"/></g><g style="fill:#0D1F1B"><rect x="15" y="15" width="10" height="10"/><rect x="71" y="15" width="10" height="10"/><rect x="15" y="71" width="10" height="10"/><rect x="42" y="8" width="8" height="8"/><rect x="42" y="24" width="8" height="8"/><rect x="8" y="42" width="8" height="8"/><rect x="24" y="42" width="8" height="8"/><rect x="42" y="42" width="8" height="8"/><rect x="58" y="42" width="8" height="8"/><rect x="74" y="42" width="8" height="8"/><rect x="42" y="58" width="8" height="8"/><rect x="58" y="66" width="8" height="8"/><rect x="74" y="58" width="8" height="8"/><rect x="42" y="74" width="8" height="8"/><rect x="74" y="76" width="8" height="8"/></g></svg>
+                <div style="text-align:center;font-weight:800;margin-top:6px">Scan me</div>
+              </div>
+              <div class="l-float" style="right:-6px;top:120px;padding:12px 16px;display:flex;align-items:center;gap:10px;transform:rotate(3deg)">
+                <span class="l-tic" style="width:34px;height:34px;border-radius:999px"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z"/></svg></span>
+                <span style="font-weight:800;font-size:14px;line-height:1.25">WhatsApp opened<br><span style="font-weight:600;color:var(--mut)">from your counter</span></span>
+              </div>
+              <div class="l-float" style="right:6px;bottom:150px;padding:12px 16px;display:flex;align-items:center;gap:10px;transform:rotate(-2deg)">
+                <span class="l-tic" style="width:34px;height:34px;border-radius:999px"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span>
+                <span style="font-weight:800;font-size:14px;line-height:1.25">Google review<br><span style="font-weight:600;color:var(--mut)">one tap away</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MADE FOR (one line) -->
+  <section class="l-strip" aria-label="Shops we serve">
+    <div class="l-wrap">
+      <div class="l-strip-row">
+        <span style="font-weight:800;color:var(--mut);flex:none;margin-right:4px">Made for</span>
+        <span class="l-pill">Salons</span>
+        <span class="l-pill">Clinics</span>
+        <span class="l-pill">Gyms</span>
+        <span class="l-pill">Cafes</span>
+        <span class="l-pill">Jewellers</span>
+        <span class="l-pill">Boutiques</span>
+        <span class="l-pill l-pill-more">+ many more</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="l-sec l-dark">
+    <div class="l-wrap l-two">
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <span class="l-kick" style="color:var(--butter)">The problem</span>
+        <h2 class="l-serif l-h2">Your counter has too many codes.</h2>
+        <p class="l-lead" style="color:#BFD3CD">A review card here, an Instagram sticker there, a Wi-Fi slip, a menu. Most customers scan one, if any. Put everything behind one code and change it any time, without reprinting.</p>
+      </div>
+      <div class="l-solve">
+        <div class="l-stickers" aria-hidden="true">
+          <span class="l-sticker" style="left:0;top:10px;background:#EFD9D3;color:#7A2B1D;transform:rotate(-8deg)">Review us</span>
+          <span class="l-sticker" style="right:0;top:0;background:#D3E4E0;color:#0B4A40;transform:rotate(6deg)">Instagram</span>
+          <span class="l-sticker" style="left:30px;top:86px;background:#CFE8DF;color:#0B5A4C;transform:rotate(4deg)">WhatsApp</span>
+          <span class="l-sticker" style="right:6px;top:100px;background:#F3E6BF;color:#6A4A0B;transform:rotate(-5deg)">Wi-Fi</span>
+          <span class="l-sticker" style="left:6px;top:168px;background:#E6E4DD;color:#2B2A27;transform:rotate(7deg)">Menu</span>
+          <span class="l-sticker" style="right:20px;top:176px;background:#DCE7D3;color:#2F5A1E;transform:rotate(-6deg)">Maps</span>
+        </div>
+        <svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="width:44px;height:44px;color:var(--butter)"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        <div class="l-onecode">
+          <svg viewBox="0 0 96 96" width="150" height="150" role="img" aria-label="One QR code" style="display:block;margin:0 auto"><g style="fill:none;stroke:#0D1F1B;stroke-width:6"><rect x="6" y="6" width="28" height="28"/><rect x="62" y="6" width="28" height="28"/><rect x="6" y="62" width="28" height="28"/></g><g style="fill:#0D1F1B"><rect x="15" y="15" width="10" height="10"/><rect x="71" y="15" width="10" height="10"/><rect x="15" y="71" width="10" height="10"/><rect x="42" y="8" width="8" height="8"/><rect x="42" y="24" width="8" height="8"/><rect x="8" y="42" width="8" height="8"/><rect x="24" y="42" width="8" height="8"/><rect x="42" y="42" width="8" height="8"/><rect x="58" y="42" width="8" height="8"/><rect x="74" y="42" width="8" height="8"/><rect x="42" y="58" width="8" height="8"/><rect x="58" y="66" width="8" height="8"/><rect x="74" y="58" width="8" height="8"/><rect x="42" y="74" width="8" height="8"/><rect x="74" y="76" width="8" height="8"/></g></svg>
+          <div class="l-serif" style="font-size:20px;margin-top:8px">Scan once</div>
+          <div style="font-size:13px;color:var(--mut)">Everything is here</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOOKS GALLERY -->
+  <section class="l-sec" style="padding-bottom:88px">
+    <div class="l-wrap">
+      <div class="l-head l-head-c">
+        <span class="l-kick">Looks</span>
+        <h2 class="l-serif l-h2">A page that feels like your shop.</h2>
+        <p class="l-lead">Five themes, five layouts and three fonts. We suggest one for your kind of shop, or you pick.</p>
+      </div>
+      <div class="l-looks">
+        <sc-for list="{{gallery}}" as="g" hint-placeholder-count="5">
+          <div class="l-mini">
+            <div class="l-mframe"><div class="l-mscreen">
+              <div style="width:390px;height:860px;transform:scale(0.441);transform-origin:top left">
+                <dc-import name="ShopPage" theme="{{g.theme}}" layout="{{g.layout}}" font="{{g.font}}" shopname="{{g.name}}" tagline="{{g.tagline}}" area="{{g.area}}" cta="{{g.cta}}" hint-size="390px,860px"></dc-import>
+              </div>
+            </div></div>
+            <div class="l-mlabel">{{g.label}}<span>{{g.look}}</span></div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:36px">
+        <a class="l-btn l-btn-k" href="#try">Try them on your shop <svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="l-sec" style="padding-top:40px">
+    <div class="l-wrap">
+      <div class="l-head">
+        <span class="l-kick">How it works</span>
+        <h2 class="l-serif l-h2">From a hello to a live counter in a few days.</h2>
+        <p class="l-lead">You send a message. We do the rest.</p>
+      </div>
+      <div class="l-steps">
+        <div class="l-step l-card l-lift"><div class="l-num">1</div><div><h3 class="l-h3">Message us on WhatsApp</h3><p>Send your shop name, logo, phone number and links.</p></div></div>
+        <div class="l-step l-card l-lift"><div class="l-num">2</div><div><h3 class="l-h3">We build your page</h3><p>Pick a look or let us suggest one. See a preview before you pay.</p></div></div>
+        <div class="l-step l-card l-lift"><div class="l-num">3</div><div><h3 class="l-h3">We print your standee</h3><p>A ready-to-place stand with your QR, sent to your counter.</p></div></div>
+        <div class="l-step l-card l-step-hi"><div class="l-num">4</div><div><h3 class="l-h3">Customers scan</h3><p>Calls, chats and reviews come in. A report arrives every month.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAYGROUND -->
+  <section id="try" class="l-sec" style="background:#FFFFFF;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="l-wrap">
+      <div class="l-head">
+        <span class="l-kick">Try it yourself</span>
+        <h2 class="l-serif l-h2">Make it yours in a minute.</h2>
+        <p class="l-lead">Pick your shop type, type your name and watch the page change.</p>
+      </div>
+      <div class="l-try">
+        <div class="l-try-ctl">
+          <div>
+            <div class="l-lab">Shop type</div>
+            <div class="l-chips">
+              <sc-for list="{{types}}" as="t" hint-placeholder-count="5">
+                <button type="button" class="{{t.cls}}" onClick="{{t.pick}}" aria-pressed="{{t.pressed}}">{{t.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div class="l-fields">
+            <div><label class="l-lab" for="p-name">Your shop name</label><input id="p-name" class="l-in" type="text" value="{{name}}" onInput="{{setName}}"></div>
+            <div><label class="l-lab" for="p-tag">Your tagline</label><input id="p-tag" class="l-in" type="text" value="{{tagline}}" onInput="{{setTagline}}"></div>
+          </div>
+          <div>
+            <div class="l-lab">Theme</div>
+            <div class="l-optgrid">
+              <sc-for list="{{themeOpts}}" as="t" hint-placeholder-count="5">
+                <button type="button" class="{{t.cls}}" onClick="{{t.pick}}" aria-pressed="{{t.pressed}}">
+                  <div style="{{t.sw}}"><div style="{{t.bar}}"></div><div style="{{t.line}}"></div><div style="{{t.line}}"></div></div>
+                  <span style="font-weight:800">{{t.name}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div class="l-lab">Layout</div>
+            <div class="l-optgrid">
+              <sc-for list="{{layoutOpts}}" as="l" hint-placeholder-count="5">
+                <button type="button" class="{{l.cls}}" onClick="{{l.pick}}" aria-pressed="{{l.pressed}}">
+                  <svg viewBox="0 0 64 44" aria-hidden="true" style="display:block;width:100%;height:auto;background:#F2EFE8;border-radius:10px"><path d="{{l.d2}}" style="fill:#C9CED8"/><path d="{{l.d1}}" style="fill:#0D1F1B"/></svg>
+                  <span style="font-weight:800">{{l.name}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div class="l-lab">Font</div>
+            <div class="l-optgrid l-optgrid-3">
+              <sc-for list="{{fontOpts}}" as="f" hint-placeholder-count="3">
+                <button type="button" class="{{f.cls}}" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}">
+                  <span style="{{f.sample}}">Aa Gg</span>
+                  <span style="font-weight:800">{{f.name}}</span>
+                  <span class="l-optnote">{{f.note}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <a class="l-btn l-btn-p l-btn-wide" href="{{waLook}}">Get this for my shop <svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <p style="margin:-10px 0 0;font-size:14px;color:var(--mut)">Opens WhatsApp with your choices filled in. You can change everything later.</p>
+        </div>
+        <div class="l-try-view">
+          <div class="l-pframe">
+            <div class="l-pscreen">
+              <div style="width:390px;height:860px;transform:scale(0.918);transform-origin:top left">
+                <dc-import name="ShopPage" theme="{{theme}}" layout="{{layout}}" font="{{font}}" shopname="{{name}}" tagline="{{tagline}}" area="{{area}}" cta="{{cta}}" hint-size="390px,860px"></dc-import>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="l-sec">
+    <div class="l-wrap">
+      <div class="l-head">
+        <span class="l-kick">What is on the page</span>
+        <h2 class="l-serif l-h2">Everything your customer needs, one tap away.</h2>
+      </div>
+      <div class="l-feat">
+        <div class="l-tile l-lift"><span class="l-tic"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span><h3 class="l-h3">Call</h3><p>One tap rings your desk.</p></div>
+        <div class="l-tile l-lift"><span class="l-tic"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z"/></svg></span><h3 class="l-h3">WhatsApp</h3><p>A chat with your message already written.</p></div>
+        <div class="l-tile l-lift"><span class="l-tic"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span><h3 class="l-h3">Google reviews</h3><p>A plain link to your review form.</p></div>
+        <div class="l-tile l-lift"><span class="l-tic"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 19.5v.01"/></svg></span><h3 class="l-h3">Wi-Fi</h3><p>Tap to show and copy the password.</p></div>
+        <div class="l-tile l-lift"><span class="l-tic"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z M12 7.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0-5z"/></svg></span><h3 class="l-h3">Directions</h3><p>Opens your shop in Maps.</p></div>
+        <div class="l-tile l-lift"><span class="l-tic"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 1 0-6V6H3z M10 6v12"/></svg></span><h3 class="l-h3">Offers</h3><p>A code to show at the desk.</p></div>
+        <div class="l-tile l-lift"><span class="l-tic"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z M12 8a4 4 0 1 0 0 8a4 4 0 0 0 0-8z"/></svg></span><h3 class="l-h3">Socials and menu</h3><p>Instagram, YouTube, price list.</p></div>
+        <div class="l-tile l-tile-hi"><span class="l-tic"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z M13.5 6.5l4 4"/></svg></span><h3 class="l-h3">We change it for you</h3><p>Message us. The QR never changes.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="l-sec l-mintbg">
+    <div class="l-wrap l-two">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <span class="l-kick">Monthly report</span>
+        <h2 class="l-serif l-h2">A report on WhatsApp, every month.</h2>
+        <p class="l-lead">How many people scanned, what they tapped and your busiest day. Bots and link previews are filtered out, so the numbers are real people.</p>
+        <ul class="l-ticks">
+          <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Scans and button taps</li>
+          <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Your top button and best day</li>
+          <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Sent on the 1st, nothing to log in to</li>
+        </ul>
+      </div>
+      <div style="display:flex;justify-content:center">
+        <div style="width:100%;max-width:440px;background:#FFFFFF;border-radius:28px;padding:22px;box-shadow:0 30px 60px -30px rgba(17,32,28,.4);border:1px solid var(--line)">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            <span style="width:36px;height:36px;border-radius:999px;background:var(--accent);color:#FFFFFF;display:flex;align-items:center;justify-content:center"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z"/></svg></span>
+            <div><div style="font-weight:800">Your Brand</div><div style="font-size:12px;color:var(--mut)">Monthly report · sample</div></div>
+          </div>
+          <div style="background:#F3F6F4;border-radius:18px;padding:18px">
+            <div style="font-weight:800">Your October report</div>
+            <div style="font-size:13px;color:var(--mut);margin-bottom:12px">Sample data, for illustration</div>
+            <svg viewBox="0 0 360 150" role="img" aria-label="Sample bar chart of scans for each week of the month" style="width:100%;height:auto;display:block">
+              <path d="M10 120H350" style="stroke:#D5DDD9;stroke-width:1"/>
+              <g style="fill:var(--accent)"><rect x="30" y="70" width="50" height="50" rx="8"/><rect x="110" y="48" width="50" height="72" rx="8"/><rect x="190" y="30" width="50" height="90" rx="8"/><rect x="270" y="56" width="50" height="64" rx="8"/></g>
+              <g style="font-size:12px;fill:#55635E;font-weight:600" text-anchor="middle"><text x="55" y="140">Week 1</text><text x="135" y="140">Week 2</text><text x="215" y="140">Week 3</text><text x="295" y="140">Week 4</text></g>
+            </svg>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+              <span class="l-pill" style="font-size:13px;padding:6px 12px">Top button: WhatsApp</span>
+              <span class="l-pill" style="font-size:13px;padding:6px 12px">Best day: Saturday</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="l-sec">
+    <div class="l-wrap">
+      <div class="l-head l-head-c">
+        <span class="l-kick">Simple plans</span>
+        <h2 class="l-serif l-h2">Setup is on us.</h2>
+        <p class="l-lead">Every plan includes the page, the setup and changes on WhatsApp. Stay longer, pay less each month.</p>
+      </div>
+      <div class="l-plans">
+        <div class="l-card l-plan l-lift">
+          <div><div class="l-h3">1 month</div><p style="margin:4px 0 0;color:var(--mut)">Try it, no long commitment.</p></div>
+          <div>
+            <div><span class="l-sr">Regular price </span><s class="l-was">₹399</s><span class="l-sr">, launch price</span></div>
+            <span class="l-serif l-price">₹299</span><span class="l-per"> / month</span>
+            <div><span class="l-save">Launch price</span></div>
+          </div>
+          <ul>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Cancel before any month starts</li>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Setup included</li>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Print-ready QR file</li>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Monthly report</li>
+          </ul>
+          <a class="l-btn l-btn-s" href="{{waHello}}">Start monthly</a>
+        </div>
+
+        <div class="l-card l-plan l-plan-hi">
+          <span class="l-plan-tag">Best value</span>
+          <div><div class="l-h3">1 year</div><p style="margin:4px 0 0;color:#BFD3CD">Set it up once and forget it.</p></div>
+          <div>
+            <div><span class="l-sr">Monthly rate for 12 months </span><s class="l-was">₹3,588</s><span class="l-sr">, now</span></div>
+            <span class="l-serif l-price">₹1,999</span><span class="l-per"> / year</span>
+            <div><span class="l-save">₹167 a month · save 44%</span></div>
+          </div>
+          <ul>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--butter);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Price locked for 12 months</li>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--butter);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Setup included</li>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--butter);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Printed standee</li>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--butter);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Renewal reminder on WhatsApp</li>
+          </ul>
+          <a class="l-btn l-btn-b" href="{{waHello}}">Start yearly</a>
+        </div>
+
+        <div class="l-card l-plan l-lift">
+          <div><div class="l-h3">6 months</div><p style="margin:4px 0 0;color:var(--mut)">A full season, no big commitment.</p></div>
+          <div>
+            <div><span class="l-sr">Monthly rate for 6 months </span><s class="l-was">₹1,794</s><span class="l-sr">, now</span></div>
+            <span class="l-serif l-price">₹1,199</span><span class="l-per"> / 6 months</span>
+            <div><span class="l-save">₹200 a month · save 33%</span></div>
+          </div>
+          <ul>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Price locked for 6 months</li>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Setup included</li>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Printed standee</li>
+            <li><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent);margin-top:2px"><path d="M5 12l5 5L20 7"/></svg>Monthly report</li>
+          </ul>
+          <a class="l-btn l-btn-s" href="{{waHello}}">Start 6 months</a>
+        </div>
+      </div>
+      <p style="margin:28px auto 0;text-align:center;font-size:14px;color:var(--mut);max-width:620px">Struck-out prices on the 6-month and yearly plans are the monthly price for the same period.</p>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="l-sec" style="padding-top:0">
+    <div class="l-wrap">
+      <div class="l-head">
+        <span class="l-kick">Built to last</span>
+        <h2 class="l-serif l-h2">The printed code never dies.</h2>
+      </div>
+      <div class="l-grid3">
+        <div class="l-card l-lift"><span class="l-tic" style="margin-bottom:14px"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h6v6h-6z"/></svg></span><h3 class="l-h3">One permanent code</h3><p style="margin:10px 0 0;color:var(--mut)">Your QR points to a short address we control, so we can change your page or its look without reprinting.</p></div>
+        <div class="l-card l-lift"><span class="l-tic" style="margin-bottom:14px"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z M9 12l2 2 4-4"/></svg></span><h3 class="l-h3">Numbers you can trust</h3><p style="margin:10px 0 0;color:var(--mut)">Bots and link previews are filtered out, and sudden spikes are checked, so your report counts real customers.</p></div>
+        <div class="l-card l-lift"><span class="l-tic" style="margin-bottom:14px"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span><h3 class="l-h3">Reviews done honestly</h3><p style="margin:10px 0 0;color:var(--mut)">One plain link to your Google form. No rating filters and no rewards, so your reviews stay genuine.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="l-sec" style="background:#FFFFFF;border-top:1px solid var(--line)">
+    <div class="l-wrap" style="max-width:860px">
+      <div class="l-head">
+        <span class="l-kick">Questions</span>
+        <h2 class="l-serif l-h2">Questions people ask.</h2>
+      </div>
+      <div>
+        <sc-for list="{{faqs}}" as="q" hint-placeholder-count="7">
+          <div style="border-top:1px solid var(--line)">
+            <h3 style="margin:0"><button type="button" class="l-faq" onClick="{{q.toggle}}" aria-expanded="{{q.expanded}}">
+              <span>{{q.q}}</span>
+              <svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true" style="{{q.icon}}"><path d="M12 5v14M5 12h14"/></svg>
+            </button></h3>
+            <sc-if value="{{q.open}}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0 0 22px;color:var(--mut);max-width:720px">{{q.a}}</p>
+            </sc-if>
+          </div>
+        </sc-for>
+        <div style="border-top:1px solid var(--line)"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="padding:88px 0">
+    <div class="l-wrap">
+      <div class="l-cta">
+        <div style="position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:999px;background:rgba(255,255,255,.07)"></div>
+        <div style="flex:1 1 420px;position:relative;min-width:0">
+          <h2 class="l-serif l-h2" style="color:#FFFFFF">Put one standee on your counter.</h2>
+          <p style="margin:14px 0 0;font-size:18px;color:#D6EBE6;max-width:520px">Message us on WhatsApp. You see a preview of your page before you pay anything.</p>
+        </div>
+        <a class="l-btn l-btn-b" href="{{waHello}}" style="position:relative;min-height:60px;font-size:18px">Message us on WhatsApp <svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="l-foot">
+    <div class="l-wrap">
+      <div style="display:flex;flex-wrap:wrap;gap:36px 56px;justify-content:space-between">
+        <div style="flex:1 1 260px;max-width:340px">
+          <div class="l-brand"><span class="l-mark"><svg class="l-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h2v2h-2z M18 14v.01 M14 19h2 M18 18v2"/></svg></span><span class="l-serif" style="font-size:22px">Your Brand</span></div>
+          <p style="margin:14px 0 0">One QR for your whole shop. Built for local shops in India.</p>
+        </div>
+        <div class="l-footcols">
+          <div class="l-footcol"><div style="color:#FFFFFF;font-weight:800">Product</div><a href="#how">How it works</a><a href="#try">Try a look</a><a href="#features">Features</a><a href="#pricing">Pricing</a></div>
+          <div class="l-footcol"><div style="color:#FFFFFF;font-weight:800">Help</div><a href="#faq">FAQ</a><a href="{{waHello}}">WhatsApp us</a><a href="#top">[support email]</a></div>
+          <div class="l-footcol"><div style="color:#FFFFFF;font-weight:800">Legal</div><a href="#top">Privacy</a><a href="#top">Terms</a><a href="#top">Refunds</a></div>
+        </div>
+      </div>
+      <div style="margin-top:40px;padding-top:20px;border-top:1px solid #1E2F2A;font-size:14px;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between"><span>© Your Brand. All rights reserved.</span><span>[city, state]</span></div>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#0F6B5C&quot;,&quot;options&quot;:[&quot;#0F6B5C&quot;,&quot;#2F4BD8&quot;,&quot;#B4441F&quot;,&quot;#11141A&quot;]},&quot;nav&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;auto&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;compact&quot;]},&quot;menu&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;closed&quot;,&quot;options&quot;:[&quot;closed&quot;,&quot;open&quot;]},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const p = props || {};
+    this.state = {
+      type: 'salon',
+      name: 'Velvet Salon & Spa',
+      tagline: 'Hair, skin and bridal studio',
+      theme: 'blush',
+      layout: 'list',
+      font: 'editorial',
+      faq: 0,
+      menu: p.menu === 'open'
+    };
+  }
+
+  renderVals() {
+    const st = this.state;
+    const types = [
+      { id: 'salon', label: 'Salon', name: 'Velvet Salon & Spa', tagline: 'Hair, skin and bridal studio', area: 'Bandra West, Mumbai', cta: 'Book on WhatsApp', theme: 'blush', layout: 'list', font: 'editorial' },
+      { id: 'clinic', label: 'Clinic', name: 'Clearsmile Dental Care', tagline: 'Family dentistry and braces', area: 'Andheri East, Mumbai', cta: 'Book an appointment', theme: 'daylight', layout: 'list', font: 'clean' },
+      { id: 'gym', label: 'Gym', name: 'Forge Fitness Studio', tagline: 'Strength, cardio and classes', area: 'Indiranagar, Bengaluru', cta: 'Ask about membership', theme: 'nightfall', layout: 'tiles', font: 'clean' },
+      { id: 'cafe', label: 'Cafe', name: 'Brew & Bun Cafe', tagline: 'Coffee, bakes and slow mornings', area: 'Koregaon Park, Pune', cta: 'Order on WhatsApp', theme: 'marigold', layout: 'cover', font: 'rounded' },
+      { id: 'jeweller', label: 'Jeweller', name: 'Aarav Jewellers', tagline: 'Gold, diamond and bridal sets', area: 'Zaveri Bazaar, Mumbai', cta: 'Book a showing', theme: 'graphite', layout: 'index', font: 'editorial' }
+    ];
+    const cur = types.find((t) => t.id === st.type) || types[0];
+    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+    const gallery = [types[1], types[2], types[0], types[3], types[4]].map((t) => ({
+      theme: t.theme, layout: t.layout, font: t.font, name: t.name, tagline: t.tagline, area: t.area, cta: t.cta,
+      label: t.label, look: cap(t.theme) + ' · ' + cap(t.layout)
+    }));
+
+    const typeBtns = types.map((t) => ({
+      label: t.label,
+      cls: 'l-chip' + (st.type === t.id ? ' l-chip-on' : ''),
+      pressed: st.type === t.id ? 'true' : 'false',
+      pick: () => this.setState({ type: t.id, name: t.name, tagline: t.tagline, theme: t.theme, layout: t.layout, font: t.font })
+    }));
+
+    const themes = [
+      { id: 'daylight', name: 'Daylight', bg: '#F3F6FB', btn: '#1F4FD1', card: '#FFFFFF', line: '#DCE3EF' },
+      { id: 'nightfall', name: 'Nightfall', bg: '#0F1424', btn: '#FFB547', card: '#1A2138', line: '#2C3554' },
+      { id: 'marigold', name: 'Marigold', bg: '#FFF1D0', btn: '#B4540A', card: '#FFFDF7', line: '#EBD9AE' },
+      { id: 'blush', name: 'Blush', bg: '#FDEFF1', btn: '#9F1D45', card: '#FFFFFF', line: '#F2D3D9' },
+      { id: 'graphite', name: 'Graphite', bg: '#F2F1EF', btn: '#16181D', card: '#FFFFFF', line: '#DEDBD6' }
+    ];
+    const themeOpts = themes.map((t) => ({
+      name: t.name,
+      cls: 'l-opt' + (st.theme === t.id ? ' l-opt-on' : ''),
+      pressed: st.theme === t.id ? 'true' : 'false',
+      sw: 'background:' + t.bg + ';border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;border:1px solid #E7E1D4',
+      bar: 'height:12px;border-radius:6px;background:' + t.btn,
+      line: 'height:8px;border-radius:4px;background:' + t.card + ';border:1px solid ' + t.line,
+      pick: () => this.setState({ theme: t.id })
+    }));
+
+    const layouts = [
+      { id: 'list', name: 'List', d1: 'M8 7h48v8H8z', d2: 'M8 19h48v5H8z M8 27h48v5H8z M8 35h48v5H8z' },
+      { id: 'tiles', name: 'Tiles', d1: 'M8 5h48v8H8z', d2: 'M8 17h22v10H8z M34 17h22v10H34z M8 31h22v10H8z M34 31h22v10H34z' },
+      { id: 'cover', name: 'Cover', d1: 'M8 21h48v8H8z', d2: 'M0 0h64v14H0z M8 33h48v4H8z M8 39h48v4H8z' },
+      { id: 'index', name: 'Index', d1: 'M8 12h48v9H8z', d2: 'M8 4h26v5H8z M8 26h48v1H8z M8 29h6v3H8z M18 29h38v3H18z M8 35h48v1H8z M8 38h6v3H8z M18 38h38v3H18z' },
+      { id: 'chat', name: 'Chat', d1: 'M30 28h26v7H30z', d2: 'M8 5h30v8H8z M8 16h24v8H8z M36 38h20v5H36z' }
+    ];
+    const layoutOpts = layouts.map((l) => ({
+      name: l.name, d1: l.d1, d2: l.d2,
+      cls: 'l-opt' + (st.layout === l.id ? ' l-opt-on' : ''),
+      pressed: st.layout === l.id ? 'true' : 'false',
+      pick: () => this.setState({ layout: l.id })
+    }));
+
+    const fonts = [
+      { id: 'editorial', name: 'Editorial', note: 'Serif headings', sample: "font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:700;line-height:1.1" },
+      { id: 'clean', name: 'Clean', note: 'Modern sans', sample: "font-family:'DM Sans',system-ui,sans-serif;font-size:26px;font-weight:700;line-height:1.1" },
+      { id: 'rounded', name: 'Rounded', note: 'Friendly and soft', sample: "font-family:'Nunito',system-ui,sans-serif;font-size:26px;font-weight:800;line-height:1.1" }
+    ];
+    const fontOpts = fonts.map((f) => ({
+      name: f.name, note: f.note, sample: f.sample,
+      cls: 'l-opt' + (st.font === f.id ? ' l-opt-on' : ''),
+      pressed: st.font === f.id ? 'true' : 'false',
+      pick: () => this.setState({ font: f.id })
+    }));
+
+    const faqData = [
+      { q: 'What do I need to get started?', a: 'A WhatsApp message with your shop name, logo, phone number and the links you want, such as Instagram and your Google review link. If something is missing, we help you set it up.' },
+      { q: 'Do my customers need an app?', a: 'No. They scan the code with their phone camera and your page opens in the browser. It loads fast, even on a slow connection.' },
+      { q: 'Can I change things later?', a: 'Yes. Message us and we change your number, offer, festival banner, buttons or look. The printed code stays exactly the same.' },
+      { q: 'Do I get a printed standee?', a: 'The 6-month and yearly plans include a printed standee with your QR code. The monthly plan includes a print-ready file you can print yourself.' },
+      { q: 'Can you get me more Google reviews?', a: 'We make it easy for happy customers to leave one with a single tap. We do not filter by rating or offer rewards for reviews, because Google does not allow it and it can hurt your listing.' },
+      { q: 'What happens when my plan ends?', a: 'Your page stays fully live for 15 more days. After that it shows your shop name, a Call button and Directions, so the printed code never leads to a dead page. Renew any time to switch everything back on.' },
+      { q: 'How do I pay?', a: 'After you approve the preview, we share payment details on WhatsApp. You never pay before you have seen your page.' }
+    ];
+    const faqs = faqData.map((q, i) => {
+      const open = st.faq === i;
+      return {
+        q: q.q, a: q.a, open: open, expanded: open ? 'true' : 'false',
+        icon: open ? 'transform:rotate(45deg);color:var(--accent);transition:transform .2s' : 'color:var(--accent);transition:transform .2s',
+        toggle: () => this.setState({ faq: this.state.faq === i ? -1 : i })
+      };
+    });
+
+    const msg = 'Hi, I want a QR page for ' + (st.name || 'my shop') + '. I liked the ' + st.theme + ' theme, ' + st.layout + ' layout and ' + st.font + ' font.';
+    return {
+      accent: this.props.accent ?? '#0F6B5C',
+      navCls: this.props.nav === 'compact' ? 'l-navbar l-compact' : 'l-navbar',
+      menuOpen: !!st.menu,
+      menuClosed: !st.menu,
+      menuExpanded: st.menu ? 'true' : 'false',
+      menuLabel: st.menu ? 'Close menu' : 'Open menu',
+      toggleMenu: () => this.setState({ menu: !this.state.menu }),
+      closeMenu: () => this.setState({ menu: false }),
+      gallery: gallery,
+      types: typeBtns,
+      themeOpts: themeOpts,
+      layoutOpts: layoutOpts,
+      fontOpts: fontOpts,
+      faqs: faqs,
+      name: st.name,
+      tagline: st.tagline,
+      area: cur.area,
+      cta: cur.cta,
+      theme: st.theme,
+      layout: st.layout,
+      font: st.font,
+      setName: (e) => this.setState({ name: e.target.value }),
+      setTagline: (e) => this.setState({ tagline: e.target.value }),
+      waHello: 'https://wa.me/?text=' + encodeURIComponent('Hi, I would like a QR page for my ' + cur.label.toLowerCase() + '.'),
+      waLook: 'https://wa.me/?text=' + encodeURIComponent(msg)
+    };
+  }
+}
+</script>
+</body>
+</html>

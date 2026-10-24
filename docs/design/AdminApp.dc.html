@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin app</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:wght@600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.a-root{font-family:'Manrope',system-ui,sans-serif;font-size:14px;line-height:1.45;color:#11141A}
+.a-root button,.a-root input,.a-root textarea,.a-root select{font-family:inherit;font-size:14px}
+.a-root button:focus-visible,.a-root input:focus-visible,.a-root textarea:focus-visible,.a-root select:focus-visible{outline:2px solid #11141A;outline-offset:2px}
+.a-ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.a-card{background:#fff;border:1px solid #E3E5EA;border-radius:14px;padding:20px;box-sizing:border-box;min-width:0}
+.a-h1{margin:0;font-size:28px;font-weight:800;letter-spacing:-0.01em}
+.a-h2{margin:0;font-size:16px;font-weight:800}
+.a-sub{color:#5B6270}
+.a-btn{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #D5D8DF;background:#fff;color:#11141A;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-sizing:border-box}
+.a-btn-p{background:var(--accent);border-color:var(--accent);color:#fff}
+.a-chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.a-c-g{color:#0B5A4C;background:#E1F2EE}
+.a-c-a{color:#7A4F00;background:#FFF1CF}
+.a-c-r{color:#9B2218;background:#FDE6E3}
+.a-c-b{color:#1D3FA6;background:#E5ECFD}
+.a-c-n{color:#454B58;background:#ECEEF2}
+.a-in{min-height:44px;width:100%;box-sizing:border-box;padding:0 12px;border-radius:10px;border:1px solid #D5D8DF;background:#fff;color:#11141A}
+textarea.a-in{padding:10px 12px;min-height:88px;resize:vertical}
+.a-lab{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.a-field{flex:1 1 240px;min-width:0}
+.a-row{display:flex;flex-wrap:wrap;gap:16px}
+.a-tbl{width:100%;border-collapse:collapse;text-align:left}
+.a-tbl th{padding:10px 8px;font-size:12px;color:#5B6270;font-weight:700}
+.a-tbl td{padding:12px 8px;border-top:1px solid #ECEEF2;vertical-align:middle}
+.a-mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px}
+.a-nav{display:flex;align-items:center;gap:10px;padding:0 12px;min-height:44px;border-radius:10px;border:0;width:100%;background:transparent;color:#454B58;font-weight:600;text-align:left;cursor:pointer}
+.a-rail{width:48px;height:48px;border-radius:12px;border:0;background:transparent;color:#454B58;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.a-nav-on{background:color-mix(in srgb, var(--accent) 12%, #ffffff);color:var(--accent);font-weight:700}
+.a-tab{min-height:44px;padding:0 14px;border:0;border-bottom:3px solid transparent;background:transparent;color:#454B58;font-weight:600;cursor:pointer}
+.a-tab-on{border-bottom-color:var(--accent);color:#11141A;font-weight:800}
+.a-opt{background:#fff;border:2px solid #E3E5EA;border-radius:14px;padding:10px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:8px;color:#11141A;box-sizing:border-box}
+.a-opt-on{border-color:var(--accent)}
+.a-sw{width:44px;height:26px;border-radius:999px;background:#C9CED8;position:relative;flex:none;border:0;padding:0;cursor:pointer}
+.a-sw::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff}
+.a-sw-on{background:var(--accent)}
+.a-sw-on::after{left:21px}
+.a-note{font-size:13px;font-weight:600}
+.a-up{color:#0B5A4C}
+.a-warn{color:#7A4F00}
+.a-mut{color:#5B6270}
+.a-seg{display:flex;flex-wrap:wrap;gap:4px;background:#E9EBF0;padding:4px;border-radius:12px}
+.a-seg button{min-height:40px;padding:0 14px;border-radius:9px;border:0;background:transparent;color:#454B58;font-weight:600;cursor:pointer}
+.a-seg .a-seg-on{background:#fff;color:#11141A;font-weight:700}
+.a-lbl-up{margin:0 0 8px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#5B6270;font-weight:700}
+.a-sep{border-top:1px solid #ECEEF2}
+</style>
+</helmet>
+
+<div class="a-root" style="--accent:{{accent}};min-height:{{minH}};background:#F4F5F7;display:flex;flex-wrap:wrap;align-items:stretch">
+
+  <sc-if value="{{isLogin}}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1 1 100%;min-height:{{minH}};display:flex;align-items:center;justify-content:center;padding:40px 20px;box-sizing:border-box">
+    <div class="a-card" style="width:100%;max-width:420px;padding:32px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;border-radius:10px;background:var(--accent)"></div>
+        <div style="font-weight:800;font-size:18px">Your Brand</div>
+      </div>
+      <div>
+        <h1 class="a-h1" style="font-size:26px">Sign in to admin</h1>
+        <p class="a-sub" style="margin:6px 0 0">Enter your username and password.</p>
+      </div>
+      <form onSubmit="{{signIn}}" style="display:flex;flex-direction:column;gap:16px">
+        <div><label class="a-lab" for="l-user">Username</label><input id="l-user" class="a-in" type="text" autocomplete="username"></div>
+        <div><label class="a-lab" for="l-pass">Password</label><input id="l-pass" class="a-in" type="password" autocomplete="current-password"></div>
+        <button type="submit" class="a-btn a-btn-p" style="width:100%">Sign in</button>
+      </form>
+      <p class="a-sub" style="margin:0;font-size:13px">Accounts are created by the owner. There is no public sign-up.</p>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{navOpen}}" hint-placeholder-val="{{ true }}">
+  <nav aria-label="Main" style="flex:1 1 232px;background:#fff;border-right:1px solid #E3E5EA;padding:22px 14px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 0 18px 12px">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <div style="width:30px;height:30px;border-radius:9px;background:var(--accent);flex:none"></div>
+        <div style="font-weight:800;font-size:16px;white-space:nowrap">Your Brand</div>
+      </div>
+      <button type="button" onClick="{{toggleNav}}" aria-label="Collapse sidebar" aria-expanded="true" class="a-rail" style="width:44px;height:44px;flex:none">
+        <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+      </button>
+    </div>
+    <sc-for list="{{navItems}}" as="n" hint-placeholder-count="7">
+      <button type="button" class="{{n.cls}}" onClick="{{n.go}}" aria-current="{{n.current}}">
+        <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"/></svg>
+        {{n.label}}
+      </button>
+    </sc-for>
+    <div style="margin-top:auto;padding-top:14px;border-top:1px solid #E3E5EA;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px;padding:0 12px">
+        <div style="width:34px;height:34px;flex:none;border-radius:999px;background:#ECEEF2;display:flex;align-items:center;justify-content:center;font-weight:800;color:#454B58">A</div>
+        <div style="min-width:0"><div style="font-weight:700">Admin</div><div class="a-sub" style="font-size:12px">[your email]</div></div>
+      </div>
+      <button type="button" class="a-btn" onClick="{{logout}}" style="justify-content:flex-start">
+        <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Log out
+      </button>
+    </div>
+  </nav>
+  </sc-if>
+
+  <sc-if value="{{navClosed}}" hint-placeholder-val="{{ false }}">
+  <nav aria-label="Main" style="flex:0 0 76px;background:#fff;border-right:1px solid #E3E5EA;padding:20px 0;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:8px">
+    <div style="width:34px;height:34px;border-radius:10px;background:var(--accent)" role="img" aria-label="Your Brand"></div>
+    <button type="button" onClick="{{toggleNav}}" aria-label="Expand sidebar" aria-expanded="false" class="a-rail" style="margin:4px 0 8px;height:44px">
+      <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+    </button>
+    <sc-for list="{{navItems}}" as="n" hint-placeholder-count="7">
+      <button type="button" class="{{n.railCls}}" onClick="{{n.go}}" aria-label="{{n.label}}" aria-current="{{n.current}}">
+        <svg class="a-ic" style="width:20px;height:20px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"/></svg>
+      </button>
+    </sc-for>
+    <div style="margin-top:auto;padding-top:14px;display:flex;flex-direction:column;align-items:center;gap:8px">
+      <div style="width:36px;height:36px;border-radius:999px;background:#ECEEF2;display:flex;align-items:center;justify-content:center;font-weight:800;color:#454B58" role="img" aria-label="Signed in as admin">A</div>
+      <button type="button" onClick="{{logout}}" aria-label="Log out" class="a-rail">
+        <svg class="a-ic" style="width:20px;height:20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </nav>
+  </sc-if>
+
+  <sc-if value="{{hasShell}}" hint-placeholder-val="{{ true }}">
+  <main style="flex:999 1 560px;min-width:0;padding:28px 32px 40px;box-sizing:border-box;display:flex;flex-direction:column;gap:22px">
+
+    <sc-if value="{{pOverview}}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px">
+      <div><h1 class="a-h1">Overview</h1><p class="a-sub" style="margin:4px 0 0">Everything across your shops, last 30 days.</p></div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <button type="button" class="a-btn">Last 30 days <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <button type="button" class="a-btn a-btn-p" onClick="{{newShop}}"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New shop</button>
+      </div>
+    </div>
+    <div class="a-row">
+      <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+        <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-weight:600;font-size:13px">{{k.label}}</div><div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;margin-top:4px">{{k.value}}</div><div class="{{k.nc}}">{{k.note}}</div></div>
+      </sc-for>
+    </div>
+    <div class="a-row">
+      <section aria-label="Scans per day" class="a-card" style="flex:2 1 480px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap"><h2 class="a-h2">Scans per day</h2><span class="a-sub" style="font-size:13px">Counted scans, all shops</span></div>
+        <svg viewBox="0 0 640 230" role="img" aria-label="Line chart of counted scans per day over the last 30 days, rising from about 150 to about 530" style="width:100%;height:auto;display:block;margin-top:12px">
+          <path d="M40 190H620M40 135H620M40 80H620M40 25H620" style="stroke:#E3E5EA;stroke-width:1;fill:none"/>
+          <g style="fill:#5B6270;font-size:11px" text-anchor="end"><text x="32" y="194">0</text><text x="32" y="139">200</text><text x="32" y="84">400</text><text x="32" y="29">600</text></g>
+          <path d="M40 190V150L84 140L128 145L172 120L216 125L260 100L304 110L348 90L392 95L436 70L480 80L524 60L568 65L612 45V190Z" style="fill:var(--accent);fill-opacity:0.12"/>
+          <path d="M40 150L84 140L128 145L172 120L216 125L260 100L304 110L348 90L392 95L436 70L480 80L524 60L568 65L612 45" style="fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round"/>
+          <circle cx="612" cy="45" r="4.5" style="fill:var(--accent)"/>
+          <g style="fill:#5B6270;font-size:11px" text-anchor="middle"><text x="40" y="214">Sep 24</text><text x="216" y="214">Oct 3</text><text x="392" y="214">Oct 12</text><text x="606" y="214">Oct 23</text></g>
+        </svg>
+      </section>
+      <section aria-label="Most used buttons" class="a-card" style="flex:1 1 300px;display:flex;flex-direction:column;gap:14px">
+        <h2 class="a-h2">Most used buttons</h2>
+        <sc-for list="{{bars}}" as="b" hint-placeholder-count="5">
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;font-weight:600"><span>{{b.label}}</span><span class="a-sub">{{b.pct}}</span></div><div style="height:8px;border-radius:999px;background:#ECEEF2"><div style="{{b.fill}}"></div></div></div>
+        </sc-for>
+      </section>
+    </div>
+    <div class="a-row" style="align-items:flex-start">
+      <section aria-label="Needs attention" class="a-card" style="flex:1 1 340px">
+        <h2 class="a-h2" style="margin-bottom:8px">Needs attention</h2>
+        <sc-for list="{{attention}}" as="a" hint-placeholder-count="4">
+          <div class="a-sep" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0"><div style="min-width:0"><div style="font-weight:700">{{a.title}}</div><div class="a-sub" style="font-size:13px">{{a.detail}}</div></div><button type="button" class="a-btn">{{a.action}}</button></div>
+        </sc-for>
+      </section>
+      <section aria-label="Recent shops" class="a-card" style="flex:2 1 520px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px"><h2 class="a-h2">Recent shops</h2><button type="button" class="a-btn" onClick="{{goShops}}" style="min-height:36px">View all shops</button></div>
+        <div style="overflow-x:auto">
+          <table class="a-tbl" style="min-width:540px">
+            <thead><tr><th>Shop</th><th>Code</th><th>Plan</th><th style="text-align:right">Scans, 30 days</th><th>Status</th></tr></thead>
+            <tbody>
+              <sc-for list="{{recent}}" as="r" hint-placeholder-count="5">
+                <tr><td style="font-weight:700">{{r.name}}</td><td class="a-mono">{{r.code}}</td><td>{{r.plan}}</td><td style="text-align:right;font-weight:600">{{r.scans}}</td><td><span class="{{r.chip}}">{{r.status}}</span></td></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{pShops}}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px">
+      <div><h1 class="a-h1">Shops</h1><p class="a-sub" style="margin:4px 0 0">Find a shop, change its look, or download its print file.</p></div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        <div class="a-seg"><button type="button" class="a-seg-on">All 48</button><button type="button">Live 42</button><button type="button">Preview 3</button><button type="button">Building 2</button><button type="button">Expired 1</button></div>
+        <button type="button" class="a-btn a-btn-p" onClick="{{newShop}}"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New shop</button>
+      </div>
+    </div>
+    <section aria-label="Shops table" class="a-card" style="padding:0;overflow:hidden">
+      <div style="display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;border-bottom:1px solid #ECEEF2">
+        <div style="flex:1 1 240px;position:relative">
+          <label for="shop-search" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search shops</label>
+          <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true" style="position:absolute;left:12px;top:13px;color:#5B6270"><path d="M11 4a7 7 0 1 0 0 14a7 7 0 0 0 0-14z M20 20l-4-4"/></svg>
+          <input id="shop-search" type="text" class="a-in" placeholder="Search name, code, slug or phone" style="padding-left:38px">
+        </div>
+        <button type="button" class="a-btn">Shop type <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <button type="button" class="a-btn">Theme <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <button type="button" class="a-btn">Layout <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <button type="button" class="a-btn">Plan <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      </div>
+      <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;background:color-mix(in srgb, var(--accent) 10%, #ffffff);border-bottom:1px solid #ECEEF2">
+        <span style="font-weight:800">{{selText}}</span>
+        <button type="button" class="a-btn">Change theme</button>
+        <button type="button" class="a-btn">Change layout</button>
+        <button type="button" class="a-btn">Change font</button>
+        <button type="button" class="a-btn">Export</button>
+        <button type="button" class="a-btn" onClick="{{clearSel}}" style="border-color:transparent;background:transparent">Clear</button>
+      </div>
+      </sc-if>
+      <div style="overflow-x:auto">
+        <table class="a-tbl" style="min-width:900px">
+          <thead><tr style="background:#FAFAFB"><th style="padding-left:16px;width:44px"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Select</span></th><th>Shop</th><th>Look</th><th>Code</th><th>Plan</th><th style="text-align:right">Scans, 30 days</th><th>Status</th><th style="padding-right:16px"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Edit</span></th></tr></thead>
+          <tbody>
+            <sc-for list="{{shopRows}}" as="s" hint-placeholder-count="8">
+              <tr>
+                <td style="padding-left:16px"><input type="checkbox" checked="{{s.checked}}" onChange="{{s.toggle}}" aria-label="{{s.selLabel}}" style="width:20px;height:20px;accent-color:#0F6B5C"></td>
+                <td><div style="font-weight:700">{{s.name}}</div><div class="a-sub" style="font-size:12px">{{s.meta}}</div></td>
+                <td><span class="a-chip a-c-n">{{s.look}}</span></td>
+                <td class="a-mono">{{s.code}}</td>
+                <td><div style="font-weight:600">{{s.plan}}</div><div class="a-sub" style="font-size:12px">{{s.renews}}</div></td>
+                <td style="text-align:right;font-weight:600">{{s.scans}}</td>
+                <td><span class="{{s.chip}}">{{s.status}}</span></td>
+                <td style="padding-right:16px;text-align:right"><button type="button" class="a-btn" onClick="{{s.edit}}" aria-label="{{s.editLabel}}">Edit</button></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid #ECEEF2" class="a-sub"><span>Showing 1 to 8 of 48</span><div style="display:flex;gap:8px"><button type="button" class="a-btn">Previous</button><button type="button" class="a-btn">Next</button></div></div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{pEditor}}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+        <button type="button" class="a-btn" onClick="{{goShops}}" style="align-self:flex-start;min-height:36px;border-color:transparent;background:transparent;padding:0;color:#454B58"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>All shops</button>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><h1 class="a-h1">{{shopName}}</h1><span class="a-chip a-c-g">Live</span><span class="a-chip a-c-a">Unpublished changes</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <button type="button" class="a-btn"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></svg>Open live page</button>
+        <button type="button" class="a-btn">Save draft</button>
+        <button type="button" class="a-btn a-btn-p">Publish changes</button>
+      </div>
+    </div>
+
+    <div role="tablist" aria-label="Shop sections" style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E3E5EA">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="6">
+        <button type="button" role="tab" class="{{t.cls}}" aria-selected="{{t.sel}}" onClick="{{t.go}}">{{t.label}}</button>
+      </sc-for>
+    </div>
+
+    <div class="a-row" style="align-items:flex-start;gap:20px">
+
+      <div style="flex:3 1 520px;min-width:0;display:flex;flex-direction:column;gap:16px">
+
+        <sc-if value="{{tDetails}}" hint-placeholder-val="{{ false }}">
+        <section class="a-card" style="display:flex;flex-direction:column;gap:16px">
+          <div><h2 class="a-h2">Business</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Shown at the top of the page.</p></div>
+          <div class="a-row">
+            <div class="a-field"><label class="a-lab" for="d-name">Shop name</label><input id="d-name" class="a-in" type="text" value="Velvet Salon &amp; Spa"></div>
+            <div class="a-field"><label class="a-lab" for="d-tag">Tagline</label><input id="d-tag" class="a-in" type="text" value="Hair, skin and bridal studio"></div>
+          </div>
+          <div class="a-row">
+            <div class="a-field"><label class="a-lab" for="d-cat">Shop type</label><select id="d-cat" class="a-in"><option>Salon and spa</option><option>Clinic</option><option>Gym</option><option>Cafe and bakery</option><option>Jeweller</option><option>Boutique</option></select></div>
+            <div class="a-field"><label class="a-lab" for="d-area">Area and city</label><input id="d-area" class="a-in" type="text" value="Bandra West, Mumbai"></div>
+          </div>
+          <div class="a-field" style="flex:none"><label class="a-lab" for="d-addr">Full address</label><input id="d-addr" class="a-in" type="text" placeholder="[street address]"></div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:16px">
+          <div><h2 class="a-h2">Contact and links</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">These feed the buttons on the page.</p></div>
+          <div class="a-row">
+            <div class="a-field"><label class="a-lab" for="d-phone">Phone number</label><input id="d-phone" class="a-in" type="tel" placeholder="[with STD code for landlines]"></div>
+            <div class="a-field"><label class="a-lab" for="d-wa">WhatsApp number</label><input id="d-wa" class="a-in" type="tel" placeholder="[mobile number]"></div>
+          </div>
+          <div class="a-field" style="flex:none"><label class="a-lab" for="d-msg">WhatsApp message, pre-filled for the customer</label><textarea id="d-msg" class="a-in">Hi, I would like to book an appointment.</textarea></div>
+          <div class="a-row">
+            <div class="a-field"><label class="a-lab" for="d-g">Google review link</label><input id="d-g" class="a-in" type="url" placeholder="[from the Google Business profile]"></div>
+            <div class="a-field"><label class="a-lab" for="d-ig">Instagram handle or link</label><input id="d-ig" class="a-in" type="text" placeholder="[@handle]"></div>
+          </div>
+          <p class="a-sub" style="margin:0;font-size:13px">The review button opens the Google review form for everyone. There is no filtering by rating and no rewards for reviews.</p>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:16px">
+          <h2 class="a-h2">Logo and cover</h2>
+          <div class="a-row">
+            <div class="a-field" style="display:flex;align-items:center;gap:14px"><div style="width:72px;height:72px;border-radius:999px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;flex:none">VS</div><div><div style="font-weight:700">Logo</div><button type="button" class="a-btn" style="margin-top:6px"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5M7 9l5-5 5 5M5 20h14"/></svg>Replace</button></div></div>
+            <div class="a-field" style="display:flex;align-items:center;gap:14px"><div style="width:120px;height:72px;border-radius:12px;background:#ECEEF2;display:flex;align-items:center;justify-content:center;color:#5B6270;font-size:12px;font-weight:600;flex:none">No cover yet</div><div><div style="font-weight:700">Cover photo</div><button type="button" class="a-btn" style="margin-top:6px"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5M7 9l5-5 5 5M5 20h14"/></svg>Upload</button></div></div>
+          </div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:16px">
+          <div><h2 class="a-h2">Owner and requests</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Internal only. Never shown to customers.</p></div>
+          <div class="a-row">
+            <div class="a-field"><label class="a-lab" for="o-name">Owner name</label><input id="o-name" class="a-in" type="text" placeholder="[name]"></div>
+            <div class="a-field"><label class="a-lab" for="o-wa">Owner WhatsApp</label><input id="o-wa" class="a-in" type="tel" placeholder="[number]"></div>
+          </div>
+          <div class="a-field" style="flex:none"><label class="a-lab" for="o-notes">Requests and notes</label><textarea id="o-notes" class="a-in" placeholder="Paste what the owner asked for here, with the date."></textarea></div>
+        </section>
+        </sc-if>
+
+        <sc-if value="{{tButtons}}" hint-placeholder-val="{{ false }}">
+        <section class="a-card">
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px"><div><h2 class="a-h2">Page buttons</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Drag to reorder. The first one is the main button.</p></div><button type="button" class="a-btn a-btn-p"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add button</button></div>
+          <sc-for list="{{btns}}" as="b" hint-placeholder-count="6">
+            <div class="a-sep" style="display:flex;align-items:center;gap:12px;padding:12px 0">
+              <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#8A90A0;stroke-width:3"><path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01"/></svg>
+              <span style="width:38px;height:38px;border-radius:999px;background:color-mix(in srgb, var(--accent) 12%, #ffffff);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="{{b.d}}"/></svg></span>
+              <div style="flex:1;min-width:0"><div style="font-weight:700">{{b.label}}</div><div class="a-sub" style="font-size:13px">{{b.type}} · {{b.target}}</div></div>
+              <button type="button" role="switch" aria-checked="{{b.checked}}" aria-label="{{b.swLabel}}" class="{{b.sw}}"></button>
+              <button type="button" class="a-btn" aria-label="{{b.editLabel}}">Edit</button>
+            </div>
+          </sc-for>
+          <div class="a-sep" style="padding-top:16px;margin-top:4px"><div class="a-lbl-up">Add another</div><div style="display:flex;flex-wrap:wrap;gap:8px"><span class="a-chip a-c-n">Facebook</span><span class="a-chip a-c-n">YouTube</span><span class="a-chip a-c-n">Website</span><span class="a-chip a-c-n">Menu or price list</span><span class="a-chip a-c-n">Custom link</span></div></div>
+        </section>
+        </sc-if>
+
+        <sc-if value="{{tLook}}" hint-placeholder-val="{{ true }}">
+        <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px"><div><h2 class="a-h2">Theme</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Colors and button style.</p></div><span class="a-chip a-c-g">Suggested for salons</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+            <sc-for list="{{themeOpts}}" as="t" hint-placeholder-count="5">
+              <button type="button" class="{{t.cls}}" onClick="{{t.pick}}" aria-pressed="{{t.pressed}}">
+                <div style="{{t.sw}}"><div style="{{t.bar}}"></div><div style="{{t.line}}"></div><div style="{{t.line}}"></div></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><span style="font-weight:800">{{t.name}}</span><span class="{{t.sugCls}}">{{t.sug}}</span></div>
+                <div class="a-sub" style="font-size:12px;margin-top:-6px">{{t.note}}</div>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
+          <div><h2 class="a-h2">Layout</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">How the buttons are arranged.</p></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+            <sc-for list="{{layoutOpts}}" as="l" hint-placeholder-count="5">
+              <button type="button" class="{{l.cls}}" onClick="{{l.pick}}" aria-pressed="{{l.pressed}}">
+                <svg viewBox="0 0 64 44" aria-hidden="true" style="display:block;width:100%;height:auto;background:#F4F5F7;border-radius:8px"><path d="{{l.d2}}" style="fill:#C9CED8"/><path d="{{l.d1}}" style="fill:var(--accent)"/></svg>
+                <div style="font-weight:800">{{l.name}}</div>
+                <div class="a-sub" style="font-size:12px;margin-top:-6px">{{l.note}}</div>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
+          <div><h2 class="a-h2">Font</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Used for the shop name and headings.</p></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+            <sc-for list="{{fontOpts}}" as="f" hint-placeholder-count="3">
+              <button type="button" class="{{f.cls}}" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}">
+                <div style="{{f.sample}}">Aa Gg</div>
+                <div style="font-weight:800">{{f.name}}</div>
+                <div class="a-sub" style="font-size:12px;margin-top:-6px">{{f.note}}</div>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:16px">
+          <div><h2 class="a-h2">Small tweaks</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Only these can be changed per shop, so every page stays consistent.</p></div>
+          <div><div class="a-lab">Button color</div><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span class="a-chip a-c-n">Theme default</span><span style="width:32px;height:32px;border-radius:999px;background:#9F1D45"></span><span style="width:32px;height:32px;border-radius:999px;background:#1F4FD1"></span><span style="width:32px;height:32px;border-radius:999px;background:#0F6B5C"></span><span style="width:32px;height:32px;border-radius:999px;background:#B4540A"></span><span style="width:32px;height:32px;border-radius:999px;background:#16181D"></span></div></div>
+          <div><div class="a-lab">Page language</div><div style="display:flex;flex-wrap:wrap;gap:10px"><span class="a-chip a-c-g">English</span><span class="a-chip a-c-n">Hindi</span><span class="a-chip a-c-n">Marathi</span></div></div>
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px" class="a-sep"><span class="a-sub" style="padding-top:14px">Draft saved a minute ago</span><button type="button" class="a-btn" style="margin-top:14px">Reset to suggested look</button></div>
+        </section>
+        </sc-if>
+
+        <sc-if value="{{tOffers}}" hint-placeholder-val="{{ false }}">
+        <section class="a-card" style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 class="a-h2">Offer</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">A ticket the customer can show at the desk.</p></div><button type="button" role="switch" aria-checked="true" aria-label="Offer on" class="a-sw a-sw-on"></button></div>
+          <div class="a-row"><div class="a-field"><label class="a-lab" for="f-t">Title</label><input id="f-t" class="a-in" type="text" value="10% off your first visit"></div><div class="a-field"><label class="a-lab" for="f-c">Code</label><input id="f-c" class="a-in a-mono" type="text" value="WELCOME10"></div></div>
+          <div class="a-row"><div class="a-field"><label class="a-lab" for="f-d">Small print</label><input id="f-d" class="a-in" type="text" value="Show this page at the desk"></div><div class="a-field"><label class="a-lab" for="f-e">Valid until</label><input id="f-e" class="a-in" type="date"></div></div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 class="a-h2">Festival banner</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">A short greeting shown above the buttons for a set period.</p></div><button type="button" role="switch" aria-checked="false" aria-label="Banner off" class="a-sw"></button></div>
+          <div class="a-row"><div class="a-field"><label class="a-lab" for="b-t">Message</label><input id="b-t" class="a-in" type="text" placeholder="[festival greeting]"></div><div class="a-field"><label class="a-lab" for="b-r">Show from and to</label><input id="b-r" class="a-in" type="text" placeholder="[start date] to [end date]"></div></div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 class="a-h2">Wi-Fi</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Use the guest network. Phones cannot join with one tap, so the page copies the password.</p></div><button type="button" role="switch" aria-checked="true" aria-label="Wi-Fi on" class="a-sw a-sw-on"></button></div>
+          <div class="a-row"><div class="a-field"><label class="a-lab" for="w-n">Network name</label><input id="w-n" class="a-in" type="text" placeholder="[guest network]"></div><div class="a-field"><label class="a-lab" for="w-p">Password</label><div style="display:flex;gap:8px"><input id="w-p" class="a-in" type="password" value="placeholder"><button type="button" class="a-btn" aria-label="Show password"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z M12 9a3 3 0 1 0 0 6a3 3 0 0 0 0-6z"/></svg></button></div></div></div>
+        </section>
+        </sc-if>
+
+        <sc-if value="{{tQrPlan}}" hint-placeholder-val="{{ false }}">
+        <section class="a-card" style="display:flex;flex-wrap:wrap;gap:20px;align-items:center">
+          <svg width="132" height="132" viewBox="0 0 96 96" aria-hidden="true" style="flex:none;background:#fff;border:1px solid #E3E5EA;border-radius:12px;padding:8px"><g style="fill:none;stroke:#11141A;stroke-width:5"><rect x="8" y="8" width="26" height="26"/><rect x="62" y="8" width="26" height="26"/><rect x="8" y="62" width="26" height="26"/></g><g style="fill:#11141A"><rect x="16" y="16" width="10" height="10"/><rect x="70" y="16" width="10" height="10"/><rect x="16" y="70" width="10" height="10"/><rect x="42" y="10" width="8" height="8"/><rect x="42" y="26" width="8" height="8"/><rect x="10" y="42" width="8" height="8"/><rect x="26" y="42" width="8" height="8"/><rect x="42" y="42" width="8" height="8"/><rect x="58" y="42" width="8" height="8"/><rect x="74" y="42" width="8" height="8"/><rect x="42" y="58" width="8" height="8"/><rect x="58" y="66" width="8" height="8"/><rect x="74" y="58" width="8" height="8"/><rect x="42" y="74" width="8" height="8"/><rect x="74" y="76" width="8" height="8"/></g></svg>
+          <div style="flex:1 1 260px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px"><h2 class="a-h2">QR code</h2><span class="a-chip a-c-g">Assigned</span></div>
+            <div><span class="a-mono" style="font-size:18px">7KX2M9</span><div class="a-sub" style="font-size:13px">yourdomain.in/q/7KX2M9 opens yourdomain.in/s/velvet-salon</div></div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="a-btn a-btn-p"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>A5 print file</button><button type="button" class="a-btn">4x6 card</button><button type="button" class="a-btn">QR as SVG</button><button type="button" class="a-btn">Reassign code</button></div>
+          </div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 class="a-h2">Plan</h2><span class="a-chip a-c-g">Paid</span></div>
+          <div class="a-row"><div class="a-field"><div class="a-sub" style="font-size:13px">Plan</div><div style="font-weight:800;font-size:18px">Yearly</div></div><div class="a-field"><div class="a-sub" style="font-size:13px">Renews</div><div style="font-weight:800;font-size:18px">14 Mar</div></div><div class="a-field"><div class="a-sub" style="font-size:13px">Started</div><div style="font-weight:800;font-size:18px">[start date]</div></div></div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="a-btn">Change plan</button><button type="button" class="a-btn">Send renewal reminder</button><button type="button" class="a-btn">Mark as paid</button></div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:12px">
+          <h2 class="a-h2">Page address</h2>
+          <div class="a-row"><div class="a-field"><label class="a-lab" for="s-slug">Address</label><input id="s-slug" class="a-in a-mono" type="text" value="velvet-salon"></div></div>
+          <p class="a-sub" style="margin:0;font-size:13px">If you change this, the old address keeps working and forwards to the new one. The printed QR never changes.</p>
+          <div class="a-sep" style="padding-top:14px;display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="a-btn">Pause this shop</button><button type="button" class="a-btn" style="color:#9B2218;border-color:#F0C4BF">Archive shop</button></div>
+        </section>
+        </sc-if>
+
+        <sc-if value="{{tActivity}}" hint-placeholder-val="{{ false }}">
+        <section class="a-card">
+          <h2 class="a-h2" style="margin-bottom:6px">Recent changes</h2>
+          <sc-for list="{{changes}}" as="c" hint-placeholder-count="5">
+            <div class="a-sep" style="display:flex;gap:12px;padding:12px 0"><span style="width:10px;height:10px;border-radius:999px;background:var(--accent);margin-top:6px;flex:none"></span><div style="flex:1;min-width:0"><div style="font-weight:700">{{c.what}}</div><div class="a-sub" style="font-size:13px">{{c.who}} · {{c.when}}</div></div><button type="button" class="a-btn" style="min-height:36px">{{c.action}}</button></div>
+          </sc-for>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap"><h2 class="a-h2">Traffic, last 30 days</h2><span class="a-sub" style="font-size:13px">Last scan 12 minutes ago</span></div>
+          <div class="a-row"><div class="a-field"><div class="a-sub" style="font-size:13px">Counted scans</div><div style="font-weight:800;font-size:26px">1,204</div></div><div class="a-field"><div class="a-sub" style="font-size:13px">Button taps</div><div style="font-weight:800;font-size:26px">512</div></div><div class="a-field"><div class="a-sub" style="font-size:13px">Filtered as bots</div><div style="font-weight:800;font-size:26px">38</div></div></div>
+          <p class="a-sub" style="margin:0;font-size:13px">Filtered traffic is kept for review but left out of the owner's report.</p>
+        </section>
+        </sc-if>
+
+      </div>
+
+      <aside aria-label="Live preview" class="a-card" style="flex:1 1 372px;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div style="align-self:stretch;display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h2 class="a-h2">Live preview</h2><span class="a-chip a-c-a">Draft</span></div>
+        <div style="width:344px;max-width:100%;padding:6px;background:#11141A;border-radius:36px;box-sizing:border-box">
+          <div style="width:332px;max-width:100%;height:731px;overflow:hidden;border-radius:30px;position:relative">
+            <div style="width:390px;height:860px;transform:scale(0.85);transform-origin:top left">
+              <dc-import name="ShopPage" theme="{{theme}}" layout="{{layout}}" font="{{font}}" hint-size="390px,860px"></dc-import>
+            </div>
+          </div>
+        </div>
+        <p class="a-sub" style="margin:0;font-size:13px;text-align:center">Changes show here straight away. Customers see them after you publish.</p>
+      </aside>
+
+    </div>
+    </sc-if>
+
+    <sc-if value="{{pQr}}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px">
+      <div><h1 class="a-h1">QR codes</h1><p class="a-sub" style="margin:4px 0 0">Printed codes never change. Assign them to shops when you sign them up.</p></div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="a-btn"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Print sheet (PDF)</button><button type="button" class="a-btn a-btn-p"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Generate codes</button></div>
+    </div>
+    <div class="a-row">
+      <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-size:13px;font-weight:600">Total codes</div><div style="font-size:32px;font-weight:800">120</div></div>
+      <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-size:13px;font-weight:600">Assigned</div><div style="font-size:32px;font-weight:800">48</div></div>
+      <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-size:13px;font-weight:600">Unassigned, in stock</div><div style="font-size:32px;font-weight:800">72</div></div>
+      <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-size:13px;font-weight:600">Retired</div><div style="font-size:32px;font-weight:800">0</div></div>
+    </div>
+    <div class="a-row" style="align-items:flex-start">
+      <section class="a-card" style="flex:3 1 560px;padding:0;overflow:hidden">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #ECEEF2"><div class="a-seg"><button type="button" class="a-seg-on">All</button><button type="button">Assigned</button><button type="button">Unassigned</button></div><label for="qr-search" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search codes</label><input id="qr-search" class="a-in" type="text" placeholder="Search code or shop" style="max-width:260px"></div>
+        <div style="overflow-x:auto"><table class="a-tbl" style="min-width:640px"><thead><tr style="background:#FAFAFB"><th style="padding-left:16px">Code</th><th>Status</th><th>Shop</th><th>Last scan</th><th style="padding-right:16px"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th></tr></thead><tbody>
+          <sc-for list="{{codes}}" as="q" hint-placeholder-count="8">
+            <tr><td class="a-mono" style="padding-left:16px">{{q.code}}</td><td><span class="{{q.chip}}">{{q.status}}</span></td><td style="font-weight:600">{{q.shop}}</td><td class="a-sub">{{q.last}}</td><td style="padding-right:16px;text-align:right"><button type="button" class="a-btn" aria-label="{{q.label}}">{{q.action}}</button></td></tr>
+          </sc-for>
+        </tbody></table></div>
+      </section>
+      <section class="a-card" style="flex:1 1 320px;display:flex;flex-direction:column;gap:14px">
+        <h2 class="a-h2">Generate a batch</h2>
+        <div><label class="a-lab" for="g-n">How many codes</label><input id="g-n" class="a-in" type="number" value="50"></div>
+        <div><label class="a-lab" for="g-s">Sticker size</label><select id="g-s" class="a-in"><option>4x6 card</option><option>A5 standee</option><option>Small sticker</option></select></div>
+        <button type="button" class="a-btn a-btn-p">Generate and download PDF</button>
+        <p class="a-sub" style="margin:0;font-size:13px">Codes avoid look-alike letters. Until a code is assigned, scanning it shows a friendly page that says it is not activated yet, with your WhatsApp contact.</p>
+      </section>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{pOnboarding}}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px">
+      <div><h1 class="a-h1">Onboarding</h1><p class="a-sub" style="margin:4px 0 0">From first message to a live standee, one board for every shop.</p></div>
+      <button type="button" class="a-btn a-btn-p"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New lead</button>
+    </div>
+    <section aria-label="Today" class="a-card" style="padding:16px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
+      <h2 class="a-h2" style="font-size:15px">Today</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;flex:1 1 400px"><button type="button" class="a-btn" style="border-radius:999px">Send preview to Glow Skin Clinic</button><button type="button" class="a-btn" style="border-radius:999px">Follow up with Brew &amp; Bun Cafe</button><button type="button" class="a-btn" style="border-radius:999px">Ship Aarav Jewellers standee</button></div>
+      <span class="a-sub" style="font-size:13px">3 tasks</span>
+    </section>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
+      <sc-for list="{{columns}}" as="col" hint-placeholder-count="5">
+        <section aria-label="{{col.title}}" style="flex:1 1 220px;min-width:0;background:#EBEDF1;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px">
+          <div style="padding:2px 4px 4px"><div style="display:flex;justify-content:space-between;align-items:center"><h2 class="a-h2" style="font-size:14px">{{col.title}}</h2><span style="min-width:24px;text-align:center;padding:1px 8px;border-radius:999px;background:#fff;font-size:12px;font-weight:700;color:#454B58">{{col.count}}</span></div><div class="a-sub" style="font-size:12px;margin-top:2px">{{col.hint}}</div></div>
+          <sc-for list="{{col.cards}}" as="cd" hint-placeholder-count="2">
+            <article style="background:#fff;border:1px solid #E3E5EA;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px"><div><div style="font-weight:700">{{cd.name}}</div><div class="a-sub" style="font-size:12px">{{cd.sub}}</div></div><div><span class="{{cd.chip}}">{{cd.tag}}</span></div><button type="button" class="{{cd.btn}}">{{cd.action}}</button></article>
+          </sc-for>
+        </section>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{pReports}}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px">
+      <div><h1 class="a-h1">Reports</h1><p class="a-sub" style="margin:4px 0 0">Real phone scans only. Bots and link previews are filtered out and kept for review.</p></div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="a-btn">Last 30 days <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><button type="button" class="a-btn"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Download CSV</button></div>
+    </div>
+    <div class="a-row">
+      <sc-for list="{{rkpis}}" as="k" hint-placeholder-count="4">
+        <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-weight:600;font-size:13px">{{k.label}}</div><div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;margin-top:4px">{{k.value}}</div><div class="{{k.nc}}">{{k.note}}</div></div>
+      </sc-for>
+    </div>
+    <div class="a-row" style="align-items:flex-start">
+      <section class="a-card" style="flex:2 1 520px;padding:0;overflow:hidden">
+        <div style="padding:16px 20px;border-bottom:1px solid #ECEEF2"><h2 class="a-h2">By shop</h2></div>
+        <div style="overflow-x:auto"><table class="a-tbl" style="min-width:560px"><thead><tr style="background:#FAFAFB"><th style="padding-left:20px">Shop</th><th style="text-align:right">Scans</th><th style="text-align:right">Taps</th><th style="text-align:right">Tap rate</th><th>Top button</th><th style="padding-right:20px">Flags</th></tr></thead><tbody>
+          <sc-for list="{{rshops}}" as="r" hint-placeholder-count="6">
+            <tr><td style="padding-left:20px;font-weight:700">{{r.name}}</td><td style="text-align:right">{{r.scans}}</td><td style="text-align:right">{{r.taps}}</td><td style="text-align:right">{{r.rate}}</td><td>{{r.top}}</td><td style="padding-right:20px"><span class="{{r.chip}}">{{r.flag}}</span></td></tr>
+          </sc-for>
+        </tbody></table></div>
+      </section>
+      <div style="flex:1 1 320px;display:flex;flex-direction:column;gap:16px;min-width:0">
+        <section class="a-card" style="display:flex;flex-direction:column;gap:12px">
+          <h2 class="a-h2">Traffic quality</h2>
+          <div class="a-row" style="gap:20px"><div><div class="a-sub" style="font-size:13px">Counted</div><div style="font-weight:800;font-size:24px">18,640</div></div><div><div class="a-sub" style="font-size:13px">Filtered</div><div style="font-weight:800;font-size:24px">783</div></div></div>
+          <div class="a-sep" style="padding-top:10px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between"><span>Crawlers and link previews</span><span style="font-weight:700">512</span></div><div style="display:flex;justify-content:space-between"><span>Tap without a signed page token</span><span style="font-weight:700">190</span></div><div style="display:flex;justify-content:space-between"><span>Repeats within 30 seconds</span><span style="font-weight:700">81</span></div></div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:10px;border-color:#F0D9A0;background:#FFFBEF">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 class="a-h2">Unusual traffic</h2><span class="a-chip a-c-a">1 to review</span></div>
+          <div style="font-weight:700">Iron House Gym</div>
+          <p class="a-sub" style="margin:0;font-size:13px">A burst of scans in a few minutes from one group of devices. Held out of the monthly report until you decide.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="a-btn">Count them</button><button type="button" class="a-btn">Mark as bots</button></div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:10px">
+          <h2 class="a-h2">Monthly WhatsApp report</h2>
+          <p class="a-sub" style="margin:0;font-size:13px">Sent on the 1st. Last run: 1 Oct, 41 of 42 delivered.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="a-btn">Preview a report</button><button type="button" class="a-btn">Resend failed</button></div>
+        </section>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{pBilling}}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px">
+      <div><h1 class="a-h1">Plans and billing</h1><p class="a-sub" style="margin:4px 0 0">Who is on which plan, and who needs a reminder.</p></div>
+      <button type="button" class="a-btn">Send all due reminders</button>
+    </div>
+    <div class="a-row">
+      <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-size:13px;font-weight:600">Monthly</div><div style="font-size:32px;font-weight:800">14</div><div class="a-note a-mut">shops</div></div>
+      <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-size:13px;font-weight:600">Yearly</div><div style="font-size:32px;font-weight:800">22</div><div class="a-note a-mut">shops</div></div>
+      <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-size:13px;font-weight:600">5 years</div><div style="font-size:32px;font-weight:800">6</div><div class="a-note a-mut">shops</div></div>
+      <div class="a-card" style="flex:1 1 200px"><div class="a-sub" style="font-size:13px;font-weight:600">Due in 14 days</div><div style="font-size:32px;font-weight:800">6</div><div class="a-note a-warn">1 overdue</div></div>
+    </div>
+    <div class="a-row" style="align-items:flex-start">
+      <section class="a-card" style="flex:2 1 560px;padding:0;overflow:hidden">
+        <div style="padding:16px 20px;border-bottom:1px solid #ECEEF2"><h2 class="a-h2">Renewals</h2></div>
+        <div style="overflow-x:auto"><table class="a-tbl" style="min-width:600px"><thead><tr style="background:#FAFAFB"><th style="padding-left:20px">Shop</th><th>Plan</th><th>Renews or ends</th><th>Payment</th><th style="padding-right:20px"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th></tr></thead><tbody>
+          <sc-for list="{{renewals}}" as="r" hint-placeholder-count="6">
+            <tr><td style="padding-left:20px;font-weight:700">{{r.shop}}</td><td>{{r.plan}}</td><td>{{r.date}}</td><td><span class="{{r.chip}}">{{r.pay}}</span></td><td style="padding-right:20px;text-align:right"><button type="button" class="a-btn" aria-label="{{r.label}}">{{r.action}}</button></td></tr>
+          </sc-for>
+        </tbody></table></div>
+      </section>
+      <section class="a-card" style="flex:1 1 320px;display:flex;flex-direction:column;gap:14px">
+        <h2 class="a-h2">Plan prices</h2>
+        <div><label class="a-lab" for="p-m">Monthly</label><input id="p-m" class="a-in" type="text" placeholder="[price in rupees]"></div>
+        <div><label class="a-lab" for="p-y">Yearly</label><input id="p-y" class="a-in" type="text" placeholder="[price in rupees]"></div>
+        <div><label class="a-lab" for="p-5">5 years</label><input id="p-5" class="a-in" type="text" placeholder="[price in rupees]"></div>
+        <p class="a-sub" style="margin:0;font-size:13px">After a plan ends, the page stays fully live for 15 more days, then shows only the shop name, a Call button and Directions.</p>
+        <button type="button" class="a-btn a-btn-p">Save prices</button>
+      </section>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{pSettings}}" hint-placeholder-val="{{ false }}">
+    <div><h1 class="a-h1">Settings</h1><p class="a-sub" style="margin:4px 0 0">Team access, defaults and how traffic is counted.</p></div>
+    <section class="a-card" style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><div><h2 class="a-h2">Team accounts</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Accounts that can sign in. Only the owner can add or remove them.</p></div><button type="button" class="a-btn"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add account</button></div>
+      <div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0"><span style="font-weight:600">[owner username]</span><span class="a-chip a-c-g">Owner</span></div>
+      <div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0"><span style="font-weight:600">[team username]</span><span class="a-chip a-c-b">Admin</span></div>
+      <div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0"><span style="font-weight:600">[helper username]</span><span class="a-chip a-c-n">Viewer</span></div>
+    </section>
+    <section class="a-card" style="display:flex;flex-direction:column;gap:8px">
+      <div><h2 class="a-h2">Themes and layouts</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Turn options on or off for new shops. Existing shops keep what they have.</p></div>
+      <div class="a-row" style="gap:32px;align-items:flex-start">
+        <div style="flex:1 1 240px"><div class="a-lbl-up" style="margin-top:8px">Themes</div>
+          <sc-for list="{{themeToggles}}" as="t" hint-placeholder-count="5"><div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0"><span style="font-weight:600">{{t.name}}</span><button type="button" role="switch" aria-checked="true" aria-label="{{t.label}}" class="a-sw a-sw-on"></button></div></sc-for>
+        </div>
+        <div style="flex:1 1 240px"><div class="a-lbl-up" style="margin-top:8px">Layouts</div>
+          <sc-for list="{{layoutToggles}}" as="t" hint-placeholder-count="5"><div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0"><span style="font-weight:600">{{t.name}}</span><button type="button" role="switch" aria-checked="true" aria-label="{{t.label}}" class="a-sw a-sw-on"></button></div></sc-for>
+        </div>
+        <div style="flex:1 1 280px"><div class="a-lbl-up" style="margin-top:8px">Suggested look by shop type</div>
+          <sc-for list="{{defaults}}" as="d" hint-placeholder-count="5"><div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0"><span style="font-weight:600">{{d.type}}</span><span class="a-chip a-c-n">{{d.look}}</span></div></sc-for>
+        </div>
+      </div>
+    </section>
+    <section class="a-card" style="display:flex;flex-direction:column;gap:8px">
+      <div><h2 class="a-h2">Traffic filtering</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Flagged requests are kept, not deleted.</p></div>
+      <div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0"><span style="font-weight:600">Ignore crawlers, link previews and prefetch</span><button type="button" role="switch" aria-checked="true" aria-label="Ignore crawlers on" class="a-sw a-sw-on"></button></div>
+      <div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0"><span style="font-weight:600">Count a button tap only if the page was opened first</span><button type="button" role="switch" aria-checked="true" aria-label="Require page token on" class="a-sw a-sw-on"></button></div>
+      <div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0"><span style="font-weight:600">Count the same device once within 30 seconds</span><button type="button" role="switch" aria-checked="true" aria-label="Dedupe on" class="a-sw a-sw-on"></button></div>
+      <div class="a-sep" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0"><span style="font-weight:600">Hold back sudden spikes for review</span><button type="button" role="switch" aria-checked="true" aria-label="Spike review on" class="a-sw a-sw-on"></button></div>
+    </section>
+    <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
+      <div><h2 class="a-h2">Domain and WhatsApp</h2></div>
+      <div class="a-row"><div class="a-field"><label class="a-lab" for="s-dom">QR address base</label><input id="s-dom" class="a-in" type="text" placeholder="[yourdomain.in]"></div><div class="a-field"><label class="a-lab" for="s-wa">WhatsApp sender number</label><input id="s-wa" class="a-in" type="tel" placeholder="[business number]"></div></div>
+      <p class="a-sub" style="margin:0;font-size:13px">The QR address base is on every printed code. Keep this domain renewed for as long as any plan is active.</p>
+      <div class="a-sep" style="padding-top:14px;display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="a-btn">Export all shop data</button><button type="button" class="a-btn a-btn-p">Save settings</button></div>
+    </section>
+    </sc-if>
+
+  </main>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#0F6B5C&quot;,&quot;options&quot;:[&quot;#0F6B5C&quot;,&quot;#2F4BD8&quot;,&quot;#B4441F&quot;,&quot;#11141A&quot;]},&quot;page&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;overview&quot;,&quot;options&quot;:[&quot;login&quot;,&quot;overview&quot;,&quot;shops&quot;,&quot;editor&quot;,&quot;qr&quot;,&quot;onboarding&quot;,&quot;reports&quot;,&quot;billing&quot;,&quot;settings&quot;]},&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;look&quot;,&quot;options&quot;:[&quot;details&quot;,&quot;buttons&quot;,&quot;look&quot;,&quot;offers&quot;,&quot;qrplan&quot;,&quot;activity&quot;]},&quot;minh&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;1000&quot;},&quot;$preview&quot;:{&quot;width&quot;:1360,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const p = props || {};
+    this.state = {
+      open: true,
+      page: p.page || 'overview',
+      tab: p.tab || 'look',
+      theme: 'blush',
+      layout: 'list',
+      font: 'editorial',
+      shopName: 'Velvet Salon & Spa',
+      sel: {}
+    };
+  }
+
+  renderVals() {
+    const st = this.state;
+    const go = (page) => (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ page: page }); };
+
+    const nav = [
+      { id: 'overview', label: 'Overview', d: 'M3 3h8v8H3z M13 3h8v8h-8z M3 13h8v8H3z M13 13h8v8h-8z' },
+      { id: 'shops', label: 'Shops', d: 'M4 9l1.5-5h13L20 9 M4 9v11h16V9 M9 20v-6h6v6' },
+      { id: 'qr', label: 'QR codes', d: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h3v3h-3z M20 14v.01 M14 20h3 M20 17v4' },
+      { id: 'onboarding', label: 'Onboarding', d: 'M9 6h11 M9 12h11 M9 18h11 M4 6l1 1 2-2 M4 12l1 1 2-2 M4 18l1 1 2-2' },
+      { id: 'reports', label: 'Reports', d: 'M5 20v-8 M12 20V5 M19 20v-12' },
+      { id: 'billing', label: 'Plans and billing', d: 'M3 5h18v14H3z M3 10h18' },
+      { id: 'settings', label: 'Settings', d: 'M12 9a3 3 0 1 0 0 6a3 3 0 0 0 0-6z M12 2v3 M12 19v3 M2 12h3 M19 12h3 M5 5l2 2 M17 17l2 2 M19 5l-2 2 M7 17l-2 2' }
+    ];
+    const activeNav = st.page === 'editor' ? 'shops' : st.page;
+    const navItems = nav.map((n) => {
+      const on = n.id === activeNav;
+      return {
+        label: n.label,
+        d: n.d,
+        cls: 'a-nav' + (on ? ' a-nav-on' : ''),
+        railCls: 'a-rail' + (on ? ' a-nav-on' : ''),
+        current: on ? 'page' : 'false',
+        go: go(n.id)
+      };
+    });
+
+    const tabDefs = [
+      { id: 'details', label: 'Details' },
+      { id: 'buttons', label: 'Buttons' },
+      { id: 'look', label: 'Look' },
+      { id: 'offers', label: 'Offers and Wi-Fi' },
+      { id: 'qrplan', label: 'QR and plan' },
+      { id: 'activity', label: 'Activity' }
+    ];
+    const tabs = tabDefs.map((t) => ({
+      label: t.label,
+      cls: 'a-tab' + (st.tab === t.id ? ' a-tab-on' : ''),
+      sel: st.tab === t.id ? 'true' : 'false',
+      go: () => this.setState({ tab: t.id })
+    }));
+
+    const chipMap = { Live: 'a-chip a-c-g', Quiet: 'a-chip a-c-a', 'Preview sent': 'a-chip a-c-b', Printing: 'a-chip a-c-a', Building: 'a-chip a-c-n', Expired: 'a-chip a-c-r' };
+    const shops = [
+      { name: 'Velvet Salon & Spa', meta: 'Salon · /s/velvet-salon', look: 'Blush · List', code: '7KX2M9', plan: 'Yearly', renews: 'Renews 14 Mar', scans: '1,204', status: 'Live' },
+      { name: 'Kaveri Sweets', meta: 'Sweet shop · /s/kaveri-sweets', look: 'Marigold · Tiles', code: 'R4PD8T', plan: 'Monthly', renews: 'Renews in 5 days', scans: '862', status: 'Live' },
+      { name: 'Iron House Gym', meta: 'Gym · /s/iron-house', look: 'Nightfall · Index', code: 'M2HC6W', plan: '5 years', renews: 'Ends Aug 2031', scans: '640', status: 'Live' },
+      { name: 'Dr. Mehta Dental', meta: 'Clinic · /s/dr-mehta-dental', look: 'Daylight · List', code: 'H8WQ5Z', plan: 'Yearly', renews: 'Renews 2 Jan', scans: '0', status: 'Quiet' },
+      { name: 'Noor Boutique', meta: 'Boutique · /s/noor-boutique', look: 'Blush · Cover', code: 'C3TY7K', plan: 'Yearly', renews: 'Renews 19 Feb', scans: '318', status: 'Live' },
+      { name: 'Bright Minds Classes', meta: 'Coaching · /s/bright-minds', look: 'Daylight · Tiles', code: 'P6LD2N', plan: 'Monthly', renews: 'Renews 5 Nov', scans: '207', status: 'Live' },
+      { name: 'Brew & Bun Cafe', meta: 'Cafe · /s/brew-and-bun', look: 'Marigold · Chat', code: 'J9NV3B', plan: 'Yearly', renews: 'Not started', scans: 'None yet', status: 'Preview sent' },
+      { name: 'Aarav Jewellers', meta: 'Jewellery · /s/aarav-jewellers', look: 'Graphite · Cover', code: 'Not assigned', plan: 'Yearly', renews: 'Not started', scans: 'None yet', status: 'Printing' }
+    ];
+    const selCount = Object.keys(st.sel).filter((k) => st.sel[k]).length;
+    const shopRows = shops.map((s) => ({
+      name: s.name, meta: s.meta, look: s.look, code: s.code, plan: s.plan, renews: s.renews, scans: s.scans, status: s.status,
+      chip: chipMap[s.status] || 'a-chip a-c-n',
+      checked: !!st.sel[s.name],
+      selLabel: 'Select ' + s.name,
+      editLabel: 'Edit ' + s.name,
+      toggle: () => { const sel = Object.assign({}, this.state.sel); sel[s.name] = !sel[s.name]; this.setState({ sel: sel }); },
+      edit: () => this.setState({ page: 'editor', shopName: s.name, tab: 'look' })
+    }));
+
+    const themes = [
+      { id: 'daylight', name: 'Daylight', note: 'Cool white, cobalt', bg: '#F3F6FB', btn: '#1F4FD1', card: '#FFFFFF', line: '#DCE3EF', sug: 'Suggested' },
+      { id: 'nightfall', name: 'Nightfall', note: 'Dark navy, amber', bg: '#0F1424', btn: '#FFB547', card: '#1A2138', line: '#2C3554', sug: '' },
+      { id: 'marigold', name: 'Marigold', note: 'Warm cream, orange', bg: '#FFF1D0', btn: '#B4540A', card: '#FFFDF7', line: '#EBD9AE', sug: '' },
+      { id: 'blush', name: 'Blush', note: 'Soft pink, raspberry', bg: '#FDEFF1', btn: '#9F1D45', card: '#FFFFFF', line: '#F2D3D9', sug: 'Suggested' },
+      { id: 'graphite', name: 'Graphite', note: 'Warm grey, black', bg: '#F2F1EF', btn: '#16181D', card: '#FFFFFF', line: '#DEDBD6', sug: '' }
+    ];
+    const themeOpts = themes.map((t) => {
+      const on = st.theme === t.id;
+      return {
+        name: t.name, note: t.note, sug: t.sug,
+        sugCls: t.sug ? 'a-chip a-c-g' : '',
+        cls: 'a-opt' + (on ? ' a-opt-on' : ''),
+        pressed: on ? 'true' : 'false',
+        sw: 'background:' + t.bg + ';border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px;border:1px solid #E3E5EA',
+        bar: 'height:12px;border-radius:6px;background:' + t.btn,
+        line: 'height:8px;border-radius:4px;background:' + t.card + ';border:1px solid ' + t.line,
+        pick: () => this.setState({ theme: t.id })
+      };
+    });
+    const layouts = [
+      { id: 'list', name: 'List', note: 'Stacked rows in one card', d1: 'M8 7h48v8H8z', d2: 'M8 19h48v5H8z M8 27h48v5H8z M8 35h48v5H8z' },
+      { id: 'tiles', name: 'Tiles', note: 'Two-column grid of tiles', d1: 'M8 5h48v8H8z', d2: 'M8 17h22v10H8z M34 17h22v10H34z M8 31h22v10H8z M34 31h22v10H34z' },
+      { id: 'cover', name: 'Cover', note: 'Cover photo, logo on top', d1: 'M8 21h48v8H8z', d2: 'M0 0h64v14H0z M8 33h48v4H8z M8 39h48v4H8z' },
+      { id: 'index', name: 'Index', note: 'Big numbered type list', d1: 'M8 12h48v9H8z', d2: 'M8 4h26v5H8z M8 26h48v1H8z M8 29h6v3H8z M18 29h38v3H18z M8 35h48v1H8z M8 38h6v3H8z M18 38h38v3H18z' },
+      { id: 'chat', name: 'Chat', note: 'Looks like a conversation', d1: 'M30 28h26v7H30z', d2: 'M8 5h30v8H8z M8 16h24v8H8z M36 38h20v5H36z' }
+    ];
+    const layoutOpts = layouts.map((l) => {
+      const on = st.layout === l.id;
+      return { name: l.name, note: l.note, d1: l.d1, d2: l.d2, cls: 'a-opt' + (on ? ' a-opt-on' : ''), pressed: on ? 'true' : 'false', pick: () => this.setState({ layout: l.id }) };
+    });
+    const fonts = [
+      { id: 'editorial', name: 'Editorial', note: 'Serif headings', sample: "font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:700" },
+      { id: 'clean', name: 'Clean', note: 'Modern sans', sample: "font-family:'DM Sans',system-ui,sans-serif;font-size:30px;font-weight:700" },
+      { id: 'rounded', name: 'Rounded', note: 'Friendly and soft', sample: "font-family:'Nunito',system-ui,sans-serif;font-size:30px;font-weight:800" }
+    ];
+    const fontOpts = fonts.map((f) => {
+      const on = st.font === f.id;
+      return { name: f.name, note: f.note, sample: f.sample, cls: 'a-opt' + (on ? ' a-opt-on' : ''), pressed: on ? 'true' : 'false', pick: () => this.setState({ font: f.id }) };
+    });
+
+    const btnDefs = [
+      { label: 'Book on WhatsApp', type: 'WhatsApp', target: '[number]', on: true, d: 'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z' },
+      { label: 'Call us', type: 'Call', target: '[number]', on: true, d: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z' },
+      { label: 'Review us on Google', type: 'Google review', target: '[review link]', on: true, d: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z' },
+      { label: 'Wi-Fi password', type: 'Wi-Fi', target: 'Tap to show', on: true, d: 'M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0' },
+      { label: 'Get directions', type: 'Maps', target: '[maps link]', on: true, d: 'M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z M12 7.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0-5z' },
+      { label: 'Follow on Instagram', type: 'Instagram', target: '[handle]', on: true, d: 'M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z M12 8a4 4 0 1 0 0 8a4 4 0 0 0 0-8z' },
+      { label: 'Services and prices', type: 'Menu', target: '[price list link]', on: false, d: 'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01' }
+    ];
+    const btns = btnDefs.map((b) => ({
+      label: b.label, type: b.type, target: b.target, d: b.d,
+      sw: 'a-sw' + (b.on ? ' a-sw-on' : ''),
+      checked: b.on ? 'true' : 'false',
+      swLabel: b.label + (b.on ? ' is on' : ' is off'),
+      editLabel: 'Edit ' + b.label
+    }));
+
+    const changes = [
+      { what: 'Changed theme from Daylight to Blush', who: 'You', when: 'Today, 11:20', action: 'Undo' },
+      { what: 'Updated the WhatsApp message', who: 'You', when: 'Today, 11:05', action: 'View' },
+      { what: 'Owner asked to change the offer code', who: 'Owner, via WhatsApp', when: 'Yesterday', action: 'Mark done' },
+      { what: 'Published the page', who: 'You', when: '12 Oct', action: 'View' },
+      { what: 'Shop created', who: 'You', when: '10 Oct', action: 'View' }
+    ];
+
+    const kpis = [
+      { label: 'Live shops', value: '42', note: '+5 this month', nc: 'a-note a-up' },
+      { label: 'Scans', value: '18,640', note: '+12% vs previous 30 days', nc: 'a-note a-up' },
+      { label: 'Button taps', value: '7,905', note: '42% of scans tapped a button', nc: 'a-note a-mut' },
+      { label: 'Renewals due', value: '6', note: 'In the next 14 days', nc: 'a-note a-warn' }
+    ];
+    const fillFor = (w) => 'width:' + w + ';height:100%;border-radius:999px;background:var(--accent)';
+    const bars = [
+      { label: 'WhatsApp', pct: '38%', fill: fillFor('38%') },
+      { label: 'Google review', pct: '27%', fill: fillFor('27%') },
+      { label: 'Wi-Fi password', pct: '18%', fill: fillFor('18%') },
+      { label: 'Call', pct: '10%', fill: fillFor('10%') },
+      { label: 'Instagram', pct: '7%', fill: fillFor('7%') }
+    ];
+    const attention = [
+      { title: 'Preview waiting for approval', detail: 'Brew & Bun Cafe · sent 2 days ago', action: 'Nudge' },
+      { title: 'Plan ends in 5 days', detail: 'Kaveri Sweets · Monthly', action: 'Remind' },
+      { title: 'Standee ready to ship', detail: 'Aarav Jewellers · printed', action: 'Mark shipped' },
+      { title: 'No scans in 7 days', detail: 'Dr. Mehta Dental · check the standee', action: 'Open' }
+    ];
+    const recent = shops.slice(0, 5).map((s) => ({ name: s.name, code: s.code, plan: s.plan, scans: s.scans, status: s.status, chip: chipMap[s.status] }));
+
+    const codes = [
+      { code: '7KX2M9', status: 'Assigned', chip: 'a-chip a-c-g', shop: 'Velvet Salon & Spa', last: '12 minutes ago', action: 'Download', label: 'Download print file for 7KX2M9' },
+      { code: 'R4PD8T', status: 'Assigned', chip: 'a-chip a-c-g', shop: 'Kaveri Sweets', last: '1 hour ago', action: 'Download', label: 'Download print file for R4PD8T' },
+      { code: 'M2HC6W', status: 'Assigned', chip: 'a-chip a-c-g', shop: 'Iron House Gym', last: '3 hours ago', action: 'Download', label: 'Download print file for M2HC6W' },
+      { code: 'H8WQ5Z', status: 'Assigned', chip: 'a-chip a-c-a', shop: 'Dr. Mehta Dental', last: '9 days ago', action: 'Download', label: 'Download print file for H8WQ5Z' },
+      { code: 'J9NV3B', status: 'Assigned', chip: 'a-chip a-c-b', shop: 'Brew & Bun Cafe', last: 'Never', action: 'Download', label: 'Download print file for J9NV3B' },
+      { code: 'W5RF4A', status: 'Unassigned', chip: 'a-chip a-c-n', shop: 'In stock', last: 'Never', action: 'Assign', label: 'Assign code W5RF4A' },
+      { code: 'T7QK2D', status: 'Unassigned', chip: 'a-chip a-c-n', shop: 'In stock', last: 'Never', action: 'Assign', label: 'Assign code T7QK2D' },
+      { code: 'Y3BN8H', status: 'Unassigned', chip: 'a-chip a-c-n', shop: 'In stock', last: 'Never', action: 'Assign', label: 'Assign code Y3BN8H' }
+    ];
+
+    const col = (title, hint, cards) => ({ title: title, hint: hint, count: cards.length, cards: cards });
+    const cardOf = (name, sub, tag, chip, action, primary) => ({ name: name, sub: sub, tag: tag, chip: chip, action: action, btn: primary ? 'a-btn a-btn-p' : 'a-btn' });
+    const columns = [
+      col('Lead', 'Collect name, logo and links', [
+        cardOf('Sharma Opticals', 'Optician · met in person', '21 Oct', 'a-chip a-c-n', 'Collect details', false),
+        cardOf('Lotus Yoga Studio', 'Fitness · WhatsApp enquiry', 'Yesterday', 'a-chip a-c-n', 'Reply', false),
+        cardOf('Patel Pharmacy', 'Pharmacy · asked for price', 'Today', 'a-chip a-c-n', 'Send plans', false)
+      ]),
+      col('Building', 'Theme, buttons, offers', [
+        cardOf('Spice Route Restaurant', 'Restaurant · Yearly', 'Waiting for logo', 'a-chip a-c-a', 'Request logo', false),
+        cardOf('Glow Skin Clinic', 'Skin clinic · Monthly', 'Ready to preview', 'a-chip a-c-b', 'Send preview', true)
+      ]),
+      col('Preview sent', 'Waiting for approval and payment', [
+        cardOf('Brew & Bun Cafe', 'Cafe · Yearly', 'Sent 2 days ago', 'a-chip a-c-a', 'Nudge on WhatsApp', false),
+        cardOf('Urban Cuts', 'Salon · Yearly', 'Sent today', 'a-chip a-c-n', 'Open preview', false),
+        cardOf('Green Leaf Bakery', 'Bakery · Monthly', 'Sent 6 days ago', 'a-chip a-c-r', 'Call owner', false)
+      ]),
+      col('Printing', 'Approved, paid, standee in progress', [
+        cardOf('Aarav Jewellers', 'Jewellery · Yearly', 'Printed, ready to ship', 'a-chip a-c-g', 'Mark shipped', true)
+      ]),
+      col('Live this week', 'First scans and the first report', [
+        cardOf('Kiran Interiors', 'Interior designer · Yearly', 'Live 2 days ago', 'a-chip a-c-g', 'Open shop', false),
+        cardOf('Fresh Basket Grocers', 'Grocery · Monthly', 'No scans yet', 'a-chip a-c-a', 'Check placement', false)
+      ])
+    ];
+
+    const rkpis = [
+      { label: 'Counted scans', value: '18,640', note: '+12% vs previous 30 days', nc: 'a-note a-up' },
+      { label: 'Button taps', value: '7,905', note: '42% tap rate', nc: 'a-note a-mut' },
+      { label: 'Filtered traffic', value: '783', note: '4% of all requests', nc: 'a-note a-warn' },
+      { label: 'Busiest day', value: 'Saturday', note: 'Across all shops', nc: 'a-note a-mut' }
+    ];
+    const rshops = [
+      { name: 'Velvet Salon & Spa', scans: '1,204', taps: '512', rate: '43%', top: 'WhatsApp', flag: 'Clean', chip: 'a-chip a-c-g' },
+      { name: 'Kaveri Sweets', scans: '862', taps: '344', rate: '40%', top: 'Google review', flag: 'Clean', chip: 'a-chip a-c-g' },
+      { name: 'Iron House Gym', scans: '640', taps: '240', rate: '38%', top: 'Wi-Fi password', flag: 'Spike to review', chip: 'a-chip a-c-a' },
+      { name: 'Noor Boutique', scans: '318', taps: '147', rate: '46%', top: 'Instagram', flag: 'Clean', chip: 'a-chip a-c-g' },
+      { name: 'Bright Minds Classes', scans: '207', taps: '81', rate: '39%', top: 'Call', flag: 'Clean', chip: 'a-chip a-c-g' },
+      { name: 'Dr. Mehta Dental', scans: '0', taps: '0', rate: 'None', top: 'None', flag: 'Quiet, 7 days', chip: 'a-chip a-c-a' }
+    ];
+
+    const renewals = [
+      { shop: 'Kaveri Sweets', plan: 'Monthly', date: '28 Oct', pay: 'Due soon', chip: 'a-chip a-c-a', action: 'Remind', label: 'Remind Kaveri Sweets' },
+      { shop: 'Bright Minds Classes', plan: 'Monthly', date: '5 Nov', pay: 'Due soon', chip: 'a-chip a-c-a', action: 'Remind', label: 'Remind Bright Minds Classes' },
+      { shop: 'Green Leaf Bakery', plan: 'Monthly', date: '19 Oct', pay: 'Overdue', chip: 'a-chip a-c-r', action: 'Call', label: 'Call Green Leaf Bakery' },
+      { shop: 'Dr. Mehta Dental', plan: 'Yearly', date: '2 Jan', pay: 'Paid', chip: 'a-chip a-c-g', action: 'View', label: 'View Dr. Mehta Dental' },
+      { shop: 'Noor Boutique', plan: 'Yearly', date: '19 Feb', pay: 'Paid', chip: 'a-chip a-c-g', action: 'View', label: 'View Noor Boutique' },
+      { shop: 'Iron House Gym', plan: '5 years', date: 'Aug 2031', pay: 'Paid', chip: 'a-chip a-c-g', action: 'View', label: 'View Iron House Gym' }
+    ];
+
+    const themeToggles = themes.map((t) => ({ name: t.name, label: t.name + ' is on' }));
+    const layoutToggles = layouts.map((l) => ({ name: l.name, label: l.name + ' is on' }));
+    const defaults = [
+      { type: 'Salon and spa', look: 'Blush · List' },
+      { type: 'Clinic', look: 'Daylight · List' },
+      { type: 'Gym', look: 'Nightfall · Index' },
+      { type: 'Cafe and bakery', look: 'Marigold · Tiles' },
+      { type: 'Jeweller', look: 'Graphite · Cover' }
+    ];
+
+    const page = st.page;
+    return {
+      accent: this.props.accent ?? '#0F6B5C',
+      minH: (this.props.minh || '1000') + 'px',
+      isLogin: page === 'login',
+      hasShell: page !== 'login',
+      navOpen: page !== 'login' && st.open,
+      navClosed: page !== 'login' && !st.open,
+      pOverview: page === 'overview',
+      pShops: page === 'shops',
+      pEditor: page === 'editor',
+      pQr: page === 'qr',
+      pOnboarding: page === 'onboarding',
+      pReports: page === 'reports',
+      pBilling: page === 'billing',
+      pSettings: page === 'settings',
+      tDetails: st.tab === 'details',
+      tButtons: st.tab === 'buttons',
+      tLook: st.tab === 'look',
+      tOffers: st.tab === 'offers',
+      tQrPlan: st.tab === 'qrplan',
+      tActivity: st.tab === 'activity',
+      navItems: navItems,
+      toggleNav: () => this.setState({ open: !this.state.open }),
+      signIn: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ page: 'overview' }); },
+      logout: () => this.setState({ page: 'login' }),
+      newShop: () => this.setState({ page: 'editor', shopName: 'New shop', tab: 'details' }),
+      goShops: go('shops'),
+      shopName: st.shopName,
+      theme: st.theme,
+      layout: st.layout,
+      font: st.font,
+      tabs: tabs,
+      shopRows: shopRows,
+      hasSel: selCount > 0,
+      selText: selCount + (selCount === 1 ? ' shop selected' : ' shops selected'),
+      clearSel: () => this.setState({ sel: {} }),
+      themeOpts: themeOpts,
+      layoutOpts: layoutOpts,
+      fontOpts: fontOpts,
+      btns: btns,
+      changes: changes,
+      kpis: kpis,
+      bars: bars,
+      attention: attention,
+      recent: recent,
+      codes: codes,
+      columns: columns,
+      rkpis: rkpis,
+      rshops: rshops,
+      renewals: renewals,
+      themeToggles: themeToggles,
+      layoutToggles: layoutToggles,
+      defaults: defaults
+    };
+  }
+}
+</script>
+</body>
+</html>

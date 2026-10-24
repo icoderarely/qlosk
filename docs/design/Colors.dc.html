@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Color scheme</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:1100px;min-height:1100px;box-sizing:border-box;padding:44px;background:#F4F5F7;color:#11141A;font-family:'Manrope',system-ui,sans-serif;font-size:14px;line-height:1.45;display:flex;flex-direction:column;gap:28px">
+
+  <div>
+    <h1 style="margin:0;font-size:32px;font-weight:800;letter-spacing:-0.01em">Color scheme</h1>
+    <p style="margin:6px 0 0;color:#5B6270;font-size:15px;max-width:640px">The neutrals and status colors stay the same in every option. Only the accent changes, and it drives the main buttons, the active menu item and the chart.</p>
+  </div>
+
+  <section aria-label="Shared colors" style="background:#FFFFFF;border:1px solid #E3E5EA;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:20px">
+    <h2 style="margin:0;font-size:16px;font-weight:800">Shared by every option</h2>
+
+    <div style="display:flex;flex-wrap:wrap;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:6px;width:116px"><div style="height:52px;border-radius:10px;background:#F4F5F7;border:1px solid #D5D8DF"></div><div style="font-weight:700;font-size:12px">Page ground</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#5B6270">#F4F5F7</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;width:116px"><div style="height:52px;border-radius:10px;background:#FFFFFF;border:1px solid #D5D8DF"></div><div style="font-weight:700;font-size:12px">Cards</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#5B6270">#FFFFFF</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;width:116px"><div style="height:52px;border-radius:10px;background:#EBEDF1;border:1px solid #D5D8DF"></div><div style="font-weight:700;font-size:12px">Board columns</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#5B6270">#EBEDF1</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;width:116px"><div style="height:52px;border-radius:10px;background:#E3E5EA;border:1px solid #D5D8DF"></div><div style="font-weight:700;font-size:12px">Lines</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#5B6270">#E3E5EA</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;width:116px"><div style="height:52px;border-radius:10px;background:#11141A"></div><div style="font-weight:700;font-size:12px">Text</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#5B6270">#11141A</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;width:116px"><div style="height:52px;border-radius:10px;background:#454B58"></div><div style="font-weight:700;font-size:12px">Menu text</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#5B6270">#454B58</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;width:116px"><div style="height:52px;border-radius:10px;background:#5B6270"></div><div style="font-weight:700;font-size:12px">Muted text</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#5B6270">#5B6270</div></div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <span style="color:#5B6270;font-weight:700;font-size:12px;width:116px">Status chips</span>
+      <span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#0B5A4C;background:#E1F2EE">Live · #0B5A4C on #E1F2EE</span>
+      <span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#7A4F00;background:#FFF1CF">Waiting · #7A4F00 on #FFF1CF</span>
+      <span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#9B2218;background:#FDE6E3">Overdue · #9B2218 on #FDE6E3</span>
+      <span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#1D3FA6;background:#E5ECFD">Preview · #1D3FA6 on #E5ECFD</span>
+    </div>
+
+    <div style="color:#5B6270">Type: Manrope for everything, JetBrains Mono for QR codes.</div>
+  </section>
+
+  <div style="display:flex;flex-wrap:wrap;gap:20px">
+
+    <section aria-label="Teal, current" style="--a:#0F6B5C;flex:1 1 440px;box-sizing:border-box;background:#FFFFFF;border:2px solid #0F6B5C;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><h3 style="margin:0;font-size:18px;font-weight:800">Teal</h3><p style="margin:2px 0 0;color:#5B6270">Calm and trustworthy. Close to the green of the Live chip.</p></div>
+        <span style="padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;color:#FFFFFF;background:#0F6B5C">Current</span>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center">
+        <div style="width:72px;height:72px;border-radius:14px;background:var(--a);flex:none"></div>
+        <div><div style="font-weight:700">Accent</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px">#0F6B5C</div><div style="font-size:12px;color:#5B6270">White text on it: about 6.4 to 1</div></div>
+      </div>
+      <div style="background:#F4F5F7;border-radius:12px;padding:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <span style="padding:10px 14px;border-radius:10px;font-weight:700;color:var(--a);background:color-mix(in srgb, var(--a) 12%, #ffffff)">Onboarding</span>
+        <span style="padding:10px 16px;border-radius:10px;font-weight:700;color:#FFFFFF;background:var(--a)">New lead</span>
+        <span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#0B5A4C;background:#E1F2EE">Live</span>
+      </div>
+    </section>
+
+    <section aria-label="Indigo" style="--a:#2F4BD8;flex:1 1 440px;box-sizing:border-box;background:#FFFFFF;border:2px solid #E3E5EA;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><h3 style="margin:0;font-size:18px;font-weight:800">Indigo</h3><p style="margin:2px 0 0;color:#5B6270">Clear and familiar for software. Stays apart from the green status.</p></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center">
+        <div style="width:72px;height:72px;border-radius:14px;background:var(--a);flex:none"></div>
+        <div><div style="font-weight:700">Accent</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px">#2F4BD8</div><div style="font-size:12px;color:#5B6270">White text on it: about 6.7 to 1</div></div>
+      </div>
+      <div style="background:#F4F5F7;border-radius:12px;padding:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <span style="padding:10px 14px;border-radius:10px;font-weight:700;color:var(--a);background:color-mix(in srgb, var(--a) 12%, #ffffff)">Onboarding</span>
+        <span style="padding:10px 16px;border-radius:10px;font-weight:700;color:#FFFFFF;background:var(--a)">New lead</span>
+        <span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#0B5A4C;background:#E1F2EE">Live</span>
+      </div>
+    </section>
+
+    <section aria-label="Rust" style="--a:#B4441F;flex:1 1 440px;box-sizing:border-box;background:#FFFFFF;border:2px solid #E3E5EA;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><h3 style="margin:0;font-size:18px;font-weight:800">Rust</h3><p style="margin:2px 0 0;color:#5B6270">Warm and a little more distinctive. Needs care next to the red Overdue chip.</p></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center">
+        <div style="width:72px;height:72px;border-radius:14px;background:var(--a);flex:none"></div>
+        <div><div style="font-weight:700">Accent</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px">#B4441F</div><div style="font-size:12px;color:#5B6270">White text on it: about 5.5 to 1</div></div>
+      </div>
+      <div style="background:#F4F5F7;border-radius:12px;padding:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <span style="padding:10px 14px;border-radius:10px;font-weight:700;color:var(--a);background:color-mix(in srgb, var(--a) 12%, #ffffff)">Onboarding</span>
+        <span style="padding:10px 16px;border-radius:10px;font-weight:700;color:#FFFFFF;background:var(--a)">New lead</span>
+        <span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#0B5A4C;background:#E1F2EE">Live</span>
+      </div>
+    </section>
+
+    <section aria-label="Ink" style="--a:#11141A;flex:1 1 440px;box-sizing:border-box;background:#FFFFFF;border:2px solid #E3E5EA;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><h3 style="margin:0;font-size:18px;font-weight:800">Ink</h3><p style="margin:2px 0 0;color:#5B6270">Black and white with no accent. Status colors are the only color on screen.</p></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center">
+        <div style="width:72px;height:72px;border-radius:14px;background:var(--a);flex:none"></div>
+        <div><div style="font-weight:700">Accent</div><div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px">#11141A</div><div style="font-size:12px;color:#5B6270">White text on it: about 18 to 1</div></div>
+      </div>
+      <div style="background:#F4F5F7;border-radius:12px;padding:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <span style="padding:10px 14px;border-radius:10px;font-weight:700;color:var(--a);background:color-mix(in srgb, var(--a) 12%, #ffffff)">Onboarding</span>
+        <span style="padding:10px 16px;border-radius:10px;font-weight:700;color:#FFFFFF;background:var(--a)">New lead</span>
+        <span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#0B5A4C;background:#E1F2EE">Live</span>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1100,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

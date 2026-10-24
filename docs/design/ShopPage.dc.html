@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shop page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:wght@600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a:focus-visible,button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="--bg:{{t.bg}};--card:{{t.card}};--text:{{t.text}};--muted:{{t.muted}};--line:{{t.line}};--btn:{{t.btnBg}};--btntext:{{t.btnText}};--iconbg:{{t.iconBg}};--iconfg:{{t.iconFg}};--chipbg:{{t.chipBg}};--chiptext:{{t.chipText}};--cover:{{t.cover}};--head:{{f.head}};--body:{{f.body}};width:390px;min-height:860px;box-sizing:border-box;background:var(--bg);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.4">
+
+  <sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+  <div style="min-height:860px;box-sizing:border-box;padding:32px 20px 24px;display:flex;flex-direction:column;gap:20px">
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
+      <div role="img" aria-label="Shop logo placeholder" style="width:72px;height:72px;border-radius:999px;background:var(--btn);color:var(--btntext);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:26px">{{initials}}</div>
+      <h1 style="margin:8px 0 0;font-family:var(--head);font-size:28px;line-height:1.15;font-weight:700">{{shopName}}</h1>
+      <p style="margin:0;color:var(--muted)">{{tagline}}</p>
+      <div style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        {{area}}
+      </div>
+    </div>
+
+    <a href="#" style="display:flex;align-items:center;gap:12px;min-height:64px;box-sizing:border-box;padding:10px 16px;border-radius:16px;background:var(--btn);color:var(--btntext);text-decoration:none">
+      <span style="width:40px;height:40px;border-radius:999px;background:color-mix(in srgb, var(--btntext) 18%, transparent);display:flex;align-items:center;justify-content:center;flex:none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z"/></svg>
+      </span>
+      <span style="flex:1"><span style="display:block;font-weight:700;font-size:16px">{{cta}}</span><span style="display:block;font-size:12px;font-weight:500">Opens WhatsApp</span></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+
+    <div>
+      <h2 style="margin:0 0 8px 4px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:700">More ways to reach us</h2>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden">
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;text-decoration:none;color:var(--text)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Call us</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Review us on Google</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Wi-Fi password</span>
+          <span style="padding:4px 10px;border-radius:999px;background:var(--chipbg);color:var(--chiptext);font-size:12px;font-weight:700">Tap to show</span>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Get directions</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Follow on Instagram</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <section aria-label="Offer" style="border:1.5px dashed var(--iconfg);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 10px;border-radius:999px;background:var(--chipbg);color:var(--chiptext);font-size:12px;font-weight:700">Offer</span><span style="font-size:12px;color:var(--muted)">Show this page at the desk</span></div>
+      <h2 style="margin:0;font-family:var(--head);font-size:18px;font-weight:700">10% off your first visit</h2>
+      <button type="button" style="min-height:44px;border-radius:12px;border:1px solid var(--iconfg);background:var(--card);color:var(--text);font-weight:700;font-size:14px;cursor:pointer">WELCOME10 · Tap to copy</button>
+    </section>
+
+    <div style="margin-top:auto;text-align:center;font-size:11px;color:var(--muted)">Powered by Your Brand</div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{isTiles}}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:860px;box-sizing:border-box;padding:32px 20px 24px;display:flex;flex-direction:column;gap:16px">
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
+      <div role="img" aria-label="Shop logo placeholder" style="width:72px;height:72px;border-radius:999px;background:var(--btn);color:var(--btntext);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:26px">{{initials}}</div>
+      <h1 style="margin:8px 0 0;font-family:var(--head);font-size:28px;line-height:1.15;font-weight:700">{{shopName}}</h1>
+      <p style="margin:0;color:var(--muted)">{{tagline}}</p>
+      <div style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        {{area}}
+      </div>
+    </div>
+
+    <a href="#" style="display:flex;align-items:center;gap:12px;min-height:64px;box-sizing:border-box;padding:10px 16px;border-radius:16px;background:var(--btn);color:var(--btntext);text-decoration:none">
+      <span style="width:40px;height:40px;border-radius:999px;background:color-mix(in srgb, var(--btntext) 18%, transparent);display:flex;align-items:center;justify-content:center;flex:none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z"/></svg>
+      </span>
+      <span style="flex:1"><span style="display:block;font-weight:700;font-size:16px">{{cta}}</span><span style="display:block;font-size:12px;font-weight:500">Opens WhatsApp</span></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+
+    <section aria-label="Offer" style="display:flex;align-items:center;gap:12px;border:1.5px dashed var(--iconfg);border-radius:16px;padding:12px 14px">
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--head);font-weight:700;font-size:16px">10% off your first visit</div>
+        <div style="font-size:12px;color:var(--muted)">Show this page at the desk</div>
+      </div>
+      <button type="button" style="min-height:44px;padding:0 12px;border-radius:12px;border:1px solid var(--iconfg);background:var(--card);color:var(--text);font-weight:700;font-size:13px;cursor:pointer;flex:none">WELCOME10</button>
+    </section>
+
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+      <a href="#" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:112px;box-sizing:border-box;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+        <span style="width:40px;height:40px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span>
+        <span><span style="display:block;font-weight:700;font-size:15px">Call us</span><span style="display:block;font-size:12px;color:var(--muted)">Talk to the desk</span></span>
+      </a>
+      <a href="#" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:112px;box-sizing:border-box;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+        <span style="width:40px;height:40px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span>
+        <span><span style="display:block;font-weight:700;font-size:15px">Review us</span><span style="display:block;font-size:12px;color:var(--muted)">On Google</span></span>
+      </a>
+      <a href="#" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:112px;box-sizing:border-box;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+        <span style="width:40px;height:40px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></svg></span>
+        <span><span style="display:block;font-weight:700;font-size:15px">Wi-Fi</span><span style="display:block;font-size:12px;color:var(--muted)">Tap to show password</span></span>
+      </a>
+      <a href="#" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:112px;box-sizing:border-box;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+        <span style="width:40px;height:40px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+        <span><span style="display:block;font-weight:700;font-size:15px">Directions</span><span style="display:block;font-size:12px;color:var(--muted)">Open in Maps</span></span>
+      </a>
+      <a href="#" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:112px;box-sizing:border-box;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+        <span style="width:40px;height:40px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></span>
+        <span><span style="display:block;font-weight:700;font-size:15px">Instagram</span><span style="display:block;font-size:12px;color:var(--muted)">Follow us</span></span>
+      </a>
+      <a href="#" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:112px;box-sizing:border-box;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+        <span style="width:40px;height:40px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg></span>
+        <span><span style="display:block;font-weight:700;font-size:15px">Services</span><span style="display:block;font-size:12px;color:var(--muted)">Prices and menu</span></span>
+      </a>
+    </div>
+
+    <div style="margin-top:auto;text-align:center;font-size:11px;color:var(--muted)">Powered by Your Brand</div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{isCover}}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:860px;box-sizing:border-box;display:flex;flex-direction:column">
+
+    <div style="height:150px;background:var(--cover);display:flex;align-items:center;justify-content:center;color:var(--text);font-size:12px;font-weight:600">Cover photo goes here</div>
+
+    <div style="padding:0 20px 24px;display:flex;flex-direction:column;gap:16px;flex:1">
+      <div style="margin-top:-38px;display:flex;flex-direction:column;gap:4px">
+        <div role="img" aria-label="Shop logo placeholder" style="width:76px;height:76px;border-radius:999px;background:var(--btn);color:var(--btntext);border:4px solid var(--bg);box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:26px">{{initials}}</div>
+        <h1 style="margin:8px 0 0;font-family:var(--head);font-size:28px;line-height:1.15;font-weight:700">{{shopName}}</h1>
+        <p style="margin:0;color:var(--muted)">{{tagline}}</p>
+        <div style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          {{area}}
+        </div>
+      </div>
+
+      <a href="#" style="display:flex;align-items:center;gap:12px;min-height:64px;box-sizing:border-box;padding:10px 16px;border-radius:16px;background:var(--btn);color:var(--btntext);text-decoration:none">
+        <span style="width:40px;height:40px;border-radius:999px;background:color-mix(in srgb, var(--btntext) 18%, transparent);display:flex;align-items:center;justify-content:center;flex:none">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z"/></svg>
+        </span>
+        <span style="flex:1"><span style="display:block;font-weight:700;font-size:16px">{{cta}}</span><span style="display:block;font-size:12px;font-weight:500">Opens WhatsApp</span></span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:var(--chipbg);color:var(--chiptext)">
+        <span style="font-weight:700;font-size:13px">10% off your first visit</span>
+        <span style="font-size:12px;font-weight:600;margin-left:auto">Code WELCOME10</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Call us</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Review us on Google</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Wi-Fi password</span>
+          <span style="padding:4px 10px;border-radius:999px;background:var(--chipbg);color:var(--chiptext);font-size:12px;font-weight:700">Tap to show</span>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Get directions</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--text)">
+          <span style="width:36px;height:36px;border-radius:999px;background:var(--iconbg);color:var(--iconfg);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></span>
+          <span style="flex:1;font-weight:600;font-size:15px">Follow on Instagram</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div style="margin-top:auto;text-align:center;font-size:11px;color:var(--muted)">Powered by Your Brand</div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{isIndex}}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:860px;box-sizing:border-box;padding:28px 20px 24px;display:flex;flex-direction:column;gap:16px">
+
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div role="img" aria-label="Shop logo placeholder" style="width:52px;height:52px;border-radius:999px;background:var(--btn);color:var(--btntext);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:20px">{{initials}}</div>
+      <h1 style="margin:10px 0 0;font-family:var(--head);font-size:34px;line-height:1.08;font-weight:700;letter-spacing:-0.01em">{{shopName}}</h1>
+      <p style="margin:0;color:var(--muted);font-size:15px">{{tagline}} · {{area}}</p>
+    </div>
+
+    <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:88px;box-sizing:border-box;padding:16px 20px;border-radius:20px;background:var(--btn);color:var(--btntext);text-decoration:none">
+      <span><span style="display:block;font-family:var(--head);font-size:22px;font-weight:700;line-height:1.15">{{cta}}</span><span style="display:block;font-size:13px;font-weight:500;margin-top:2px">Opens WhatsApp</span></span>
+      <span style="width:44px;height:44px;border-radius:999px;background:color-mix(in srgb, var(--btntext) 18%, transparent);display:flex;align-items:center;justify-content:center;flex:none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+
+    <section aria-label="Offer" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;background:var(--chipbg);color:var(--chiptext)">
+      <div style="flex:1;min-width:0"><div style="font-family:var(--head);font-weight:700;font-size:16px">10% off your first visit</div><div style="font-size:12px;font-weight:600">Show this page at the desk</div></div>
+      <button type="button" style="min-height:44px;padding:0 14px;border-radius:10px;border:1.5px dashed var(--chiptext);background:transparent;color:var(--chiptext);font-weight:700;font-size:13px;cursor:pointer;flex:none">WELCOME10</button>
+    </section>
+
+    <div>
+      <h2 style="margin:0 0 4px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:700">Everything else</h2>
+      <div style="border-bottom:1px solid var(--line)">
+        <a href="#" style="display:flex;align-items:center;gap:14px;min-height:60px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+          <span style="width:24px;font-size:13px;font-weight:700;color:var(--muted)">01</span>
+          <span style="flex:1;font-family:var(--head);font-size:20px;font-weight:600">Call us</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:14px;min-height:60px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+          <span style="width:24px;font-size:13px;font-weight:700;color:var(--muted)">02</span>
+          <span style="flex:1;font-family:var(--head);font-size:20px;font-weight:600">Review us on Google</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:14px;min-height:60px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+          <span style="width:24px;font-size:13px;font-weight:700;color:var(--muted)">03</span>
+          <span style="flex:1;font-family:var(--head);font-size:20px;font-weight:600">Wi-Fi password</span>
+          <span style="padding:4px 10px;border-radius:999px;background:var(--chipbg);color:var(--chiptext);font-size:12px;font-weight:700">Tap to show</span>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:14px;min-height:60px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+          <span style="width:24px;font-size:13px;font-weight:700;color:var(--muted)">04</span>
+          <span style="flex:1;font-family:var(--head);font-size:20px;font-weight:600">Get directions</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:14px;min-height:60px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+          <span style="width:24px;font-size:13px;font-weight:700;color:var(--muted)">05</span>
+          <span style="flex:1;font-family:var(--head);font-size:20px;font-weight:600">Follow on Instagram</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--muted)"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div style="margin-top:auto;text-align:center;font-size:11px;color:var(--muted)">Powered by Your Brand</div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{isChat}}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:860px;box-sizing:border-box;display:flex;flex-direction:column">
+
+    <header style="display:flex;align-items:center;gap:12px;padding:20px;background:var(--card);border-bottom:1px solid var(--line)">
+      <div role="img" aria-label="Shop logo placeholder" style="width:48px;height:48px;flex:none;border-radius:999px;background:var(--btn);color:var(--btntext);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:18px">{{initials}}</div>
+      <div style="min-width:0">
+        <h1 style="margin:0;font-family:var(--head);font-size:20px;line-height:1.2;font-weight:700">{{shopName}}</h1>
+        <div style="font-size:13px;color:var(--muted)">{{tagline}} · {{areaShort}}</div>
+      </div>
+    </header>
+
+    <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:12px">
+      <div style="align-self:flex-start;max-width:290px;padding:12px 16px;border-radius:18px 18px 18px 4px;background:var(--card);border:1px solid var(--line)">Hi, welcome to {{shopName}}. How can we help you today?</div>
+
+      <div style="align-self:flex-start;max-width:290px;padding:12px 16px;border-radius:18px 18px 18px 4px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:var(--head);font-weight:700;font-size:16px">10% off your first visit</div>
+        <div style="font-size:13px;color:var(--muted)">Show this page at the desk.</div>
+        <button type="button" style="min-height:44px;border-radius:12px;border:1px solid var(--iconfg);background:var(--card);color:var(--text);font-weight:700;font-size:14px;cursor:pointer">WELCOME10 · Tap to copy</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;margin-top:8px">
+        <a href="#" style="display:flex;align-items:center;gap:10px;min-height:48px;padding:0 18px;border-radius:999px;background:var(--btn);color:var(--btntext);text-decoration:none;font-weight:700">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z"/></svg>
+          {{cta}}
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--iconfg);color:var(--iconfg);text-decoration:none;font-weight:600">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+          Call us
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--iconfg);color:var(--iconfg);text-decoration:none;font-weight:600">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
+          Review us on Google
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--iconfg);color:var(--iconfg);text-decoration:none;font-weight:600">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></svg>
+          Wi-Fi password
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--iconfg);color:var(--iconfg);text-decoration:none;font-weight:600">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          Get directions
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--iconfg);color:var(--iconfg);text-decoration:none;font-weight:600">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+          Follow on Instagram
+        </a>
+      </div>
+    </div>
+
+    <div style="padding:0 20px 20px;text-align:center;font-size:11px;color:var(--muted)">Powered by Your Brand</div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;daylight&quot;, &quot;options&quot;: [&quot;daylight&quot;, &quot;nightfall&quot;, &quot;marigold&quot;, &quot;blush&quot;, &quot;graphite&quot;]}, &quot;layout&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;list&quot;, &quot;options&quot;: [&quot;list&quot;, &quot;tiles&quot;, &quot;cover&quot;, &quot;index&quot;, &quot;chat&quot;]}, &quot;font&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;clean&quot;, &quot;options&quot;: [&quot;editorial&quot;, &quot;clean&quot;, &quot;rounded&quot;]}, &quot;$preview&quot;: {&quot;width&quot;: 390, &quot;height&quot;: 860}, &quot;shopname&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Velvet Salon &amp; Spa&quot;}, &quot;tagline&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Hair, skin and bridal studio&quot;}, &quot;area&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Bandra West, Mumbai&quot;}, &quot;cta&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Book on WhatsApp&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const themes = {
+      daylight: { bg: '#F3F6FB', card: '#FFFFFF', text: '#0E1A2B', muted: '#55607A', line: '#DCE3EF', btnBg: '#1F4FD1', btnText: '#FFFFFF', iconBg: '#E6EDFC', iconFg: '#1F4FD1', chipBg: '#E6EDFC', chipText: '#1B3FAE', cover: 'linear-gradient(135deg, #BFD0F7, #E6EDFC)' },
+      nightfall: { bg: '#0F1424', card: '#1A2138', text: '#F2F4FA', muted: '#A3ABC2', line: '#2C3554', btnBg: '#FFB547', btnText: '#1B1303', iconBg: '#2A3354', iconFg: '#FFB547', chipBg: '#2A3354', chipText: '#FFD08A', cover: 'linear-gradient(135deg, #27356B, #0F1424)' },
+      marigold: { bg: '#FFF1D0', card: '#FFFDF7', text: '#2A1D05', muted: '#6B5530', line: '#EBD9AE', btnBg: '#B4540A', btnText: '#FFFFFF', iconBg: '#FBE3B0', iconFg: '#8F4107', chipBg: '#FBE3B0', chipText: '#7A3706', cover: 'linear-gradient(135deg, #F6C66A, #FFF1D0)' },
+      blush: { bg: '#FDEFF1', card: '#FFFFFF', text: '#3A1620', muted: '#7A4A55', line: '#F2D3D9', btnBg: '#9F1D45', btnText: '#FFFFFF', iconBg: '#FBD9E0', iconFg: '#8A1538', chipBg: '#FBD9E0', chipText: '#7A1233', cover: 'linear-gradient(135deg, #F7B8C6, #FDEFF1)' },
+      graphite: { bg: '#F2F1EF', card: '#FFFFFF', text: '#16181D', muted: '#5E5C57', line: '#DEDBD6', btnBg: '#16181D', btnText: '#FFFFFF', iconBg: '#E9E7E3', iconFg: '#16181D', chipBg: '#E9E7E3', chipText: '#2B2A27', cover: 'linear-gradient(135deg, #D9D6D0, #F2F1EF)' }
+    };
+    const fonts = {
+      editorial: { head: "'Fraunces', Georgia, serif", body: "'DM Sans', system-ui, sans-serif" },
+      clean: { head: "'DM Sans', system-ui, sans-serif", body: "'DM Sans', system-ui, sans-serif" },
+      rounded: { head: "'Nunito', system-ui, sans-serif", body: "'Nunito', system-ui, sans-serif" }
+    };
+    const layout = this.props.layout ?? 'list';
+    const shopName = (this.props.shopname || 'Velvet Salon & Spa').trim();
+    const area = this.props.area ?? 'Bandra West, Mumbai';
+    const initials = shopName.split(/\s+/).filter((w) => /[A-Za-z0-9]/.test(w[0])).slice(0, 2).map((w) => w[0].toUpperCase()).join('') || 'S';
+    return {
+      shopName: shopName,
+      tagline: this.props.tagline ?? 'Hair, skin and bridal studio',
+      area: area,
+      areaShort: area.split(',')[0],
+      cta: this.props.cta || 'Book on WhatsApp',
+      initials: initials,
+      t: themes[this.props.theme] || themes.daylight,
+      f: fonts[this.props.font] || fonts.clean,
+      isList: layout === 'list',
+      isTiles: layout === 'tiles',
+      isCover: layout === 'cover',
+      isIndex: layout === 'index',
+      isChat: layout === 'chat'
+    };
+  }
+}
+</script>
+</body>
+</html>
