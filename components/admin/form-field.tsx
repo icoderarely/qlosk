@@ -95,7 +95,7 @@ export function SelectField({
   const id = useId();
   return (
     <Wrap label={label} hideLabel={hideLabel} block={block} id={id}>
-      <select id={id} className={inputClass(className)} {...rest}>
+      <select id={id} className={inputClass(`select-chevron pr-10 ${className}`)} {...rest}>
         {children}
       </select>
     </Wrap>
