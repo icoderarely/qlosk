@@ -287,6 +287,7 @@ export function ShopEditor({
                 billing={billing}
                 canEdit={canEdit}
                 onOpenStandee={() => setTab("standee")}
+                qrSvg={standeeQr.svg}
               />
             ) : null}
             {tab === "activity" ? (

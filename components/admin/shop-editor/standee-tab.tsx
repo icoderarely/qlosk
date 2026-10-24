@@ -33,6 +33,8 @@ const SECTION = "flex flex-col gap-3.5 p-5";
 /** What the server knows about this shop's QR: the drawn code, or why there is none. */
 export type StandeeQr = {
   art: QrArt | null;
+  /** The same code as a standalone SVG, for the QR and plan tab. */
+  svg: string | null;
   /** The shop's assigned code; null while it has none (the preview then shows a sample code). */
   code: string | null;
   /** Why no code can be drawn, such as a missing QR address. */

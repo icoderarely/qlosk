@@ -59,7 +59,7 @@ export function Ic({ d, className = "" }: { d: IconName; className?: string }) {
   );
 }
 
-/** A drawn QR look-alike for the page art. It is not a scannable code. */
+/** A drawn QR look-alike for the page art. It is not a scannable code, but it carries the Q mark like a real one. */
 // `variant` turns the same art so a row of them reads as different codes.
 export function QrArt({ size, label, variant = 0 }: { size: number; label: string; variant?: 0 | 1 | 2 | 3 }) {
   return (
@@ -85,6 +85,13 @@ export function QrArt({ size, label, variant = 0 }: { size: number; label: strin
         <rect x="74" y="58" width="8" height="8" />
         <rect x="42" y="74" width="8" height="8" />
         <rect x="74" y="76" width="8" height="8" />
+      </g>
+      {/* The Q mark in the middle, as on every real code (spec section 11): white gap, near-black mark. */}
+      <rect x="34" y="34" width="28" height="28" fill="#fff" />
+      <g transform="translate(37 37) scale(0.6667) translate(-6 -6)" fill="none" stroke="#0D1F1B">
+        <rect x="9" y="9" width="26" height="26" rx="9" strokeWidth="6" />
+        <rect x="18" y="18" width="8" height="8" rx="2" fill="#0D1F1B" stroke="none" />
+        <rect x="28.5" y="28.5" width="12" height="12" rx="3.2" fill="#0D1F1B" stroke="#fff" strokeWidth="3" />
       </g>
     </svg>
   );

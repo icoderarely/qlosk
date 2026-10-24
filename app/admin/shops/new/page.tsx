@@ -21,7 +21,7 @@ export default async function Page() {
       shopTypes={shopTypes}
       canEdit
       qrChoices={{ stock: [], shops: [] }}
-      standeeQr={{ art: null, code: null, problem: null }}
+      standeeQr={{ art: null, svg: null, code: null, problem: null }}
       enabledThemes={THEME_IDS.filter((t) => settings.enabledThemes[t])}
       enabledLayouts={LAYOUT_IDS.filter((l) => settings.enabledLayouts[l])}
     />

@@ -12,7 +12,7 @@ import { hasRole } from "@/services/admin-roles";
 import { getShopPlan } from "@/services/billing";
 import { loadSettings, loadShopTypes } from "@/lib/load-settings";
 import { qrBaseUrl } from "@/lib/print-assets";
-import { buildQrArt, qrTarget } from "@/services/qr-art";
+import { buildQrArt, qrArtSvg, qrTarget } from "@/services/qr-art";
 import { getShopEditor } from "@/services/shop-editor";
 import { LAYOUT_IDS, THEME_IDS } from "@/components/shop-page/types";
 
@@ -23,9 +23,9 @@ export const metadata: Metadata = { title: "Edit shop" };
 function standeeQrFor(code: string | null, savedBase: string | undefined): StandeeQr {
   try {
     const art = buildQrArt(qrTarget(qrBaseUrl(savedBase), code ?? "XXXXXX"));
-    return { art, code, problem: null };
+    return { art, svg: qrArtSvg(art), code, problem: null };
   } catch (error) {
-    return { art: null, code, problem: error instanceof Error ? error.message : "The QR address is not set." };
+    return { art: null, svg: null, code, problem: error instanceof Error ? error.message : "The QR address is not set." };
   }
 }
 

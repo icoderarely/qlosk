@@ -41,6 +41,7 @@ export function QrPlanTab({
   billing,
   canEdit,
   onOpenStandee,
+  qrSvg,
 }: TabProps & {
   info: QrPlanInfo;
   choices: QrChoices;
@@ -48,6 +49,8 @@ export function QrPlanTab({
   canEdit: boolean;
   /** Switches the editor to the Standee tab. */
   onOpenStandee: () => void;
+  /** The shop's QR as SVG, drawn on the server. */
+  qrSvg: string | null;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -84,7 +87,7 @@ export function QrPlanTab({
   return (
     <>
       <Card className="flex flex-wrap items-center gap-5 p-5">
-        <QrSample />
+        <QrSample svg={qrSvg} />
         <div className="flex flex-[1_1_260px] flex-col gap-2.5">
           <div className="flex items-center gap-2.5">
             <h2 className="m-0 text-base font-extrabold">QR code</h2>
