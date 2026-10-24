@@ -29,7 +29,7 @@ export function graceEnds(planEndsAt: Date): Date {
 export const PLAN_PITCH: Record<number, string> = {
   1: "Try it, cancel before any month starts",
   6: "A full season, no big commitment",
-  12: "Best value, renewal reminder on WhatsApp",
+  12: "Renewal reminder on WhatsApp",
 };
 
 export type PaymentState = "paid" | "due_soon" | "overdue" | "not_started";

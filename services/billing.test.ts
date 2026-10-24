@@ -22,9 +22,9 @@ const NOW = new Date("2026-10-24T12:00:00+05:30");
 const days = (n: number) => new Date(NOW.getTime() + n * 24 * 3600_000);
 
 const PLANS: PlanRow[] = [
-  { id: "p-month", name: "Monthly", months: 1, pricePaise: 49900 },
-  { id: "p-year", name: "Yearly", months: 12, pricePaise: 0 },
-  { id: "p-five", name: "5 years", months: 60, pricePaise: 0 },
+  { id: "p-month", name: "Monthly", months: 1, pricePaise: 49900, isCustom: false },
+  { id: "p-year", name: "Yearly", months: 12, pricePaise: 0, isCustom: false },
+  { id: "p-five", name: "5 years", months: 60, pricePaise: 0, isCustom: true },
 ];
 
 const shop = (id: string, name: string, planId: string | null, endsInDays: number | null, extra: Partial<BillingShop> = {}): BillingShop => ({
@@ -48,6 +48,7 @@ function fake(shops: BillingShop[], plans: PlanRow[] = PLANS) {
   const priced: { id: string; pricePaise: number }[][] = [];
   const logs: string[] = [];
   const planSet: string[] = [];
+  const customMade: PlanRow[] = [];
   const store: BillingStore = {
     async plans() {
       return plans;
@@ -61,6 +62,11 @@ function fake(shops: BillingShop[], plans: PlanRow[] = PLANS) {
     async renew(args) {
       renewed.push(args);
       last = { logId: "log1", at: NOW, before: args.before, endsAfter: args.planEndsAt };
+    },
+    async customPlan({ months, pricePaise }) {
+      const p: PlanRow = { id: `custom-${months}`, name: `${months} months`, months, pricePaise, isCustom: true };
+      customMade.push(p);
+      return p;
     },
     async setPlan(args) {
       planSet.push(args.planId);
@@ -77,7 +83,7 @@ function fake(shops: BillingShop[], plans: PlanRow[] = PLANS) {
       logs.push(args.what);
     },
   };
-  return { store, renewed, undone, priced, logs, planSet, setLast: (l: LastRenewal | null) => (last = l) };
+  return { store, renewed, undone, priced, logs, planSet, customMade, setLast: (l: LastRenewal | null) => (last = l) };
 }
 
 describe("prices", () => {
@@ -117,7 +123,7 @@ describe("getBilling", () => {
     assert.deepEqual(b.planCounts, [
       { plan: "Monthly", shops: 2 },
       { plan: "Yearly", shops: 1 },
-      { plan: "5 years", shops: 1 },
+      { plan: "Custom", shops: 1 },
     ]);
     assert.deepEqual(b.due, { inDays: 14, count: 1, overdue: 1 });
   });
@@ -161,7 +167,6 @@ describe("getBilling", () => {
     assert.deepEqual(b.prices, [
       { id: "p-month", plan: "Monthly", rupees: "499" },
       { id: "p-year", plan: "Yearly", rupees: "" },
-      { id: "p-five", plan: "5 years", rupees: "" },
     ]);
   });
 });
@@ -252,14 +257,15 @@ describe("undoPaid", () => {
 
 describe("planOptions", () => {
   const plans: PlanRow[] = [
-    { id: "m", name: "1 month", months: 1, pricePaise: 29900 },
-    { id: "h", name: "6 months", months: 6, pricePaise: 119900 },
-    { id: "y", name: "1 year", months: 12, pricePaise: 199900 },
-    { id: "n", name: "Unpriced", months: 3, pricePaise: 0 },
+    { id: "m", name: "Monthly", months: 1, pricePaise: 29900, isCustom: false },
+    { id: "h", name: "Half yearly", months: 6, pricePaise: 119900, isCustom: false },
+    { id: "y", name: "Yearly", months: 12, pricePaise: 199900, isCustom: false },
+    { id: "n", name: "Unpriced", months: 3, pricePaise: 0, isCustom: false },
   ];
 
   it("works out the price per month and the saving against paying monthly", () => {
     const [m, h, y, n] = planOptions(plans);
+    assert.deepEqual([m.bestValue, h.bestValue, y.bestValue], [false, false, true]);
     assert.equal(m.perMonth, "₹299 a month");
     assert.equal(m.saving, "");
     assert.equal(h.perMonth, "₹200 a month");
@@ -272,10 +278,44 @@ describe("planOptions", () => {
   });
 });
 
+describe("custom plans", () => {
+  it("creates a custom length with its price and puts the shop on it", async () => {
+    const f = fake([shop("a", "Kaveri", "p-month", 5)]);
+    const r = await changePlan(f.store, "a", { custom: { months: 17, rupees: "3,499" } }, "me");
+    assert.equal(r.ok, true);
+    assert.deepEqual(f.customMade.map((p) => [p.months, p.pricePaise]), [[17, 349900]]);
+    assert.deepEqual(f.planSet, ["custom-17"]);
+  });
+
+  it("uses the standard plan when the custom length matches one", async () => {
+    const f = fake([shop("a", "Kaveri", "p-month", 5)]);
+    await changePlan(f.store, "a", { custom: { months: 12, rupees: "" } }, "me");
+    assert.deepEqual(f.planSet, ["p-year"]);
+    assert.equal(f.customMade.length, 0);
+  });
+
+  it("rejects a bad length or price", async () => {
+    const f = fake([shop("a", "Kaveri", "p-month", 5)]);
+    for (const custom of [{ months: 0, rupees: "" }, { months: 1.5, rupees: "" }, { months: 500, rupees: "" }, { months: 17, rupees: "abc" }]) {
+      assert.equal((await changePlan(f.store, "a", { custom }, "me")).ok, false);
+    }
+    assert.equal(f.planSet.length, 0);
+  });
+
+  it("shows a shop's custom plan in the form and counts custom shops together", async () => {
+    const f = fake([shop("a", "Iron", "p-five", 400)]);
+    const data = await getShopPlan(f.store, "a", NOW);
+    assert.deepEqual(data?.custom, { months: 60, rupees: "" });
+    assert.equal(data?.options.some((o) => o.name === "5 years"), false);
+    const billing = await getBilling(f.store, NOW);
+    assert.deepEqual(billing.planCounts.at(-1), { plan: "Custom", shops: 1 });
+  });
+});
+
 describe("changePlan and getShopPlan", () => {
   it("sets the plan, logs it, and leaves the dates alone", async () => {
     const f = fake([shop("a", "Kaveri", "p-month", 5)]);
-    const result = await changePlan(f.store, "a", "p-year", "me");
+    const result = await changePlan(f.store, "a", { planId: "p-year" }, "me");
     assert.equal(result.ok, true);
     assert.deepEqual(f.planSet, ["p-year"]);
     assert.match(f.logs[0], /Monthly to Yearly/);
@@ -283,9 +323,9 @@ describe("changePlan and getShopPlan", () => {
 
   it("does nothing for the plan it is already on, or an unknown plan", async () => {
     const f = fake([shop("a", "Kaveri", "p-month", 5)]);
-    assert.equal((await changePlan(f.store, "a", "p-month", "me")).ok, true);
-    assert.equal((await changePlan(f.store, "a", "nope", "me")).ok, false);
-    assert.equal((await changePlan(f.store, "zzz", "p-year", "me")).ok, false);
+    assert.equal((await changePlan(f.store, "a", { planId: "p-month" }, "me")).ok, true);
+    assert.equal((await changePlan(f.store, "a", { planId: "nope" }, "me")).ok, false);
+    assert.equal((await changePlan(f.store, "zzz", { planId: "p-year" }, "me")).ok, false);
     assert.equal(f.planSet.length, 0);
   });
 

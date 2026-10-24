@@ -47,6 +47,8 @@ export function QrPlanTab({
   const [confirm, setConfirm] = useState<"retire" | "archive" | null>(null);
   const [choosingPlan, setChoosingPlan] = useState(false);
   const [planPick, setPlanPick] = useState("");
+  const [customMonths, setCustomMonths] = useState("");
+  const [customRupees, setCustomRupees] = useState("");
   const [confirmingPay, setConfirmingPay] = useState(false);
   const [undoable, setUndoable] = useState(false);
 
@@ -199,6 +201,11 @@ export function QrPlanTab({
                 <span className="flex min-w-0 flex-col">
                   <span className="font-bold">
                     {o.name} <span className="font-normal">· {o.price}</span>
+                    {o.bestValue ? (
+                      <span className="ml-2 rounded-full bg-[#e3f3ea] px-2 py-0.5 text-xs font-bold text-[#1d6b45]">
+                        Best value
+                      </span>
+                    ) : null}
                     {o.perMonth ? <span className="font-normal text-muted"> · {o.perMonth}</span> : null}
                     {o.saving ? <span className="font-bold text-[#1d6b45]"> · {o.saving}</span> : null}
                   </span>
@@ -206,14 +213,59 @@ export function QrPlanTab({
                 </span>
               </label>
             ))}
+            <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-[10px] border border-field bg-white p-3 has-[:checked]:border-ink">
+              <input
+                type="radio"
+                name="plan"
+                value="custom"
+                checked={planPick === "custom"}
+                onChange={() => setPlanPick("custom")}
+                className="mt-1 size-4"
+              />
+              <span className="flex min-w-0 flex-col">
+                <span className="font-bold">Custom</span>
+                <span className="text-[13px] text-muted">Any number of months, with a price you set for this shop</span>
+              </span>
+            </label>
+            {planPick === "custom" ? (
+              <FieldRow>
+                <TextField
+                  label="Months"
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={120}
+                  placeholder="17"
+                  value={customMonths}
+                  onChange={(e) => setCustomMonths(e.target.value)}
+                />
+                <TextField
+                  label="Price in rupees (optional)"
+                  inputMode="decimal"
+                  placeholder="3,499"
+                  value={customRupees}
+                  onChange={(e) => setCustomRupees(e.target.value)}
+                />
+              </FieldRow>
+            ) : null}
             <div className="flex flex-wrap gap-2.5">
               <Button
                 variant="primary"
-                disabled={disabled || !planPick || planPick === billing.planId}
+                disabled={
+                  disabled ||
+                  !planPick ||
+                  planPick === billing.planId ||
+                  (planPick === "custom" && !(Number(customMonths) >= 1))
+                }
                 className="disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() =>
                   run(async () => {
-                    const r = await changeShopPlan(id, planPick);
+                    const r = await changeShopPlan(
+                      id,
+                      planPick === "custom"
+                        ? { custom: { months: Number(customMonths), rupees: customRupees } }
+                        : { planId: planPick },
+                    );
                     if (r.ok) setChoosingPlan(false);
                     return r;
                   })
@@ -232,7 +284,9 @@ export function QrPlanTab({
               <Button
                 disabled={disabled}
                 onClick={() => {
-                  setPlanPick(billing.planId ?? "");
+                  setPlanPick(billing.custom ? "custom" : (billing.planId ?? ""));
+                  setCustomMonths(billing.custom ? String(billing.custom.months) : "");
+                  setCustomRupees(billing.custom?.rupees ?? "");
                   setChoosingPlan(true);
                 }}
               >

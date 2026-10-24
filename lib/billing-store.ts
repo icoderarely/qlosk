@@ -40,7 +40,7 @@ export function createBillingStore(db: PrismaClient): BillingStore {
   return {
     async plans() {
       const plans = await db.plan.findMany({ orderBy: { months: "asc" } });
-      return plans.map((p) => ({ id: p.id, name: p.name, months: p.months, pricePaise: p.pricePaise }));
+      return plans.map((p) => ({ id: p.id, name: p.name, months: p.months, pricePaise: p.pricePaise, isCustom: p.isCustom }));
     },
 
     async shops() {
@@ -62,6 +62,14 @@ export function createBillingStore(db: PrismaClient): BillingStore {
         db.shop.update({ where: { id: shopId }, data: { planStartedAt, planEndsAt, status } }),
         db.changeLog.create({ data: { shopId, userEmail, what, undoPayload } }),
       ]);
+    },
+
+    async customPlan({ months, pricePaise }) {
+      const where = { isCustom: true, months, pricePaise };
+      const p =
+        (await db.plan.findFirst({ where })) ??
+        (await db.plan.create({ data: { ...where, name: months === 1 ? "1 month" : `${months} months` } }));
+      return { id: p.id, name: p.name, months: p.months, pricePaise: p.pricePaise, isCustom: p.isCustom };
     },
 
     async setPlan({ shopId, planId, what, userEmail }) {

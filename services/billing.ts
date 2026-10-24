@@ -18,7 +18,12 @@ import type { DbShopStatus } from "./shops.ts";
 
 const MAX_PRICE_RUPEES = 1_000_000;
 
-export type PlanRow = { id: string; name: string; months: number; pricePaise: number };
+export type PlanRow = { id: string; name: string; months: number; pricePaise: number; isCustom: boolean };
+
+export const MAX_CUSTOM_MONTHS = 120;
+
+/** What the editor sends for a custom plan: a number of months and an optional price in rupees. */
+export type CustomPlanInput = { months: number; rupees: string };
 
 export type BillingShop = {
   id: string;
@@ -55,6 +60,8 @@ export type BillingStore = {
     /** The plan dates and status before this renewal, kept in the change log so it can be undone. */
     before: PlanSnapshot;
   }): Promise<void>;
+  /** The custom plan with this length and price, created when it does not exist yet. */
+  customPlan(args: { months: number; pricePaise: number }): Promise<PlanRow>;
   /** Sets the shop's plan and writes one change_log row, in one transaction. Dates are not touched. */
   setPlan(args: { shopId: string; planId: string; what: string; userEmail: string }): Promise<void>;
   /** The newest renewal for the shop that has not been undone, or null. */
@@ -90,12 +97,16 @@ export type PlanOption = {
   /** "Save 44% vs monthly", empty for the monthly plan or when there is nothing to compare. */
   saving: string;
   pitch: string;
+  /** The offer to lead with: the yearly plan. */
+  bestValue: boolean;
 };
 
 /** What the shop editor's Plan card shows and offers. */
 export type ShopPlanData = {
   planId: string | null;
   options: PlanOption[];
+  /** The shop's plan when it is a custom length, so the form can show it. */
+  custom: { months: number; rupees: string } | null;
   payment: PaymentState | null;
   /** The end date Mark as paid would set, null without a plan. */
   renewsTo: string | null;
@@ -147,7 +158,7 @@ function formatRupees(paise: number): string {
 /** The picker's lines: price, per month, and the saving against paying the 1-month plan again and again. */
 export function planOptions(plans: PlanRow[]): PlanOption[] {
   const monthly = plans.find((p) => p.months === 1)?.pricePaise ?? 0;
-  return plans.map((p) => {
+  return plans.filter((p) => !p.isCustom).map((p) => {
     const priced = p.pricePaise > 0;
     const saved = priced && monthly > 0 && p.months > 1 ? Math.round((1 - p.pricePaise / (monthly * p.months)) * 100) : 0;
     return {
@@ -157,6 +168,7 @@ export function planOptions(plans: PlanRow[]): PlanOption[] {
       perMonth: priced ? `${formatRupees(Math.round(p.pricePaise / p.months / 100) * 100)} a month` : "",
       saving: saved > 0 ? `Save ${saved}% vs monthly` : "",
       pitch: PLAN_PITCH[p.months] ?? "",
+      bestValue: p.months === 12,
     };
   });
 }
@@ -167,7 +179,7 @@ export async function getShopPlan(store: BillingStore, shopId: string, now: Date
   const options = planOptions(plans);
   const plan = plans.find((p) => p.id === shop.planId);
   if (!plan) {
-    return { planId: null, options, payment: null, renewsTo: null, remindHref: null, remindNote: "Choose a plan first." };
+    return { planId: null, options, custom: null, payment: null, renewsTo: null, remindHref: null, remindNote: "Choose a plan first." };
   }
   const payment = paymentState(shop.planEndsAt, now);
   const renewsTo = formatPlanDate(
@@ -180,20 +192,41 @@ export async function getShopPlan(store: BillingStore, shopId: string, now: Date
   else if (!shop.ownerWhatsapp) remindNote = "Add the owner's WhatsApp number on the Details tab.";
   else remindHref = whatsappTarget(shop.ownerWhatsapp, reminderText(shop, plan, payment, now));
   if (!remindHref && !remindNote) remindNote = "The owner's WhatsApp number is not valid.";
-  return { planId: plan.id, options, payment, renewsTo, remindHref, remindNote };
+  const custom = plan.isCustom ? { months: plan.months, rupees: rupeesFromPaise(plan.pricePaise) } : null;
+  return { planId: plan.id, options, custom, payment, renewsTo, remindHref, remindNote };
 }
 
-/** Choose or change the shop's plan. The dates stay as they are; the next Mark as paid adds a period of the new plan. */
+/**
+ * Choose or change the shop's plan: a standard plan by id, or a custom length
+ * ({ months, rupees }). The dates stay as they are; the next Mark as paid adds a
+ * period of the new plan.
+ */
 export async function changePlan(
   store: BillingStore,
   shopId: string,
-  planId: string,
+  choice: { planId: string } | { custom: CustomPlanInput },
   userEmail: string,
 ): Promise<{ ok: true; message: string } | { ok: false; error: string }> {
   const [shop, plans] = await Promise.all([store.find(shopId), store.plans()]);
   if (!shop) return { ok: false, error: "This shop no longer exists." };
-  const plan = plans.find((p) => p.id === planId);
-  if (!plan) return { ok: false, error: "Choose a plan." };
+
+  let plan: PlanRow | undefined;
+  if ("planId" in choice) {
+    plan = plans.find((p) => p.id === choice.planId);
+    if (!plan) return { ok: false, error: "Choose a plan." };
+  } else {
+    const { months, rupees } = choice.custom;
+    if (!Number.isInteger(months) || months < 1 || months > MAX_CUSTOM_MONTHS) {
+      return { ok: false, error: `Custom length must be a whole number of months, 1 to ${MAX_CUSTOM_MONTHS}.` };
+    }
+    const pricePaise = paiseFromRupees(rupees);
+    if (pricePaise === null) return { ok: false, error: "The price is not a number. Use rupees, such as 4,999, or leave it empty." };
+    // A custom length equal to a standard plan is that plan.
+    plan =
+      plans.find((p) => !p.isCustom && p.months === months && (pricePaise === 0 || pricePaise === p.pricePaise)) ??
+      (await store.customPlan({ months, pricePaise }));
+  }
+
   if (shop.planId === plan.id) return { ok: true, message: `${shop.name} is already on the ${plan.name} plan.` };
   const was = plans.find((p) => p.id === shop.planId)?.name ?? "no plan";
   await store.setPlan({ shopId, planId: plan.id, what: `Plan changed: ${was} to ${plan.name}`, userEmail });
@@ -222,7 +255,13 @@ export async function getBilling(store: BillingStore, now: Date = new Date()): P
   const [plans, shops] = await Promise.all([store.plans(), store.shops()]);
   const byId = new Map(plans.map((p) => [p.id, p]));
 
-  const planCounts = plans.map((p) => ({ plan: p.name, shops: shops.filter((s) => s.planId === p.id).length }));
+  const customIds = new Set(plans.filter((p) => p.isCustom).map((p) => p.id));
+  const planCounts = [
+    ...plans.filter((p) => !p.isCustom).map((p) => ({ plan: p.name, shops: shops.filter((s) => s.planId === p.id).length })),
+    ...(shops.some((s) => s.planId && customIds.has(s.planId))
+      ? [{ plan: "Custom", shops: shops.filter((s) => s.planId && customIds.has(s.planId)).length }]
+      : []),
+  ];
   const withPlan = shops.filter((s) => s.planId && byId.has(s.planId) && s.status !== "paused");
 
   let dueCount = 0;
@@ -262,7 +301,7 @@ export async function getBilling(store: BillingStore, now: Date = new Date()): P
     planCounts,
     due: { inDays: DUE_WINDOW_DAYS, count: dueCount, overdue },
     renewals,
-    prices: plans.map((p) => ({ id: p.id, plan: p.name, rupees: rupeesFromPaise(p.pricePaise) })),
+    prices: plans.filter((p) => !p.isCustom).map((p) => ({ id: p.id, plan: p.name, rupees: rupeesFromPaise(p.pricePaise) })),
   };
 }
 

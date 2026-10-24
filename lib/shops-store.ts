@@ -122,7 +122,7 @@ export function createShopsStore(db: PrismaClient): ShopsStore {
     },
 
     async planNames() {
-      const rows = await db.plan.findMany({ orderBy: { months: "asc" }, select: { name: true } });
+      const rows = await db.plan.findMany({ where: { isCustom: false }, orderBy: { months: "asc" }, select: { name: true } });
       return rows.map((r) => r.name);
     },
 

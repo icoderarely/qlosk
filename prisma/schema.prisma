@@ -94,6 +94,9 @@ model Plan {
   name       String
   months     Int
   pricePaise Int    @map("price_paise")
+  // The standard plans (Monthly, Half yearly, Yearly) are not custom. A custom
+  // plan is a length in months set for one shop, such as 17 months.
+  isCustom   Boolean @default(false) @map("is_custom")
 
   shops Shop[]
 

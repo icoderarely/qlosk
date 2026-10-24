@@ -30,14 +30,20 @@ export async function markShopPaid(shopId: unknown): Promise<BillingActionResult
   return result;
 }
 
-export async function changeShopPlan(shopId: unknown, planId: unknown): Promise<BillingActionResult> {
+const PlanChoice = z.union([
+  z.object({ planId: z.uuid() }),
+  z.object({ custom: z.object({ months: z.number(), rupees: z.string().max(20) }) }),
+]);
+
+export async function changeShopPlan(shopId: unknown, choice: unknown): Promise<BillingActionResult> {
   const user = await requireRole("admin");
-  const ids = z.object({ shop: z.uuid(), plan: z.uuid() }).safeParse({ shop: shopId, plan: planId });
-  if (!ids.success) return { ok: false, error: "Choose a plan." };
-  const result = await changePlan(createBillingStore(getDb()), ids.data.shop, ids.data.plan, user.email);
+  const id = z.uuid().safeParse(shopId);
+  const pick = PlanChoice.safeParse(choice);
+  if (!id.success || !pick.success) return { ok: false, error: "Choose a plan." };
+  const result = await changePlan(createBillingStore(getDb()), id.data, pick.data, user.email);
   if (result.ok) {
     refresh();
-    revalidatePath(`/admin/shops/${ids.data.shop}`);
+    revalidatePath(`/admin/shops/${id.data}`);
   }
   return result;
 }
