@@ -293,7 +293,7 @@ export function PlaygroundSection({
           ) : null}
         </div>
 
-        <div className={landing ? "l-try-view" : "flex flex-none justify-center lg:sticky lg:top-4 lg:w-[434px]"}>
+        <div className={landing ? "l-try-view" : "order-first flex flex-none justify-center lg:order-none lg:sticky lg:top-4 lg:w-[434px]"}>
           {landing ? <LandingPhone>{preview}</LandingPhone> : <Phone>{preview}</Phone>}
         </div>
       </div>
