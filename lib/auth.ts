@@ -17,6 +17,10 @@ function createAuth() {
     session: {
       expiresIn: 60 * 60 * 24 * 30,
       updateAge: 60 * 60 * 24,
+      // The session is also kept in a signed cookie for a few minutes, so most
+      // admin requests skip the session and user queries. Signing out clears it.
+      // The role is still read from the database on every check (lib/require-role.ts).
+      cookieCache: { enabled: true, maxAge: 5 * 60 },
     },
     advanced: {
       // Cookies are Secure in production by default.

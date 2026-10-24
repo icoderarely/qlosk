@@ -198,7 +198,14 @@ export async function getShops(
 ): Promise<ShopList> {
   const filter = filterFromQuery(query);
   let page = query.page;
-  let result = await store.list(filter, (page - 1) * SHOP_PAGE_SIZE, SHOP_PAGE_SIZE);
+  // The filter counts and dropdown options do not depend on the list, so they load alongside it.
+  const [first, byStatus, types, plans] = await Promise.all([
+    store.list(filter, (page - 1) * SHOP_PAGE_SIZE, SHOP_PAGE_SIZE),
+    store.countByStatus(),
+    store.shopTypes(),
+    store.planNames(),
+  ]);
+  let result = first;
   const pageCount = Math.max(1, Math.ceil(result.total / SHOP_PAGE_SIZE));
   if (page > pageCount) {
     // A bookmarked page that no longer exists: show the last one.
@@ -206,11 +213,6 @@ export async function getShops(
     result = await store.list(filter, (page - 1) * SHOP_PAGE_SIZE, SHOP_PAGE_SIZE);
   }
 
-  const [byStatus, types, plans] = await Promise.all([
-    store.countByStatus(),
-    store.shopTypes(),
-    store.planNames(),
-  ]);
   const count = (statuses: DbShopStatus[] | null) =>
     (statuses ?? (Object.keys(byStatus) as DbShopStatus[])).reduce(
       (sum, st) => sum + (byStatus[st] ?? 0),

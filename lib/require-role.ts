@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getRole, hasRole } from "@/services/admin-roles";
@@ -15,8 +16,9 @@ export type AdminUser = {
 
 // The signed-in person if they have a row in admin_roles, else null. Reads the
 // session from Better Auth and the role from the database on every call, so a
-// removed or demoted account loses access at once.
-export async function getCurrentUser(): Promise<AdminUser | null> {
+// removed or demoted account loses access at once. cache() makes the layout, the
+// page and the action that runs in the same request share one lookup.
+export const getCurrentUser = cache(async (): Promise<AdminUser | null> => {
   const session = await getAuth().api.getSession({ headers: await headers() });
   if (!session) return null;
   const role = await getRole(getDb(), session.user.id);
@@ -28,7 +30,7 @@ export async function getCurrentUser(): Promise<AdminUser | null> {
     email: session.user.email,
     role,
   };
-}
+});
 
 // The one server-side check. Call it first in app/admin/layout.tsx, in every
 // admin page and in every server action. Signed out sends you to /admin-login;

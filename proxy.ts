@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 import { getAuth } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { createPublicStore } from "@/lib/public-page-store";
@@ -35,16 +36,23 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = await getAuth().api.getSession({ headers: request.headers });
-  const role = session ? await getRole(getDb(), session.user.id) : null;
-  const signedIn = role !== null;
   const onLogin = request.nextUrl.pathname === "/admin-login";
 
-  if (onLogin && signedIn) {
-    return NextResponse.redirect(new URL("/admin", request.url));
+  // Admin pages: only look for the session cookie here (no database). Every page,
+  // layout and action still validates the session and role with requireRole(), so
+  // this just saves signed-out visitors a render. Validating here too cost a few
+  // queries on every admin request.
+  if (!onLogin) {
+    return getSessionCookie(request)
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL("/admin-login", request.url));
   }
-  if (!onLogin && !signedIn) {
-    return NextResponse.redirect(new URL("/admin-login", request.url));
+
+  // /admin-login: a full check, so a stale cookie does not bounce between the two pages.
+  const session = await getAuth().api.getSession({ headers: request.headers });
+  const role = session ? await getRole(getDb(), session.user.id) : null;
+  if (role !== null) {
+    return NextResponse.redirect(new URL("/admin", request.url));
   }
   return NextResponse.next();
 }
