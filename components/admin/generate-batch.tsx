@@ -46,7 +46,7 @@ export function GenerateBatch({ canEdit }: { canEdit: boolean }) {
         method="get"
         className="flex flex-col gap-3 border-t border-line pt-3.5"
       >
-        <SelectField label="Sticker size" name="size" defaultValue="card">
+        <SelectField block label="Sticker size" name="size" defaultValue="card">
           <option value="card">4x6 card</option>
           <option value="a5">A5 standee</option>
           <option value="small">Small sticker</option>

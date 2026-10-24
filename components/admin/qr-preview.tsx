@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { Button, DownloadButton } from "./button";
 
-export type QrPreviewData = { code: string; shopName: string | null; shopId: string | null; url: string; svg: string };
+export type QrPreviewData = { code: string; shopName: string | null; shopId: string | null; url: string; svg: string; inStock: boolean };
 
 const dataUri = (svg: string) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 
@@ -59,6 +59,8 @@ export function QrPreviewDialog({ data, onClose }: { data: QrPreviewData | null;
           <div className="flex flex-wrap justify-center gap-2">
             {data.shopId ? (
               <DownloadButton href={`/admin/print/shop/${data.shopId}/svg`}>Download SVG</DownloadButton>
+            ) : data.inStock ? (
+              <DownloadButton href={`/admin/print/code/${data.code}`}>Download SVG</DownloadButton>
             ) : null}
             <Button onClick={onClose}>Close</Button>
           </div>

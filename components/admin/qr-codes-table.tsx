@@ -57,7 +57,7 @@ export function QrCodesTable({
   function previewOf(r: QrRow): QrPreviewData | null {
     const svg = qrSvgs[r.code];
     if (!svg || !qrBase) return null;
-    return { code: r.code, shopName: r.shopName, shopId: r.shopId, url: `${qrBase}/q/${r.code}`, svg };
+    return { code: r.code, shopName: r.shopName, shopId: r.shopId, url: `${qrBase}/q/${r.code}`, svg, inStock: r.status === "unassigned" };
   }
 
   // Only codes in stock can be deleted, so only those get a checkbox.
@@ -325,6 +325,11 @@ function CodeRow({
                 href={`/admin/print/shop/${row.shopId}/a5`}
                 aria-label={`Download print file for ${row.code}`}
               >
+                Download
+              </DownloadButton>
+            ) : null}
+            {row.status === "unassigned" ? (
+              <DownloadButton href={`/admin/print/code/${row.code}`} aria-label={`Download QR for ${row.code}`}>
                 Download
               </DownloadButton>
             ) : null}
