@@ -18,8 +18,9 @@ export function Hero({ whatsappHref, fromPrice }: { whatsappHref: string; fromPr
                 One QR for your <em className="l-em">whole shop.</em>
               </h1>
               <p className="l-lead" style={{ maxWidth: 520, color: "var(--on-hero)" }}>
-                Customers scan once and get Call, WhatsApp, Google review, Wi-Fi, Maps and your latest offer. We build
-                the page, print the standee and send you a report every month.
+                {BRAND_NAME} gives your shop one permanent QR code. Customers scan once and get Call, WhatsApp, Google
+                review, Wi-Fi, Maps and your latest offer. We build the page, print the standee and send you a report
+                every month.
               </p>
               <div className="l-ctas">
                 <a className="l-btn l-btn-b" href="#try">Try a look for my shop <Ic d="arrowRight" /></a>
