@@ -95,9 +95,21 @@ export function SelectField({
   const id = useId();
   return (
     <Wrap label={label} hideLabel={hideLabel} block={block} id={id}>
-      <select id={id} className={inputClass(`select-chevron pr-10 ${className}`)} {...rest}>
-        {children}
-      </select>
+      {/* The chevron is drawn here, 12px inside the border: the browser's own arrow hugs the edge. */}
+      <div className="relative">
+        <select id={id} className={inputClass(`appearance-none pr-10 ${className}`)} {...rest}>
+          {children}
+        </select>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 16 16"
+          className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 fill-none stroke-ink stroke-[1.75]"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M4 6l4 4 4-4" />
+        </svg>
+      </div>
     </Wrap>
   );
 }
