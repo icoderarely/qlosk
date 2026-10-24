@@ -1,7 +1,9 @@
 import Image from "next/image";
+import { BrandMark } from "@/components/brand-mark";
 import { BRAND_NAME } from "@/lib/brand";
 import { Icon, LINK_ICON, type IconName } from "./icons";
 import { initials, safeHref } from "./links";
+import { ShareButton } from "./share-button";
 import { STRINGS } from "./strings";
 import type { ShopInfo, ShopLink } from "./types";
 
@@ -47,12 +49,36 @@ export function LocationLine({ text }: { text: string }) {
   );
 }
 
+const CHIP_BTN =
+  "relative flex size-11 flex-none items-center justify-center rounded-xl border border-sp-line bg-sp-card text-sp-text";
+
+// Top bar: our mark on the left, a share button on the right.
+// `overlay` lays it over the top of the cover photo instead of in the flow.
+export function TopBar({ overlay = false }: { overlay?: boolean }) {
+  return (
+    <div className={`flex items-center justify-between px-5 pt-5 ${overlay ? "absolute inset-x-0 top-0 z-10" : ""}`}>
+      <span className={CHIP_BTN} role="img" aria-label={BRAND_NAME}>
+        <BrandMark className="size-5" />
+      </span>
+      <ShareButton className={`${CHIP_BTN} cursor-pointer`} />
+    </div>
+  );
+}
+
+// Bottom: a call to action for shop owners, then who made the page.
 export function Footer({ className = "" }: { className?: string }) {
   return (
-    <div
-      className={`mt-auto text-center text-[11px] text-sp-muted ${className}`}
-    >
-      {STRINGS.poweredBy} {BRAND_NAME}
+    <div className={`mt-auto flex flex-col items-center gap-2.5 pt-4 text-center ${className}`}>
+      <a
+        href="/playground"
+        className="inline-flex min-h-11 items-center gap-2 rounded-full bg-sp-chipbg px-5 text-[14px] font-bold text-sp-chiptext no-underline"
+      >
+        {STRINGS.getYourOwn}
+        <Icon name="arrow" size={16} />
+      </a>
+      <div className="text-[11px] text-sp-muted">
+        {STRINGS.poweredBy} {BRAND_NAME}
+      </div>
     </div>
   );
 }

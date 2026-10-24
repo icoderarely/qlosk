@@ -17,6 +17,10 @@ export const STRINGS = {
   chatWelcome: (name: string) =>
     `Hi, welcome to ${name}. How can we help you today?`,
   poweredBy: "Powered by",
+  getYourOwn: "Get your own page",
+  share: "Copy link to this page",
+  linkCopied: "Link copied",
+  viewOnMobile: "View on mobile",
 } as const;
 
 // The chat layout writes the offer note as a sentence.

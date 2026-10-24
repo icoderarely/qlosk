@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { BrandTile } from "@/components/brand-mark";
 import { BRAND_NAME } from "@/lib/brand";
 import { getCurrentUser } from "@/lib/require-role";
 import { LoginForm } from "./login-form";
@@ -9,7 +10,7 @@ export default function AdminLoginPage() {
     <main className="flex min-h-dvh items-center justify-center px-5 py-10">
       <div className="flex w-full max-w-[420px] flex-col gap-5 rounded-[14px] border border-line bg-white p-8">
         <div className="flex items-center gap-2.5">
-          <div className="size-[34px] rounded-[10px] bg-accent" />
+          <BrandTile className="size-[34px] rounded-[10px]" />
           <div className="text-lg font-extrabold">{BRAND_NAME}</div>
         </div>
         <div>

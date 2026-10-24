@@ -2,7 +2,7 @@ import Image from "next/image";
 import { CopyCode } from "../copy-code";
 import { Icon, LINK_ICON } from "../icons";
 import { locationLine, safeHref } from "../links";
-import { Footer, HEAD, IconCircle, Logo, LocationLine, PrimaryButton, WifiChip } from "../parts";
+import { Footer, HEAD, IconCircle, Logo, LocationLine, PrimaryButton, TopBar, WifiChip } from "../parts";
 import { STRINGS } from "../strings";
 import type { ShopLayoutProps } from "../types";
 import { WifiReveal } from "../wifi-reveal";
@@ -30,6 +30,7 @@ export function CoverLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProp
         ) : (
           STRINGS.coverPlaceholder
         )}
+        <TopBar overlay />
       </div>
 
       <div className="flex flex-1 flex-col gap-4 px-5 pb-6">

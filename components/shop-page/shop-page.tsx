@@ -4,6 +4,7 @@ import { CoverLayout } from "./layouts/cover";
 import { IndexLayout } from "./layouts/index-list";
 import { ListLayout } from "./layouts/list";
 import { TilesLayout } from "./layouts/tiles";
+import { TopBar } from "./parts";
 import { splitLinks } from "./links";
 import { themeStyle } from "./themes";
 import type { LayoutId, ShopLayoutProps, ShopPageProps } from "./types";
@@ -58,6 +59,7 @@ export function ShopPage({
             {banner.text}
           </div>
         ) : null}
+        {layout === "cover" || layout === "chat" ? null : <TopBar />}
         <Layout shop={shop} primary={primary} rest={rest} offer={offer} wifi={wifi} />
       </div>
     </div>

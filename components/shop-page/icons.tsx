@@ -49,6 +49,7 @@ const ICONS = {
   facebook: (
     <path d="M15 4h-2a4 4 0 0 0-4 4v3H6v4h3v6h4v-6h3l1-4h-4V8a1 1 0 0 1 1-1h2z" />
   ),
+  share: <path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />,
   link: (
     <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
   ),

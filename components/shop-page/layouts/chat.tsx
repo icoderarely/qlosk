@@ -1,7 +1,7 @@
 import { CopyCode } from "../copy-code";
 import { Icon, LINK_ICON } from "../icons";
 import { safeHref } from "../links";
-import { Footer, HEAD, Logo } from "../parts";
+import { Footer, HEAD, Logo, TopBar } from "../parts";
 import { STRINGS, asSentence } from "../strings";
 import type { ShopLayoutProps } from "../types";
 import { WifiReveal } from "../wifi-reveal";
@@ -16,15 +16,19 @@ export function ChatLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProps
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex items-center gap-3 border-b border-sp-line bg-sp-card p-5">
-        <Logo shop={shop} className="size-12 text-[18px]" />
-        <div className="min-w-0">
-          <h1 className={`m-0 text-[20px] font-bold leading-[1.2] ${HEAD}`}>
-            {shop.name}
-          </h1>
-          {sub ? <div className="text-[13px] text-sp-muted">{sub}</div> : null}
-        </div>
-      </header>
+      {/* The top bar sits inside the header band so the head is one colour. */}
+      <div className="border-b border-sp-line bg-sp-card">
+        <TopBar />
+        <header className="flex items-center gap-3 p-5">
+          <Logo shop={shop} className="size-12 text-[18px]" />
+          <div className="min-w-0">
+            <h1 className={`m-0 text-[20px] font-bold leading-[1.2] ${HEAD}`}>
+              {shop.name}
+            </h1>
+            {sub ? <div className="text-[13px] text-sp-muted">{sub}</div> : null}
+          </div>
+        </header>
+      </div>
 
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className={`${BUBBLE} px-4 py-3`}>{STRINGS.chatWelcome(shop.name)}</div>

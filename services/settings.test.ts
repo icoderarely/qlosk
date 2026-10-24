@@ -22,7 +22,7 @@ const ALL_LAYOUTS = { list: true, tiles: true, cover: true, index: true, chat: t
 const FILTERS = { crawlers: true, token: true, dedupe: true, rateLimit: true, spikes: true };
 const SUGGESTIONS = {
   "Salon and spa": { theme: "blush", layout: "list" },
-  Clinic: { theme: "daylight", layout: "list" },
+  Clinic: { theme: "daylight", layout: "chat" },
   Gym: { theme: "nightfall", layout: "index" },
   Restaurant: { theme: "marigold", layout: "tiles" },
   "Cafe and bakery": { theme: "marigold", layout: "tiles" },

@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { cache, Suspense } from "react";
+import { DesktopFrame } from "@/components/shop-page/desktop-frame";
 import { ShopPage } from "@/components/shop-page/shop-page";
 import { getDb } from "@/lib/db";
+import { loadSettings } from "@/lib/load-settings";
+import { qrBaseUrl } from "@/lib/print-assets";
 import { createPublicStore } from "@/lib/public-page-store";
 import { trackingKeys } from "@/lib/tracking-env";
+import { qrSvg, qrTarget } from "@/services/print";
 import { lookupPublicPage, withTapLinks } from "@/services/public-page";
 import { signTapToken } from "@/services/tracking";
 
@@ -36,5 +40,22 @@ async function Shop({ params }: { params: PageProps<"/s/[slug]">["params"] }) {
   const { tokenKey } = trackingKeys();
   const now = new Date();
   const props = withTapLinks(result.props, result.code, (code, linkId) => signTapToken(tokenKey, code, linkId, now));
-  return <ShopPage {...props} />;
+  const qr = await shopQr(result.code);
+  return (
+    <DesktopFrame qr={qr}>
+      <ShopPage {...props} />
+    </DesktopFrame>
+  );
+}
+
+// The shop's printed QR, drawn for the corner of the desktop view. Skipped when
+// the shop has no code or no QR address is set; the page works without it.
+async function shopQr(code: string | null) {
+  if (!code) return null;
+  try {
+    const base = qrBaseUrl((await loadSettings()).domain.qrBase);
+    return { svg: qrSvg(qrTarget(base, code)), label: "QR code to open this page on your phone" };
+  } catch {
+    return null;
+  }
 }

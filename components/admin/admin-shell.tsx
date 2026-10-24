@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { logout } from "@/app/admin/actions";
+import { BrandTile } from "@/components/brand-mark";
 import { BRAND_NAME } from "@/lib/brand";
 import { Icon } from "./icon";
 import {
@@ -48,7 +49,7 @@ export function AdminShell({
         >
           <div className="flex items-center justify-between gap-2 pb-[18px] pl-3">
             <div className="flex min-w-0 items-center gap-2.5">
-              <div className="size-[30px] flex-none rounded-[9px] bg-accent" />
+              <BrandTile />
               <div className="whitespace-nowrap text-base font-extrabold">
                 {BRAND_NAME}
               </div>
@@ -106,22 +107,24 @@ export function AdminShell({
       ) : (
         <nav
           aria-label="Main"
-          className="sticky top-0 flex h-dvh w-[76px] flex-none flex-col items-center gap-2 border-r border-line bg-white py-5"
+          className="sticky top-0 flex h-dvh w-[72px] flex-none flex-col gap-1.5 border-r border-line bg-white px-3.5 py-[22px]"
         >
-          <div
-            role="img"
-            aria-label={BRAND_NAME}
-            className="size-[34px] rounded-[10px] bg-accent"
-          />
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            aria-label="Expand sidebar"
-            aria-expanded="false"
-            className="mb-2 mt-1 flex size-12 cursor-pointer items-center justify-center rounded-xl text-menu hover:bg-ground"
-          >
-            <Icon d={ICON_EXPAND} />
-          </button>
+          <div className="pb-[18px]">
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              aria-label="Expand sidebar"
+              aria-expanded="false"
+              className="group relative flex size-11 cursor-pointer items-center justify-center rounded-xl text-menu hover:bg-ground focus-visible:bg-ground"
+            >
+              <span className="group-hover:hidden group-focus-visible:hidden">
+                <BrandTile />
+              </span>
+              <span className="absolute hidden group-hover:block group-focus-visible:block">
+                <Icon d={ICON_EXPAND} />
+              </span>
+            </button>
+          </div>
 
           {NAV_ITEMS.map((item) => {
             const on = isActive(pathname, item.href);
@@ -131,28 +134,30 @@ export function AdminShell({
                 href={item.href}
                 aria-label={item.label}
                 aria-current={on ? "page" : undefined}
-                className={`flex size-12 items-center justify-center rounded-xl ${on ? NAV_ON : NAV_OFF}`}
+                className={`flex size-11 items-center justify-center rounded-[10px] ${on ? NAV_ON : NAV_OFF}`}
               >
-                <Icon d={item.icon} size={20} />
+                <Icon d={item.icon} />
               </Link>
             );
           })}
 
-          <div className="mt-auto flex flex-col items-center gap-2 pt-3.5">
+          <div className="mt-auto flex flex-col gap-2.5 border-t border-line pt-3.5">
             <div
               role="img"
               aria-label={`Signed in as ${displayName}`}
-              className="flex size-9 items-center justify-center rounded-full bg-line-soft font-extrabold text-menu"
+              className="flex size-11 items-center justify-center"
             >
-              {initial}
+              <span className="flex size-[34px] items-center justify-center rounded-full bg-line-soft font-extrabold text-menu">
+                {initial}
+              </span>
             </div>
             <form action={logout}>
               <button
                 type="submit"
                 aria-label="Log out"
-                className="flex size-12 cursor-pointer items-center justify-center rounded-xl text-menu hover:bg-ground"
+                className="flex size-11 cursor-pointer items-center justify-center rounded-[10px] border border-field bg-white text-ink"
               >
-                <Icon d={ICON_LOGOUT} size={20} />
+                <Icon d={ICON_LOGOUT} />
               </button>
             </form>
           </div>

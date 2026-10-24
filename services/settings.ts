@@ -38,7 +38,7 @@ export const OTHER_SHOP_TYPE = "Other";
 // These are the starting suggestions, used until someone changes them.
 export const DEFAULT_SHOP_TYPES: ShopTypeOption[] = [
   { label: "Salon and spa", plural: "salons", suggested: { theme: "blush", layout: "list" } },
-  { label: "Clinic", plural: "clinics", suggested: { theme: "daylight", layout: "list" } },
+  { label: "Clinic", plural: "clinics", suggested: { theme: "daylight", layout: "chat" } },
   { label: "Gym", plural: "gyms", suggested: { theme: "nightfall", layout: "index" } },
   { label: "Restaurant", plural: "restaurants", suggested: { theme: "marigold", layout: "tiles" } },
   { label: "Cafe and bakery", plural: "cafes and bakeries", suggested: { theme: "marigold", layout: "tiles" } },
