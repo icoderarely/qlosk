@@ -24,6 +24,7 @@ export function Footer({ whatsappHref }: { whatsappHref: string }) {
               <Link href="/#try">Try a look</Link>
               <Link href="/#features">Features</Link>
               <Link href="/#pricing">Pricing</Link>
+              <Link href="/playground">Playground</Link>
             </nav>
             <nav className="l-footcol" aria-label="Help">
               <b>Help</b>
