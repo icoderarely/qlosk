@@ -15,6 +15,7 @@ import { qrBaseUrl } from "@/lib/print-assets";
 import { buildQrArt, qrArtSvg, qrTarget } from "@/services/qr-art";
 import { getShopEditor } from "@/services/shop-editor";
 import { LAYOUT_IDS, THEME_IDS } from "@/components/shop-page/types";
+import { Suspense } from "react";
 
 export const metadata: Metadata = { title: "Edit shop" };
 
@@ -29,7 +30,17 @@ function standeeQrFor(code: string | null, savedBase: string | undefined): Stand
   }
 }
 
-export default async function Page({ params, searchParams }: PageProps<"/admin/shops/[id]">) {
+// The session is request-time data, so the page body sits behind its own Suspense
+// boundary: a navigation into this page can show the fallback instead of blocking.
+export default function Page(props: Parameters<typeof Body>[0]) {
+  return (
+    <Suspense fallback={<div className="min-h-[50dvh]" role="status" aria-label="Loading" />}>
+      <Body {...props} />
+    </Suspense>
+  );
+}
+
+async function Body({ params, searchParams }: PageProps<"/admin/shops/[id]">) {
   const user = await requireRole("viewer");
   const { id } = await params;
   // A malformed id would make Postgres throw; treat it as not found.

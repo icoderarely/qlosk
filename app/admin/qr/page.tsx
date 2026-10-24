@@ -13,10 +13,21 @@ import { createQrStore } from "@/lib/qr-store";
 import { hasRole } from "@/services/admin-roles";
 import { qrSvg, qrTarget } from "@/services/print";
 import { getQrOverview, parseQrQuery } from "@/services/qr";
+import { Suspense } from "react";
 
 export const metadata: Metadata = { title: "QR codes" };
 
-export default async function Page({
+// The session is request-time data, so the page body sits behind its own Suspense
+// boundary: a navigation into this page can show the fallback instead of blocking.
+export default function Page(props: Parameters<typeof Body>[0]) {
+  return (
+    <Suspense fallback={<div className="min-h-[50dvh]" role="status" aria-label="Loading" />}>
+      <Body {...props} />
+    </Suspense>
+  );
+}
+
+async function Body({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

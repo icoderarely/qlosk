@@ -14,10 +14,21 @@ import { getDb } from "@/lib/db";
 import { requireRole } from "@/lib/require-role";
 import { createStatsStore } from "@/lib/stats-store";
 import { getOverview, parseRange } from "@/services/stats";
+import { Suspense } from "react";
 
 export const metadata: Metadata = { title: "Overview" };
 
-export default async function Page({
+// The session is request-time data, so the page body sits behind its own Suspense
+// boundary: a navigation into this page can show the fallback instead of blocking.
+export default function Page(props: Parameters<typeof Body>[0]) {
+  return (
+    <Suspense fallback={<div className="min-h-[50dvh]" role="status" aria-label="Loading" />}>
+      <Body {...props} />
+    </Suspense>
+  );
+}
+
+async function Body({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
