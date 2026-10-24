@@ -16,6 +16,7 @@ export default async function Page() {
   const [shopTypes, settings] = await Promise.all([loadShopTypes(), loadSettings()]);
   return (
     <ShopEditor
+      billing={null}
       data={newShopData()}
       shopTypes={shopTypes}
       canEdit

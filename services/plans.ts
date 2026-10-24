@@ -25,6 +25,13 @@ export function graceEnds(planEndsAt: Date): Date {
   return new Date(planEndsAt.getTime() + GRACE_DAYS * DAY_MS);
 }
 
+/** One line selling each plan length in the Change plan picker, by months. */
+export const PLAN_PITCH: Record<number, string> = {
+  1: "Try it, cancel before any month starts",
+  6: "A full season, no big commitment",
+  12: "Best value, renewal reminder on WhatsApp",
+};
+
 export type PaymentState = "paid" | "due_soon" | "overdue" | "not_started";
 
 /** Paid: the plan runs more than 14 days. Due soon: it ends within 14 days. Overdue: it has ended. */

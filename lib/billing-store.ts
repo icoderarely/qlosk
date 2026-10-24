@@ -64,6 +64,13 @@ export function createBillingStore(db: PrismaClient): BillingStore {
       ]);
     },
 
+    async setPlan({ shopId, planId, what, userEmail }) {
+      await db.$transaction([
+        db.shop.update({ where: { id: shopId }, data: { planId } }),
+        db.changeLog.create({ data: { shopId, userEmail, what } }),
+      ]);
+    },
+
     async lastRenewal(shopId) {
       const row = await db.changeLog.findFirst({
         where: { shopId, undoPayload: { path: ["kind"], equals: "renewal" } },

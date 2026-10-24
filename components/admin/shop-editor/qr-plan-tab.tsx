@@ -1,14 +1,17 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { changeShopPlan, markShopPaid, undoShopPaid } from "@/app/admin/billing/actions";
 import { assignQrCode, reassignQrCode, retireQrCode } from "@/app/admin/qr/actions";
 import { changeShopStatusAction } from "@/app/admin/shops/editor-actions";
+import type { ShopPlanData } from "@/services/billing";
 import type { DbShopStatus } from "@/services/shops";
-import { Button, DownloadButton } from "../button";
+import { Button, buttonClass, DownloadButton } from "../button";
 import { Card } from "../card";
 import { Chip } from "../chip";
 import { TextField, FieldRow, SelectField } from "../form-field";
 import { ICON_DOWNLOAD } from "../icons";
 import { QrSample } from "../qr-sample";
+import { PaymentChip } from "../status-chip";
 import type { TabProps } from "./state";
 import { notify } from "../notify";
 
@@ -35,12 +38,17 @@ export function QrPlanTab({
   set,
   info,
   choices,
+  billing,
   canEdit,
-}: TabProps & { info: QrPlanInfo; choices: QrChoices; canEdit: boolean }) {
+}: TabProps & { info: QrPlanInfo; choices: QrChoices; billing: ShopPlanData | null; canEdit: boolean }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [pick, setPick] = useState("");
   const [confirm, setConfirm] = useState<"retire" | "archive" | null>(null);
+  const [choosingPlan, setChoosingPlan] = useState(false);
+  const [planPick, setPlanPick] = useState("");
+  const [confirmingPay, setConfirmingPay] = useState(false);
+  const [undoable, setUndoable] = useState(false);
 
   // Runs one server action, shows its answer, and reloads the page data.
   function run(action: () => Promise<{ ok: true; message?: string } | { ok: false; error: string }>) {
@@ -163,19 +171,145 @@ export function QrPlanTab({
       <Card className="flex flex-col gap-3.5 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="m-0 text-base font-extrabold">Plan</h2>
-          {/* TODO(slice 9): payment status chip */}
+          {billing?.payment ? <PaymentChip status={billing.payment} /> : null}
         </div>
         <FieldRow>
           <PlanFact label="Plan" value={info.plan?.name ?? "No plan yet"} />
           <PlanFact label="Renews" value={info.plan?.renewsOn ?? "Not started"} />
           <PlanFact label="Started" value={info.plan?.started ?? "Not started"} />
         </FieldRow>
-        {/* TODO(slice 9): change plan, send reminder, mark as paid */}
-        <div className="flex flex-wrap gap-2.5">
-          <Button>Change plan</Button>
-          <Button>Send renewal reminder</Button>
-          <Button>Mark as paid</Button>
-        </div>
+        {id === null || !billing ? (
+          <div className="text-[13px] text-muted">Save the shop first, then choose a plan.</div>
+        ) : choosingPlan ? (
+          <fieldset className="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
+            <legend className="mb-1.5 p-0 text-[13px] font-bold">Choose a plan</legend>
+            {billing.options.map((o) => (
+              <label
+                key={o.id}
+                className="flex min-h-11 cursor-pointer items-start gap-3 rounded-[10px] border border-field bg-white p-3 has-[:checked]:border-ink"
+              >
+                <input
+                  type="radio"
+                  name="plan"
+                  value={o.id}
+                  checked={planPick === o.id}
+                  onChange={() => setPlanPick(o.id)}
+                  className="mt-1 size-4"
+                />
+                <span className="flex min-w-0 flex-col">
+                  <span className="font-bold">
+                    {o.name} <span className="font-normal">· {o.price}</span>
+                    {o.perMonth ? <span className="font-normal text-muted"> · {o.perMonth}</span> : null}
+                    {o.saving ? <span className="font-bold text-[#1d6b45]"> · {o.saving}</span> : null}
+                  </span>
+                  {o.pitch ? <span className="text-[13px] text-muted">{o.pitch}</span> : null}
+                </span>
+              </label>
+            ))}
+            <div className="flex flex-wrap gap-2.5">
+              <Button
+                variant="primary"
+                disabled={disabled || !planPick || planPick === billing.planId}
+                className="disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() =>
+                  run(async () => {
+                    const r = await changeShopPlan(id, planPick);
+                    if (r.ok) setChoosingPlan(false);
+                    return r;
+                  })
+                }
+              >
+                Save plan
+              </Button>
+              <Button variant="ghost" onClick={() => setChoosingPlan(false)}>
+                Cancel
+              </Button>
+            </div>
+          </fieldset>
+        ) : (
+          <div className="flex flex-wrap items-center gap-2.5">
+            {canEdit ? (
+              <Button
+                disabled={disabled}
+                onClick={() => {
+                  setPlanPick(billing.planId ?? "");
+                  setChoosingPlan(true);
+                }}
+              >
+                {billing.planId ? "Change plan" : "Choose plan"}
+              </Button>
+            ) : null}
+            {billing.remindHref ? (
+              <a
+                href={billing.remindHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Send renewal reminder on WhatsApp (opens in a new tab)"
+                className={buttonClass()}
+              >
+                Send renewal reminder
+              </a>
+            ) : (
+              <Button disabled className="cursor-not-allowed opacity-50">
+                Send renewal reminder
+              </Button>
+            )}
+            {canEdit && billing.planId ? (
+              confirmingPay ? (
+                <>
+                  <Button
+                    variant="primary"
+                    disabled={disabled}
+                    onClick={() =>
+                      run(async () => {
+                        setConfirmingPay(false);
+                        const r = await markShopPaid(id);
+                        setUndoable(r.ok);
+                        return r;
+                      })
+                    }
+                  >
+                    {billing.payment === "paid" ? `Extend to ${billing.renewsTo}` : `Confirm paid, until ${billing.renewsTo}`}
+                  </Button>
+                  <Button variant="ghost" onClick={() => setConfirmingPay(false)}>
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {undoable ? (
+                    <Button
+                      disabled={disabled}
+                      onClick={() =>
+                        run(async () => {
+                          setUndoable(false);
+                          return undoShopPaid(id);
+                        })
+                      }
+                    >
+                      Undo
+                    </Button>
+                  ) : null}
+                  <Button
+                    disabled={disabled}
+                    onClick={() => {
+                      setUndoable(false);
+                      setConfirmingPay(true);
+                    }}
+                  >
+                    {billing.payment === "paid" ? "Renew early" : "Mark as paid"}
+                  </Button>
+                </>
+              )
+            ) : null}
+          </div>
+        )}
+        {billing && !choosingPlan ? (
+          <div className="text-[13px] text-muted">
+            {billing.remindHref ? "" : `Reminder: ${billing.remindNote} `}
+            {canEdit && !billing.planId ? "Mark as paid needs a plan." : ""}
+          </div>
+        ) : null}
       </Card>
 
       <Card className="flex flex-col gap-3 p-5">

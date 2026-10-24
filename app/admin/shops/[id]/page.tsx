@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ShopEditor } from "@/components/admin/shop-editor/shop-editor";
 import { getDb } from "@/lib/db";
+import { createBillingStore } from "@/lib/billing-store";
 import { createQrStore } from "@/lib/qr-store";
 import { requireRole } from "@/lib/require-role";
 import { createEditorStore } from "@/lib/shop-editor-store";
 import { hasRole } from "@/services/admin-roles";
+import { getShopPlan } from "@/services/billing";
 import { getShopEditor } from "@/services/shop-editor";
 import { loadSettings, loadShopTypes } from "@/lib/load-settings";
 import { LAYOUT_IDS, THEME_IDS } from "@/components/shop-page/types";
@@ -19,8 +21,9 @@ export default async function Page({ params }: PageProps<"/admin/shops/[id]">) {
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const canEdit = hasRole(user.role, "admin");
   const qr = createQrStore(getDb());
-  const [data, shopTypes, settings, stock, shopsWithoutCode] = await Promise.all([
+  const [data, billing, shopTypes, settings, stock, shopsWithoutCode] = await Promise.all([
     getShopEditor(createEditorStore(getDb()), id),
+    getShopPlan(createBillingStore(getDb()), id),
     loadShopTypes(),
     loadSettings(),
     canEdit ? qr.stock(100) : Promise.resolve([]),
@@ -35,6 +38,7 @@ export default async function Page({ params }: PageProps<"/admin/shops/[id]">) {
       shopTypes={shopTypes}
       canEdit={canEdit}
       qrChoices={{ stock, shops: shopsWithoutCode }}
+      billing={billing}
       enabledThemes={THEME_IDS.filter((t) => settings.enabledThemes[t])}
       enabledLayouts={LAYOUT_IDS.filter((l) => settings.enabledLayouts[l])}
     />

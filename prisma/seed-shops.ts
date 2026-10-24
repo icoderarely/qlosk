@@ -33,7 +33,7 @@ type Sample = {
   layout: string;
   font: string;
   code: string | null;
-  plan: "Monthly" | "Yearly" | "5 years" | null;
+  plan: "1 month" | "1 year" | "5 years" | null;
   /** Days from today until the plan ends. Negative means already ended. */
   endsInDays: number | null;
   /** Scans per day over the last 30 days; null for no stats. */
@@ -41,23 +41,24 @@ type Sample = {
 };
 
 const SHOPS: Sample[] = [
-  { name: "Velvet Salon & Spa", slug: "velvet-salon", type: "Salon and spa", area: "Bandra West", city: "Mumbai", phone: "+919800000001", status: "live", theme: "blush", layout: "list", font: "editorial", code: "7KX2M9", plan: "Yearly", endsInDays: 140, scansPerDay: 40 },
-  { name: "Kaveri Sweets", slug: "kaveri-sweets", type: "Sweet shop", area: "T Nagar", city: "Chennai", phone: "+919800000002", status: "live", theme: "marigold", layout: "tiles", font: "clean", code: "R4PD8T", plan: "Monthly", endsInDays: 5, scansPerDay: 29 },
+  { name: "Velvet Salon & Spa", slug: "velvet-salon", type: "Salon and spa", area: "Bandra West", city: "Mumbai", phone: "+919800000001", status: "live", theme: "blush", layout: "list", font: "editorial", code: "7KX2M9", plan: "1 year", endsInDays: 140, scansPerDay: 40 },
+  { name: "Kaveri Sweets", slug: "kaveri-sweets", type: "Sweet shop", area: "T Nagar", city: "Chennai", phone: "+919800000002", status: "live", theme: "marigold", layout: "tiles", font: "clean", code: "R4PD8T", plan: "1 month", endsInDays: 5, scansPerDay: 29 },
   { name: "Iron House Gym", slug: "iron-house", type: "Gym", area: "Koramangala", city: "Bengaluru", phone: "+919800000003", status: "live", theme: "nightfall", layout: "index", font: "clean", code: "M2HC6W", plan: "5 years", endsInDays: 1750, scansPerDay: 21 },
-  { name: "Dr. Mehta Dental", slug: "dr-mehta-dental", type: "Clinic", area: "Navrangpura", city: "Ahmedabad", phone: "+919800000004", status: "quiet", theme: "daylight", layout: "list", font: "clean", code: "H8WQ5Z", plan: "Yearly", endsInDays: 70, scansPerDay: 0 },
-  { name: "Noor Boutique", slug: "noor-boutique", type: "Boutique", area: "Banjara Hills", city: "Hyderabad", phone: "+919800000005", status: "live", theme: "blush", layout: "cover", font: "rounded", code: "C3TY7K", plan: "Yearly", endsInDays: 118, scansPerDay: 10 },
-  { name: "Bright Minds Classes", slug: "bright-minds", type: "Coaching", area: "Kothrud", city: "Pune", phone: "+919800000006", status: "live", theme: "daylight", layout: "tiles", font: "clean", code: "P6LD2N", plan: "Monthly", endsInDays: 12, scansPerDay: 7 },
-  { name: "Brew & Bun Cafe", slug: "brew-and-bun", type: "Cafe and bakery", area: "Indiranagar", city: "Bengaluru", phone: "+919800000007", status: "preview", theme: "marigold", layout: "chat", font: "rounded", code: "J9NV3B", plan: "Yearly", endsInDays: null, scansPerDay: null },
-  { name: "Aarav Jewellers", slug: "aarav-jewellers", type: "Jeweller", area: "Zaveri Bazaar", city: "Mumbai", phone: "+919800000008", status: "preview", theme: "graphite", layout: "cover", font: "editorial", code: null, plan: "Yearly", endsInDays: null, scansPerDay: null },
+  { name: "Dr. Mehta Dental", slug: "dr-mehta-dental", type: "Clinic", area: "Navrangpura", city: "Ahmedabad", phone: "+919800000004", status: "quiet", theme: "daylight", layout: "list", font: "clean", code: "H8WQ5Z", plan: "1 year", endsInDays: 70, scansPerDay: 0 },
+  { name: "Noor Boutique", slug: "noor-boutique", type: "Boutique", area: "Banjara Hills", city: "Hyderabad", phone: "+919800000005", status: "live", theme: "blush", layout: "cover", font: "rounded", code: "C3TY7K", plan: "1 year", endsInDays: 118, scansPerDay: 10 },
+  { name: "Bright Minds Classes", slug: "bright-minds", type: "Coaching", area: "Kothrud", city: "Pune", phone: "+919800000006", status: "live", theme: "daylight", layout: "tiles", font: "clean", code: "P6LD2N", plan: "1 month", endsInDays: 12, scansPerDay: 7 },
+  { name: "Brew & Bun Cafe", slug: "brew-and-bun", type: "Cafe and bakery", area: "Indiranagar", city: "Bengaluru", phone: "+919800000007", status: "preview", theme: "marigold", layout: "chat", font: "rounded", code: "J9NV3B", plan: "1 year", endsInDays: null, scansPerDay: null },
+  { name: "Aarav Jewellers", slug: "aarav-jewellers", type: "Jeweller", area: "Zaveri Bazaar", city: "Mumbai", phone: "+919800000008", status: "preview", theme: "graphite", layout: "cover", font: "editorial", code: null, plan: "1 year", endsInDays: null, scansPerDay: null },
   { name: "Sunrise Pharmacy", slug: "sunrise-pharmacy", type: "Clinic", area: "Sector 17", city: "Chandigarh", phone: "+919800000009", status: "building", theme: "daylight", layout: "list", font: "clean", code: null, plan: null, endsInDays: null, scansPerDay: null },
   { name: "Lotus Yoga Studio", slug: "lotus-yoga", type: "Gym", area: "Alkapuri", city: "Vadodara", phone: "+919800000010", status: "building", theme: "blush", layout: "index", font: "editorial", code: null, plan: null, endsInDays: null, scansPerDay: null },
-  { name: "Old Town Tailors", slug: "old-town-tailors", type: "Boutique", area: "Chandni Chowk", city: "Delhi", phone: "+919800000011", status: "expired", theme: "graphite", layout: "list", font: "clean", code: "W5GF4S", plan: "Monthly", endsInDays: -20, scansPerDay: 2 },
-  { name: "Green Leaf Cafe", slug: "green-leaf-cafe", type: "Cafe and bakery", area: "Camp", city: "Pune", phone: "+919800000012", status: "paused", theme: "nightfall", layout: "chat", font: "clean", code: "D7BK9X", plan: "Yearly", endsInDays: 200, scansPerDay: 3 },
+  { name: "Old Town Tailors", slug: "old-town-tailors", type: "Boutique", area: "Chandni Chowk", city: "Delhi", phone: "+919800000011", status: "expired", theme: "graphite", layout: "list", font: "clean", code: "W5GF4S", plan: "1 month", endsInDays: -20, scansPerDay: 2 },
+  { name: "Green Leaf Cafe", slug: "green-leaf-cafe", type: "Cafe and bakery", area: "Camp", city: "Pune", phone: "+919800000012", status: "paused", theme: "nightfall", layout: "chat", font: "clean", code: "D7BK9X", plan: "1 year", endsInDays: 200, scansPerDay: 3 },
 ];
 
 const PLANS = [
-  { name: "Monthly", months: 1 },
-  { name: "Yearly", months: 12 },
+  { name: "1 month", months: 1 },
+  { name: "6 months", months: 6 },
+  { name: "1 year", months: 12 },
   { name: "5 years", months: 60 },
 ];
 

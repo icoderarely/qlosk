@@ -1,5 +1,6 @@
 "use client";
 
+import type { ShopPlanData } from "@/services/billing";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { publishShopPage, saveShopDraft } from "@/app/admin/shops/editor-actions";
@@ -44,6 +45,7 @@ export function ShopEditor({
   enabledThemes,
   enabledLayouts,
   qrChoices,
+  billing,
 }: {
   data: ShopEditorData;
   shopTypes: ShopTypeOption[];
@@ -51,6 +53,7 @@ export function ShopEditor({
   enabledThemes: ThemeId[];
   enabledLayouts: LayoutId[];
   qrChoices: QrChoices;
+  billing: ShopPlanData | null;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -221,6 +224,7 @@ export function ShopEditor({
                 set={set}
                 info={{ shopId, status: data.status, code: data.code, plan: data.plan }}
                 choices={qrChoices}
+                billing={billing}
                 canEdit={canEdit}
               />
             )

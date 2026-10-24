@@ -5,7 +5,7 @@ import { z } from "zod";
 import { createBillingStore } from "@/lib/billing-store";
 import { getDb } from "@/lib/db";
 import { requireRole } from "@/lib/require-role";
-import { markPaid, savePrices, undoPaid } from "@/services/billing";
+import { changePlan, markPaid, savePrices, undoPaid } from "@/services/billing";
 
 // Thin on purpose: role check first, then the service. A viewer's call throws
 // in requireRole before anything is read or written.
@@ -23,7 +23,22 @@ export async function markShopPaid(shopId: unknown): Promise<BillingActionResult
   const id = z.uuid().safeParse(shopId);
   if (!id.success) return { ok: false, error: "Choose a shop." };
   const result = await markPaid(createBillingStore(getDb()), id.data, user.email);
-  if (result.ok) refresh();
+  if (result.ok) {
+    refresh();
+    revalidatePath(`/admin/shops/${id.data}`);
+  }
+  return result;
+}
+
+export async function changeShopPlan(shopId: unknown, planId: unknown): Promise<BillingActionResult> {
+  const user = await requireRole("admin");
+  const ids = z.object({ shop: z.uuid(), plan: z.uuid() }).safeParse({ shop: shopId, plan: planId });
+  if (!ids.success) return { ok: false, error: "Choose a plan." };
+  const result = await changePlan(createBillingStore(getDb()), ids.data.shop, ids.data.plan, user.email);
+  if (result.ok) {
+    refresh();
+    revalidatePath(`/admin/shops/${ids.data.shop}`);
+  }
   return result;
 }
 
@@ -32,7 +47,10 @@ export async function undoShopPaid(shopId: unknown): Promise<BillingActionResult
   const id = z.uuid().safeParse(shopId);
   if (!id.success) return { ok: false, error: "Choose a shop." };
   const result = await undoPaid(createBillingStore(getDb()), id.data, user.email);
-  if (result.ok) refresh();
+  if (result.ok) {
+    refresh();
+    revalidatePath(`/admin/shops/${id.data}`);
+  }
   return result;
 }
 

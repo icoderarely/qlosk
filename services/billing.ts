@@ -10,6 +10,7 @@ import {
   paymentState,
   renewalDates,
   statusAfterRenewal,
+  PLAN_PITCH,
   type PaymentState,
 } from "./plans.ts";
 import type { Decision } from "./qr.ts";
@@ -54,6 +55,8 @@ export type BillingStore = {
     /** The plan dates and status before this renewal, kept in the change log so it can be undone. */
     before: PlanSnapshot;
   }): Promise<void>;
+  /** Sets the shop's plan and writes one change_log row, in one transaction. Dates are not touched. */
+  setPlan(args: { shopId: string; planId: string; what: string; userEmail: string }): Promise<void>;
   /** The newest renewal for the shop that has not been undone, or null. */
   lastRenewal(shopId: string): Promise<LastRenewal | null>;
   /** Restores the dates and status, retires the renewal's undo and writes one change_log row, in one transaction. */
@@ -75,6 +78,31 @@ export type RenewalRow = {
   /** tel: link, or null when there is no number. */
   callHref: string | null;
   canMarkPaid: boolean;
+};
+
+export type PlanOption = {
+  id: string;
+  name: string;
+  /** "₹1,999", or "Price not set". */
+  price: string;
+  /** "₹167 a month", empty when no price is set. */
+  perMonth: string;
+  /** "Save 44% vs monthly", empty for the monthly plan or when there is nothing to compare. */
+  saving: string;
+  pitch: string;
+};
+
+/** What the shop editor's Plan card shows and offers. */
+export type ShopPlanData = {
+  planId: string | null;
+  options: PlanOption[];
+  payment: PaymentState | null;
+  /** The end date Mark as paid would set, null without a plan. */
+  renewsTo: string | null;
+  /** wa.me reminder link, or null: see remindNote. */
+  remindHref: string | null;
+  /** Why there is no reminder link; empty when there is one. */
+  remindNote: string;
 };
 
 export type BillingData = {
@@ -114,6 +142,67 @@ export function paiseFromRupees(raw: string): number | null {
 
 function formatRupees(paise: number): string {
   return `₹${new Intl.NumberFormat("en-IN").format(paise / 100)}`;
+}
+
+/** The picker's lines: price, per month, and the saving against paying the 1-month plan again and again. */
+export function planOptions(plans: PlanRow[]): PlanOption[] {
+  const monthly = plans.find((p) => p.months === 1)?.pricePaise ?? 0;
+  return plans.map((p) => {
+    const priced = p.pricePaise > 0;
+    const saved = priced && monthly > 0 && p.months > 1 ? Math.round((1 - p.pricePaise / (monthly * p.months)) * 100) : 0;
+    return {
+      id: p.id,
+      name: p.name,
+      price: priced ? formatRupees(p.pricePaise) : "Price not set",
+      perMonth: priced ? `${formatRupees(Math.round(p.pricePaise / p.months / 100) * 100)} a month` : "",
+      saving: saved > 0 ? `Save ${saved}% vs monthly` : "",
+      pitch: PLAN_PITCH[p.months] ?? "",
+    };
+  });
+}
+
+export async function getShopPlan(store: BillingStore, shopId: string, now: Date = new Date()): Promise<ShopPlanData | null> {
+  const [shop, plans] = await Promise.all([store.find(shopId), store.plans()]);
+  if (!shop) return null;
+  const options = planOptions(plans);
+  const plan = plans.find((p) => p.id === shop.planId);
+  if (!plan) {
+    return { planId: null, options, payment: null, renewsTo: null, remindHref: null, remindNote: "Choose a plan first." };
+  }
+  const payment = paymentState(shop.planEndsAt, now);
+  const renewsTo = formatPlanDate(
+    renewalDates({ planStartedAt: shop.planStartedAt, planEndsAt: shop.planEndsAt, months: plan.months, now }).planEndsAt,
+    now,
+  );
+  let remindHref: string | null = null;
+  let remindNote = "";
+  if (payment === "paid") remindNote = "Paid up for more than 14 days.";
+  else if (!shop.ownerWhatsapp) remindNote = "Add the owner's WhatsApp number on the Details tab.";
+  else remindHref = whatsappTarget(shop.ownerWhatsapp, reminderText(shop, plan, payment, now));
+  if (!remindHref && !remindNote) remindNote = "The owner's WhatsApp number is not valid.";
+  return { planId: plan.id, options, payment, renewsTo, remindHref, remindNote };
+}
+
+/** Choose or change the shop's plan. The dates stay as they are; the next Mark as paid adds a period of the new plan. */
+export async function changePlan(
+  store: BillingStore,
+  shopId: string,
+  planId: string,
+  userEmail: string,
+): Promise<{ ok: true; message: string } | { ok: false; error: string }> {
+  const [shop, plans] = await Promise.all([store.find(shopId), store.plans()]);
+  if (!shop) return { ok: false, error: "This shop no longer exists." };
+  const plan = plans.find((p) => p.id === planId);
+  if (!plan) return { ok: false, error: "Choose a plan." };
+  if (shop.planId === plan.id) return { ok: true, message: `${shop.name} is already on the ${plan.name} plan.` };
+  const was = plans.find((p) => p.id === shop.planId)?.name ?? "no plan";
+  await store.setPlan({ shopId, planId: plan.id, what: `Plan changed: ${was} to ${plan.name}`, userEmail });
+  return {
+    ok: true,
+    message: shop.planEndsAt
+      ? `Plan is now ${plan.name}. The current end date stays; the next payment adds ${plan.name}.`
+      : `Plan is now ${plan.name}. It starts when you mark it as paid.`,
+  };
 }
 
 const ORDER: Record<PaymentState, number> = { overdue: 0, due_soon: 1, paid: 2, not_started: 3 };

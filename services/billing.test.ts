@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  changePlan,
   formatPlanDate,
+  getShopPlan,
+  planOptions,
   getBilling,
   markPaid,
   undoPaid,
@@ -44,6 +47,7 @@ function fake(shops: BillingShop[], plans: PlanRow[] = PLANS) {
   let last: LastRenewal | null = null;
   const priced: { id: string; pricePaise: number }[][] = [];
   const logs: string[] = [];
+  const planSet: string[] = [];
   const store: BillingStore = {
     async plans() {
       return plans;
@@ -58,6 +62,10 @@ function fake(shops: BillingShop[], plans: PlanRow[] = PLANS) {
       renewed.push(args);
       last = { logId: "log1", at: NOW, before: args.before, endsAfter: args.planEndsAt };
     },
+    async setPlan(args) {
+      planSet.push(args.planId);
+      logs.push(args.what);
+    },
     async lastRenewal() {
       return last;
     },
@@ -69,7 +77,7 @@ function fake(shops: BillingShop[], plans: PlanRow[] = PLANS) {
       logs.push(args.what);
     },
   };
-  return { store, renewed, undone, priced, logs, setLast: (l: LastRenewal | null) => (last = l) };
+  return { store, renewed, undone, priced, logs, planSet, setLast: (l: LastRenewal | null) => (last = l) };
 }
 
 describe("prices", () => {
@@ -239,5 +247,58 @@ describe("undoPaid", () => {
     assert.equal((await undoPaid(f.store, "a", "me", NOW)).ok, false);
     f.setLast({ logId: "log1", at: days(-2), before: { planStartedAt: null, planEndsAt: null, status: "live" }, endsAfter: days(5) });
     assert.equal((await undoPaid(f.store, "a", "me", NOW)).ok, false);
+  });
+});
+
+describe("planOptions", () => {
+  const plans: PlanRow[] = [
+    { id: "m", name: "1 month", months: 1, pricePaise: 29900 },
+    { id: "h", name: "6 months", months: 6, pricePaise: 119900 },
+    { id: "y", name: "1 year", months: 12, pricePaise: 199900 },
+    { id: "n", name: "Unpriced", months: 3, pricePaise: 0 },
+  ];
+
+  it("works out the price per month and the saving against paying monthly", () => {
+    const [m, h, y, n] = planOptions(plans);
+    assert.equal(m.perMonth, "₹299 a month");
+    assert.equal(m.saving, "");
+    assert.equal(h.perMonth, "₹200 a month");
+    assert.equal(h.saving, "Save 33% vs monthly");
+    assert.equal(y.price, "₹1,999");
+    assert.equal(y.perMonth, "₹167 a month");
+    assert.equal(y.saving, "Save 44% vs monthly");
+    assert.equal(n.price, "Price not set");
+    assert.equal(n.perMonth, "");
+  });
+});
+
+describe("changePlan and getShopPlan", () => {
+  it("sets the plan, logs it, and leaves the dates alone", async () => {
+    const f = fake([shop("a", "Kaveri", "p-month", 5)]);
+    const result = await changePlan(f.store, "a", "p-year", "me");
+    assert.equal(result.ok, true);
+    assert.deepEqual(f.planSet, ["p-year"]);
+    assert.match(f.logs[0], /Monthly to Yearly/);
+  });
+
+  it("does nothing for the plan it is already on, or an unknown plan", async () => {
+    const f = fake([shop("a", "Kaveri", "p-month", 5)]);
+    assert.equal((await changePlan(f.store, "a", "p-month", "me")).ok, true);
+    assert.equal((await changePlan(f.store, "a", "nope", "me")).ok, false);
+    assert.equal((await changePlan(f.store, "zzz", "p-year", "me")).ok, false);
+    assert.equal(f.planSet.length, 0);
+  });
+
+  it("explains a missing reminder link", async () => {
+    const none = fake([shop("a", "Kaveri", null, null)]);
+    assert.equal((await getShopPlan(none.store, "a", NOW))?.remindNote, "Choose a plan first.");
+    const noNumber = fake([shop("b", "Noor", "p-month", 3)]);
+    assert.match((await getShopPlan(noNumber.store, "b", NOW))?.remindNote ?? "", /WhatsApp/);
+    const paid = fake([shop("c", "Iron", "p-month", 60, { ownerWhatsapp: "+919800000001" })]);
+    const data = await getShopPlan(paid.store, "c", NOW);
+    assert.equal(data?.payment, "paid");
+    assert.equal(data?.remindHref, null);
+    const due = fake([shop("d", "Dental", "p-month", 3, { ownerWhatsapp: "+919800000001" })]);
+    assert.match((await getShopPlan(due.store, "d", NOW))?.remindHref ?? "", /^https:\/\/wa\.me\//);
   });
 });
