@@ -6,7 +6,7 @@ export function PhoneFrame({ children }: { children: React.ReactNode }) {
     <div className="box-border w-[344px] max-w-full rounded-[36px] bg-ink p-1.5">
       <div className="relative h-[731px] w-[332px] max-w-full overflow-hidden rounded-[30px]">
         <div
-          className="h-[860px] w-[390px] origin-top-left scale-[0.85]"
+          className="h-[860px] w-[390px] origin-top-left scale-[0.85] overflow-y-auto overflow-x-hidden overscroll-contain"
           style={{ "--page-min-h": "860px" } as React.CSSProperties}
         >
           {children}

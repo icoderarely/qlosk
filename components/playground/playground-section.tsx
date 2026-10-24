@@ -343,7 +343,7 @@ function Phone({ children }: { children: React.ReactNode }) {
           }}
         >
           <div
-            className="overflow-hidden rounded-[34px]"
+            className="overflow-y-auto overflow-x-hidden overscroll-contain rounded-[34px]"
             style={{ width: SCREEN_W, height: SCREEN_H, "--page-min-h": `${SCREEN_H}px` } as React.CSSProperties}
           >
             {children}
