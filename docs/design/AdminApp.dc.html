@@ -66,8 +66,8 @@ textarea.a-in{padding:10px 12px;min-height:88px;resize:vertical}
   <div style="flex:1 1 100%;min-height:{{minH}};display:flex;align-items:center;justify-content:center;padding:40px 20px;box-sizing:border-box">
     <div class="a-card" style="width:100%;max-width:420px;padding:32px;display:flex;flex-direction:column;gap:20px">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:34px;height:34px;border-radius:10px;background:var(--accent)"></div>
-        <div style="font-weight:800;font-size:18px">Your Brand</div>
+        <svg width="34" height="34" viewBox="0 0 48 48" style="flex:none" role="img" aria-label="Qlosk"><rect width="48" height="48" rx="14" fill="#FBF1B5"/><rect x="9" y="9" width="26" height="26" rx="9" fill="none" stroke="#0D1F1B" stroke-width="6"/><rect x="18" y="18" width="8" height="8" rx="2" fill="#0D1F1B"/><rect x="28.5" y="28.5" width="12" height="12" rx="3.2" fill="#0D1F1B" stroke="#FBF1B5" stroke-width="3"/></svg>
+        <div style="font-weight:800;font-size:18px">Qlosk</div>
       </div>
       <div>
         <h1 class="a-h1" style="font-size:26px">Sign in to admin</h1>
@@ -87,8 +87,8 @@ textarea.a-in{padding:10px 12px;min-height:88px;resize:vertical}
   <nav aria-label="Main" style="flex:1 1 232px;background:#fff;border-right:1px solid #E3E5EA;padding:22px 14px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 0 18px 12px">
       <div style="display:flex;align-items:center;gap:10px;min-width:0">
-        <div style="width:30px;height:30px;border-radius:9px;background:var(--accent);flex:none"></div>
-        <div style="font-weight:800;font-size:16px;white-space:nowrap">Your Brand</div>
+        <svg width="30" height="30" viewBox="0 0 48 48" style="flex:none" role="img" aria-label="Qlosk"><rect width="48" height="48" rx="14" fill="#FBF1B5"/><rect x="9" y="9" width="26" height="26" rx="9" fill="none" stroke="#0D1F1B" stroke-width="6"/><rect x="18" y="18" width="8" height="8" rx="2" fill="#0D1F1B"/><rect x="28.5" y="28.5" width="12" height="12" rx="3.2" fill="#0D1F1B" stroke="#FBF1B5" stroke-width="3"/></svg>
+        <div style="font-weight:800;font-size:16px;white-space:nowrap">Qlosk</div>
       </div>
       <button type="button" onClick="{{toggleNav}}" aria-label="Collapse sidebar" aria-expanded="true" class="a-rail" style="width:44px;height:44px;flex:none">
         <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
@@ -115,7 +115,7 @@ textarea.a-in{padding:10px 12px;min-height:88px;resize:vertical}
 
   <sc-if value="{{navClosed}}" hint-placeholder-val="{{ false }}">
   <nav aria-label="Main" style="flex:0 0 76px;background:#fff;border-right:1px solid #E3E5EA;padding:20px 0;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:8px">
-    <div style="width:34px;height:34px;border-radius:10px;background:var(--accent)" role="img" aria-label="Your Brand"></div>
+    <svg width="34" height="34" viewBox="0 0 48 48" style="flex:none" role="img" aria-label="Qlosk"><rect width="48" height="48" rx="14" fill="#FBF1B5"/><rect x="9" y="9" width="26" height="26" rx="9" fill="none" stroke="#0D1F1B" stroke-width="6"/><rect x="18" y="18" width="8" height="8" rx="2" fill="#0D1F1B"/><rect x="28.5" y="28.5" width="12" height="12" rx="3.2" fill="#0D1F1B" stroke="#FBF1B5" stroke-width="3"/></svg>
     <button type="button" onClick="{{toggleNav}}" aria-label="Expand sidebar" aria-expanded="false" class="a-rail" style="margin:4px 0 8px;height:44px">
       <svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
     </button>
@@ -387,13 +387,47 @@ textarea.a-in{padding:10px 12px;min-height:88px;resize:vertical}
         </section>
         </sc-if>
 
+        <sc-if value="{{tStandee}}" hint-placeholder-val="{{ false }}">
+        <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px"><div><h2 class="a-h2">Standee design</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">The printed A5 stand for this shop. Pick a layout and the preview updates.</p></div><span class="a-chip a-c-g">Code {{standeeCode}}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+            <sc-for list="{{sDesignOpts}}" as="d" hint-placeholder-count="3">
+              <button type="button" class="{{d.cls}}" onClick="{{d.pick}}" aria-pressed="{{d.pressed}}">
+                <svg viewBox="0 0 64 90" aria-hidden="true" style="display:block;width:100%;height:auto;background:#F4F5F7;border-radius:8px"><path d="{{d.d2}}" style="fill:#C9CED8"/><path d="{{d.d1}}" style="fill:var(--accent)"/></svg>
+                <div style="font-weight:800">{{d.name}}</div>
+                <div class="a-sub" style="font-size:12px;margin-top:-6px">{{d.note}}</div>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
+          <div><h2 class="a-h2">Colour</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Light colours only, so the QR code always prints dark on white.</p></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px">
+            <sc-for list="{{sThemeOpts}}" as="t" hint-placeholder-count="5">
+              <button type="button" class="{{t.cls}}" onClick="{{t.pick}}" aria-pressed="{{t.pressed}}">
+                <div style="{{t.sw}}"><div style="{{t.bar}}"></div><div style="{{t.line}}"></div></div>
+                <div style="font-weight:800;font-size:14px">{{t.name}}</div>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+        <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
+          <div><h2 class="a-h2">Words and size</h2><p class="a-sub" style="margin:2px 0 0;font-size:13px">Name, tagline and logo come from the Details tab. The icons follow the buttons switched on for this shop.</p></div>
+          <div class="a-row">
+            <div class="a-field"><label class="a-lab" for="st-h">Headline</label><input id="st-h" class="a-in" type="text" value="{{sHeadline}}" placeholder="{{sHeadlineHint}}" onInput="{{setHeadline}}"></div>
+            <div class="a-field"><label class="a-lab" for="st-s">Print size</label><select id="st-s" class="a-in" onChange="{{setSize}}"><option value="A5">A5 standee, 148 x 210 mm</option><option value="A4">A4 poster, 210 x 297 mm</option></select></div>
+          </div>
+          <p class="a-sub" style="margin:0;font-size:13px">Keep headlines short, under 40 characters. The reviews line never offers rewards or asks only happy customers to review.</p>
+        </section>
+        </sc-if>
+
         <sc-if value="{{tQrPlan}}" hint-placeholder-val="{{ false }}">
         <section class="a-card" style="display:flex;flex-wrap:wrap;gap:20px;align-items:center">
           <svg width="132" height="132" viewBox="0 0 96 96" aria-hidden="true" style="flex:none;background:#fff;border:1px solid #E3E5EA;border-radius:12px;padding:8px"><g style="fill:none;stroke:#11141A;stroke-width:5"><rect x="8" y="8" width="26" height="26"/><rect x="62" y="8" width="26" height="26"/><rect x="8" y="62" width="26" height="26"/></g><g style="fill:#11141A"><rect x="16" y="16" width="10" height="10"/><rect x="70" y="16" width="10" height="10"/><rect x="16" y="70" width="10" height="10"/><rect x="42" y="10" width="8" height="8"/><rect x="42" y="26" width="8" height="8"/><rect x="10" y="42" width="8" height="8"/><rect x="26" y="42" width="8" height="8"/><rect x="42" y="42" width="8" height="8"/><rect x="58" y="42" width="8" height="8"/><rect x="74" y="42" width="8" height="8"/><rect x="42" y="58" width="8" height="8"/><rect x="58" y="66" width="8" height="8"/><rect x="74" y="58" width="8" height="8"/><rect x="42" y="74" width="8" height="8"/><rect x="74" y="76" width="8" height="8"/></g></svg>
           <div style="flex:1 1 260px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:10px"><h2 class="a-h2">QR code</h2><span class="a-chip a-c-g">Assigned</span></div>
             <div><span class="a-mono" style="font-size:18px">7KX2M9</span><div class="a-sub" style="font-size:13px">yourdomain.in/q/7KX2M9 opens yourdomain.in/s/velvet-salon</div></div>
-            <div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="a-btn a-btn-p"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>A5 print file</button><button type="button" class="a-btn">4x6 card</button><button type="button" class="a-btn">QR as SVG</button><button type="button" class="a-btn">Reassign code</button></div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="a-btn a-btn-p" onClick="{{openStandee}}"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Design and download standee</button><button type="button" class="a-btn">QR as SVG</button><button type="button" class="a-btn">Reassign code</button></div>
           </div>
         </section>
         <section class="a-card" style="display:flex;flex-direction:column;gap:14px">
@@ -425,6 +459,7 @@ textarea.a-in{padding:10px 12px;min-height:88px;resize:vertical}
 
       </div>
 
+      <sc-if value="{{tNotStandee}}" hint-placeholder-val="{{ true }}">
       <aside aria-label="Live preview" class="a-card" style="flex:1 1 372px;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:12px">
         <div style="align-self:stretch;display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h2 class="a-h2">Live preview</h2><span class="a-chip a-c-a">Draft</span></div>
         <div style="width:344px;max-width:100%;padding:6px;background:#11141A;border-radius:36px;box-sizing:border-box">
@@ -436,6 +471,23 @@ textarea.a-in{padding:10px 12px;min-height:88px;resize:vertical}
         </div>
         <p class="a-sub" style="margin:0;font-size:13px;text-align:center">Changes show here straight away. Customers see them after you publish.</p>
       </aside>
+      </sc-if>
+      <sc-if value="{{tStandee}}" hint-placeholder-val="{{ false }}">
+      <aside aria-label="Standee preview" class="a-card" style="flex:1 1 372px;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:14px">
+        <div style="align-self:stretch;display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h2 class="a-h2">Standee preview</h2><span class="a-chip a-c-n">{{sSizeLabel}}</span></div>
+        <div style="width:372px;max-width:100%;height:{{sPrevH}}px;overflow:hidden;border-radius:6px;border:1px solid #E3E5EA;box-shadow:0 14px 30px -22px rgba(17,20,26,.5);position:relative;background:#fff">
+          <div style="width:560px;height:794px;transform:scale(0.664);transform-origin:top left">
+            <dc-import name="Standee" design="{{sDesign}}" theme="{{sEffTheme}}" font="{{font}}" shopname="{{shopName}}" tagline="{{sTagline}}" headline="{{sHeadline}}" hint-size="560px,794px"></dc-import>
+          </div>
+        </div>
+        <div style="align-self:stretch;display:flex;align-items:center;gap:8px;background:#EAF6EF;color:#14633A;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>QR checked: it opens qlosk.com/q/{{standeeCode}}</div>
+        <div style="align-self:stretch;display:flex;flex-direction:column;gap:10px">
+          <button type="button" class="a-btn a-btn-p" style="width:100%"><svg class="a-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Download print PDF</button>
+          <button type="button" class="a-btn" style="width:100%">Download PNG to share on WhatsApp</button>
+        </div>
+        <p class="a-sub" style="margin:0;font-size:12.5px;text-align:center">The print PDF has 3 mm bleed. Print one copy and scan it with two phones before ordering more.</p>
+      </aside>
+      </sc-if>
 
     </div>
     </sc-if>
@@ -456,7 +508,7 @@ textarea.a-in{padding:10px 12px;min-height:88px;resize:vertical}
         <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #ECEEF2"><div class="a-seg"><button type="button" class="a-seg-on">All</button><button type="button">Assigned</button><button type="button">Unassigned</button></div><label for="qr-search" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search codes</label><input id="qr-search" class="a-in" type="text" placeholder="Search code or shop" style="max-width:260px"></div>
         <div style="overflow-x:auto"><table class="a-tbl" style="min-width:640px"><thead><tr style="background:#FAFAFB"><th style="padding-left:16px">Code</th><th>Status</th><th>Shop</th><th>Last scan</th><th style="padding-right:16px"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th></tr></thead><tbody>
           <sc-for list="{{codes}}" as="q" hint-placeholder-count="8">
-            <tr><td class="a-mono" style="padding-left:16px">{{q.code}}</td><td><span class="{{q.chip}}">{{q.status}}</span></td><td style="font-weight:600">{{q.shop}}</td><td class="a-sub">{{q.last}}</td><td style="padding-right:16px;text-align:right"><button type="button" class="a-btn" aria-label="{{q.label}}">{{q.action}}</button></td></tr>
+            <tr><td class="a-mono" style="padding-left:16px">{{q.code}}</td><td><span class="{{q.chip}}">{{q.status}}</span></td><td style="font-weight:600">{{q.shop}}</td><td class="a-sub">{{q.last}}</td><td style="padding-right:16px;text-align:right"><button type="button" class="a-btn" aria-label="{{q.label}}" onClick="{{q.open}}">{{q.action}}</button></td></tr>
           </sc-for>
         </tbody></table></div>
       </section>
@@ -617,6 +669,10 @@ class Component extends DCLogic {
       theme: 'blush',
       layout: 'list',
       font: 'editorial',
+      sDesign: 'arch',
+      sTheme: 'match',
+      sHeadline: '',
+      sSize: 'A5',
       shopName: 'Velvet Salon & Spa',
       sel: {}
     };
@@ -653,6 +709,7 @@ class Component extends DCLogic {
       { id: 'buttons', label: 'Buttons' },
       { id: 'look', label: 'Look' },
       { id: 'offers', label: 'Offers and Wi-Fi' },
+      { id: 'standee', label: 'Standee' },
       { id: 'qrplan', label: 'QR and plan' },
       { id: 'activity', label: 'Activity' }
     ];
@@ -726,6 +783,34 @@ class Component extends DCLogic {
       return { name: f.name, note: f.note, sample: f.sample, cls: 'a-opt' + (on ? ' a-opt-on' : ''), pressed: on ? 'true' : 'false', pick: () => this.setState({ font: f.id }) };
     });
 
+    const taglines = { 'Velvet Salon & Spa': 'Hair, skin and bridal studio', 'Kaveri Sweets': 'Mithai and namkeen since 1986', 'Iron House Gym': 'Strength, cardio and classes', 'Dr. Mehta Dental': 'Family dentistry and braces', 'Noor Boutique': 'Ethnic wear and bridal', 'Bright Minds Classes': 'Maths and science, grades 8 to 12', 'Brew & Bun Cafe': 'Coffee, bakes and slow mornings', 'Aarav Jewellers': 'Gold, diamond and bridal sets', 'New shop': 'Your tagline here' };
+    const sTagline = taglines[st.shopName] || 'Your tagline here';
+    const standeeCode = (shops.find((x) => x.name === st.shopName) || { code: '7KX2M9' }).code.replace('Not assigned', 'XXXXXX');
+    const headlineHints = { arch: 'Everything about us, one scan', ticket: 'Your shortcut to everything here', badge: 'One scan. Everything here.' };
+    const sDesigns = [
+      { id: 'arch', name: 'Arch', note: 'Rounded panel, QR in the middle', d1: 'M22 40h20v20H22z', d2: 'M8 84V30a24 24 0 0 1 48 0v54z M26 66h12v2H26z M24 72h16v2H24z' },
+      { id: 'ticket', name: 'Ticket', note: 'Coupon card with a tear line', d1: 'M10 52h24v24H10z', d2: 'M6 6h52v78H6z M12 14h30v5H12z M12 24h40v8H12z M8 42h48v1H8z M38 54h16v3H38z M38 62h16v3H38z M38 70h16v3H38z' },
+      { id: 'badge', name: 'Round badge', note: 'QR inside a ring of words', d1: 'M22 30h20v20H22z', d2: 'M4 2h56v10H4z M6 40a26 26 0 1 0 52 0a26 26 0 1 0 -52 0z M20 76h24v4H20z' }
+    ];
+    const sDesignOpts = sDesigns.map((d) => {
+      const on = st.sDesign === d.id;
+      return { name: d.name, note: d.note, d1: d.d1, d2: d.d2, cls: 'a-opt' + (on ? ' a-opt-on' : ''), pressed: on ? 'true' : 'false', pick: () => this.setState({ sDesign: d.id }) };
+    });
+    const lightThemes = themes.filter((t) => t.id !== 'nightfall');
+    const sEffTheme = st.sTheme === 'match' ? (st.theme === 'nightfall' ? 'daylight' : st.theme) : st.sTheme;
+    const sThemeOpts = [{ id: 'match', name: 'Match shop page', bg: '#F4F5F7', btn: '#11141A', card: '#FFFFFF', line: '#D5D8DF' }].concat(lightThemes).map((t) => {
+      const on = st.sTheme === t.id;
+      return {
+        name: t.name,
+        cls: 'a-opt' + (on ? ' a-opt-on' : ''),
+        pressed: on ? 'true' : 'false',
+        sw: 'background:' + t.bg + ';border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px;border:1px solid #E3E5EA',
+        bar: 'height:12px;border-radius:6px;background:' + t.btn,
+        line: 'height:8px;border-radius:4px;background:' + t.card + ';border:1px solid ' + t.line,
+        pick: () => this.setState({ sTheme: t.id })
+      };
+    });
+
     const btnDefs = [
       { label: 'Book on WhatsApp', type: 'WhatsApp', target: '[number]', on: true, d: 'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z' },
       { label: 'Call us', type: 'Call', target: '[number]', on: true, d: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z' },
@@ -774,15 +859,17 @@ class Component extends DCLogic {
     const recent = shops.slice(0, 5).map((s) => ({ name: s.name, code: s.code, plan: s.plan, scans: s.scans, status: s.status, chip: chipMap[s.status] }));
 
     const codes = [
-      { code: '7KX2M9', status: 'Assigned', chip: 'a-chip a-c-g', shop: 'Velvet Salon & Spa', last: '12 minutes ago', action: 'Download', label: 'Download print file for 7KX2M9' },
-      { code: 'R4PD8T', status: 'Assigned', chip: 'a-chip a-c-g', shop: 'Kaveri Sweets', last: '1 hour ago', action: 'Download', label: 'Download print file for R4PD8T' },
-      { code: 'M2HC6W', status: 'Assigned', chip: 'a-chip a-c-g', shop: 'Iron House Gym', last: '3 hours ago', action: 'Download', label: 'Download print file for M2HC6W' },
-      { code: 'H8WQ5Z', status: 'Assigned', chip: 'a-chip a-c-a', shop: 'Dr. Mehta Dental', last: '9 days ago', action: 'Download', label: 'Download print file for H8WQ5Z' },
-      { code: 'J9NV3B', status: 'Assigned', chip: 'a-chip a-c-b', shop: 'Brew & Bun Cafe', last: 'Never', action: 'Download', label: 'Download print file for J9NV3B' },
+      { code: '7KX2M9', status: 'Assigned', chip: 'a-chip a-c-g', shop: 'Velvet Salon & Spa', last: '12 minutes ago', action: 'Standee', label: 'Open the standee for 7KX2M9' },
+      { code: 'R4PD8T', status: 'Assigned', chip: 'a-chip a-c-g', shop: 'Kaveri Sweets', last: '1 hour ago', action: 'Standee', label: 'Open the standee for R4PD8T' },
+      { code: 'M2HC6W', status: 'Assigned', chip: 'a-chip a-c-g', shop: 'Iron House Gym', last: '3 hours ago', action: 'Standee', label: 'Open the standee for M2HC6W' },
+      { code: 'H8WQ5Z', status: 'Assigned', chip: 'a-chip a-c-a', shop: 'Dr. Mehta Dental', last: '9 days ago', action: 'Standee', label: 'Open the standee for H8WQ5Z' },
+      { code: 'J9NV3B', status: 'Assigned', chip: 'a-chip a-c-b', shop: 'Brew & Bun Cafe', last: 'Never', action: 'Standee', label: 'Open the standee for J9NV3B' },
       { code: 'W5RF4A', status: 'Unassigned', chip: 'a-chip a-c-n', shop: 'In stock', last: 'Never', action: 'Assign', label: 'Assign code W5RF4A' },
       { code: 'T7QK2D', status: 'Unassigned', chip: 'a-chip a-c-n', shop: 'In stock', last: 'Never', action: 'Assign', label: 'Assign code T7QK2D' },
       { code: 'Y3BN8H', status: 'Unassigned', chip: 'a-chip a-c-n', shop: 'In stock', last: 'Never', action: 'Assign', label: 'Assign code Y3BN8H' }
     ];
+
+    codes.forEach((q) => { q.open = () => this.setState(q.status === 'Assigned' ? { page: 'editor', shopName: q.shop, tab: 'standee' } : {}); });
 
     const col = (title, hint, cards) => ({ title: title, hint: hint, count: cards.length, cards: cards });
     const cardOf = (name, sub, tag, chip, action, primary) => ({ name: name, sub: sub, tag: tag, chip: chip, action: action, btn: primary ? 'a-btn a-btn-p' : 'a-btn' });
@@ -865,6 +952,8 @@ class Component extends DCLogic {
       tLook: st.tab === 'look',
       tOffers: st.tab === 'offers',
       tQrPlan: st.tab === 'qrplan',
+      tStandee: st.tab === 'standee',
+      tNotStandee: st.tab !== 'standee',
       tActivity: st.tab === 'activity',
       navItems: navItems,
       toggleNav: () => this.setState({ open: !this.state.open }),
@@ -883,6 +972,19 @@ class Component extends DCLogic {
       clearSel: () => this.setState({ sel: {} }),
       themeOpts: themeOpts,
       layoutOpts: layoutOpts,
+      sDesignOpts: sDesignOpts,
+      sThemeOpts: sThemeOpts,
+      sEffTheme: sEffTheme,
+      sDesign: st.sDesign,
+      sHeadline: st.sHeadline,
+      sHeadlineHint: headlineHints[st.sDesign],
+      sTagline: sTagline,
+      sSizeLabel: st.sSize === 'A4' ? 'A4 · 210 × 297 mm' : 'A5 · 148 × 210 mm',
+      sPrevH: 527,
+      standeeCode: standeeCode,
+      setHeadline: (e) => this.setState({ sHeadline: e.target.value }),
+      setSize: (e) => this.setState({ sSize: e.target.value }),
+      openStandee: () => this.setState({ tab: 'standee' }),
       fontOpts: fontOpts,
       btns: btns,
       changes: changes,

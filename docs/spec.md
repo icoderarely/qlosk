@@ -1,6 +1,6 @@
-# QR Shop Pages: Build Spec
+# Qlosk: Build Spec
 
-Visual reference: `docs/design/` (ShopPage, AdminApp, Colors). Where this spec and the design files disagree, ask.
+Visual reference: `docs/design/` (ShopPage, AdminApp, LandingV2, Standee, Logo, Colors). The product is called Qlosk (qlosk.com). Where this spec and the design files disagree, ask.
 
 ## 1. What we are building
 
@@ -12,7 +12,7 @@ A done-for-you service for local shops in India. One permanent QR code opens a m
 - Permanent QR codes (`/q/code`) that can be reassigned, with scan logging.
 - Admin app: login, overview, shops list, shop editor with live preview, QR codes, onboarding board, reports, plans and billing, settings.
 - Public `/playground` page where anyone can try the looks. It later becomes a section of the landing page.
-- A5 print file per shop, plus a printable sheet of unassigned codes.
+- Standee designer per shop (3 designs, light colours, A5 or A4) with a live preview and print PDF and PNG downloads, plus a printable sheet of unassigned codes. See section 11.
 - Tracking with bot filtering. Bots are flagged and kept, never deleted.
 
 **v1 leaves out**
@@ -33,7 +33,7 @@ One Next.js app does everything for v1. Business logic lives in `services/` with
 | ORM | Prisma | Typed queries, easy migrations |
 | Admin auth | Better Auth, username and password | Sign-up is closed; accounts are created by the owner only |
 | Validation | zod | Shared by forms and route handlers |
-| Files | Cloudinary | Logos and covers; behind one storage service |
+| Files | Cloudflare R2 or Vercel Blob | Logos and covers; behind one storage service |
 | Hosting | Vercel | Cron jobs for daily stats and reminders |
 | Payments | Razorpay (later) | After v1 |
 
@@ -81,8 +81,9 @@ The QR code always encodes `/q/code`, never the shop page. That lets us count sc
 | `/admin-login` | Username and password sign-in. Lives outside `/admin`. Signed-in users who open it go to `/admin`. Anyone not signed in who opens any `/admin/...` page is redirected here. |
 | `/admin` | Overview: KPIs, scans chart, top buttons, needs attention, recent shops |
 | `/admin/shops` | List with status tabs, search, filters, bulk change of theme, layout, font |
-| `/admin/shops/new`, `/admin/shops/[id]` | Shop editor: tabs Details, Buttons, Look, Offers and Wi-Fi, QR and plan, Activity, plus live preview |
-| `/admin/qr` | Code stock, generate a batch, print sheet, assign and reassign |
+| `/admin/shops/new`, `/admin/shops/[id]` | Shop editor: tabs Details, Buttons, Look, Offers and Wi-Fi, Standee, QR and plan, Activity, plus live preview |
+| `/admin/shops/[id]/standee.pdf`, `.png` | Server-generated standee downloads for that shop (role-checked) |
+| `/admin/qr` | Code stock, generate a batch, print sheet, assign and reassign. Each assigned code has a "Standee" button that opens that shop's Standee tab. |
 | `/admin/onboarding` | Board: Lead, Building, Preview sent, Printing, Live this week |
 | `/admin/reports` | KPIs, by-shop table, traffic quality, spike review, monthly report |
 | `/admin/billing` | Plan counts, renewals, plan prices |
@@ -94,8 +95,9 @@ Postgres holds everything. Raw events stay in the database; daily rollups make r
 
 | Table | Key fields | Notes |
 | --- | --- | --- |
-| `shops` | id, slug, name, tagline, shop_type, area, city, address, phone, whatsapp, wa_message, logo_url, cover_url, status, owner_name, owner_whatsapp, notes, plan_id, plan_started_at, plan_ends_at | status: building, preview, live, quiet, expired, paused, archived |
+| `shops` | id, slug, name, tagline, shop_type, area, city, address, phone, whatsapp, wa_message, logo_url, cover_url, status, owner_name, owner_whatsapp, notes, standee_design, standee_theme, standee_headline, standee_size, plan_id, plan_started_at, plan_ends_at | status: building, preview, live, quiet, expired, paused, archived |
 | `shop_pages` | shop_id, state (draft or published), config JSON, published_at | config = theme, layout, font, button color override, language, offer, banner, wifi. Publish copies draft to published. |
+| `print_files` | id, shop_id, kind (pdf, png, sheet), design, theme, size, created_by, created_at, file_url | One row per generated download |
 | `slug_history` | shop_id, old_slug | Old addresses keep forwarding |
 | `links` | id, shop_id, type, label, target, position, enabled | type: whatsapp, call, google_review, wifi, maps, instagram, facebook, youtube, website, menu, custom |
 | `qr_codes` | code, shop_id (nullable), status, batch_id, created_at | 6 characters, no look-alike letters; unassigned codes have no shop |
@@ -196,8 +198,10 @@ No CAPTCHA.
 
 **QR and print**
 
-- The QR encodes `https://<domain>/q/<code>` only. Vector output (SVG or PDF), error correction Q or H, quiet zone at least 4 modules.
-- Print file is A5 (148 x 210 mm) with 3 mm bleed; QR at least 30 x 30 mm. Also a 4x6 inch card and a sheet of unassigned codes.
+- The QR encodes `https://<domain>/q/<code>` only. Vector output (SVG or PDF), error correction H, white border of at least 2 modules inside a white card (4 modules when printed without a card).
+- The Qlosk Q mark sits in the centre of the standee QR codes (section 11). It covers under 10% of the code and is near-black with no background tile. Nothing else is placed on the code and the code is never coloured.
+- Before any PDF, PNG or sheet is saved, the server decodes the QR from the rendered output and fails loudly if it does not read back exactly the expected URL.
+- Print file is A5 (148 x 210 mm) with 3 mm bleed (or A4), QR at least 30 x 30 mm (the standee designs print it at about 65 to 80 mm). Also a sheet of unassigned codes.
 - Codes are 6 characters from an alphabet without 0, O, 1, I, L. Never reuse a retired code.
 
 **Security**
@@ -225,7 +229,7 @@ Vertical slices. Each ends with something clickable and a check.
 3. **Playground.** Pickers, shop-type switcher, URL state, WhatsApp button. Done when a copied URL reopens the same look.
 4. **Shops and editor.** List with filters and bulk actions; editor tabs; draft and publish; live preview. Done when you create a shop, change its look, publish, and `/s/slug` shows it.
 5. **QR and redirects.** Code generation, assign and reassign, `/q/code`, `/r/...`, logging, unassigned page. Done when a test scan is logged and lands on the shop.
-6. **Print files.** A5 PDF with bleed, 4x6 card, unassigned sheet. Done when a test print scans from 1 m.
+6. **Standee designer and print files.** Standee tab, three designs, live preview, PDF and PNG downloads, unassigned sheet (section 11). Done when a test print scans from 1 m.
 7. **Bot filtering and rollups.** Checks from section 7, nightly job. Done when a curl with a bot user agent is flagged and a phone scan is counted.
 8. **Overview, Reports, Onboarding** with real numbers.
 9. **Billing and Settings.** Plans, renewals, expiry behavior, team accounts, toggles.
@@ -267,4 +271,24 @@ Design source: `docs/design/LandingV2.dc.html`. Copy its layout, spacing, colors
 - All WhatsApp links use the number from settings; the playground button includes the chosen theme, layout and font in the message.
 - Accessibility: one `h1`, real buttons and links, visible focus, 44 px targets, `prefers-reduced-motion` turns off the nav animation and hover lifts.
 - Performance: hero and fonts load first; the five gallery phones and the playground preview render on the server; no layout shift when fonts load.
-- Placeholders to replace before launch: city, WhatsApp number, legal pages.
+- Placeholders to replace before launch: support email, city, WhatsApp number, legal pages. The brand name (Qlosk) and logo are settled; see section 11.
+
+## 11. Brand and standee
+
+**Brand**
+
+- Name: Qlosk. Domain: qlosk.com. Replace every placeholder brand name with Qlosk (landing, admin sidebar and login, shop page footer "Powered by Qlosk", standee).
+- Mark: a Q built from a QR finder square. A rounded square frame (stroke 6 on a 48 grid, corner radius 9) with a centre dot (8 x 8, radius 2) and a small square tail at the bottom right (12 x 12, radius 3.2). Default use is the near-black mark on a butter tile (`#FBF1B5`, radius 14); on teal or dark, a butter mark. Reference: `docs/design/Logo.dc.html`; vector file: `docs/design/qlosk-icon.svg` (use it as `app/icon.svg`).
+- Wordmark: "Qlosk" in Fraunces Bold, letter spacing -0.025em, beside the mark.
+- Colours: butter `#FBF1B5`, ink `#0D1F1B`, teal `#0F6B5C`, cream `#FBF8F2`. Clear space around the mark is at least half the tile. Do not recolour outside these, stretch, or use another font for the wordmark.
+
+**Standee**
+
+- Three designs: **arch** (rounded panel with logo, name, QR and an icon row), **ticket** (coupon card with a tear line, QR beside a list of what it opens) and **badge** (QR inside a circle with words around its edge). Reference: `docs/design/Standee.dc.html` (props: design, theme, font, shopname, tagline, headline).
+- Light themes only: blush, marigold, daylight, graphite, or "match shop page" (nightfall maps to daylight). The font follows the shop page font.
+- Content on every design: shop logo (or initials), name, tagline, headline, QR with the Qlosk mark in the middle, a short hint ("Point your phone camera at the code. No app needed."), icons for the shop's enabled buttons, and the credit "Powered by [Qlosk mark] Qlosk · qlosk.com".
+- Default headlines: arch "Everything about us, one scan", ticket "Your shortcut to everything here", badge "One scan. Everything here." The owner can edit the headline (under 40 characters). Review wording never offers rewards or asks only happy customers to review.
+- Sizes: A5 (148 x 210 mm) and A4 (210 x 297 mm), same proportions, 3 mm bleed on the PDF. PNG export is 1080 px wide for WhatsApp.
+- QR centre: clear the middle 9 x 9 modules, place the Q mark (near-black, no tile) with about 1.5 modules of white margin. The three corner squares stay dark. Tested: scans at full size and at about 45% size with this layout. Pale yellow marks or corner squares do not scan; do not use them.
+- The editor's Standee tab saves the choices on the shop (`standee_design`, `standee_theme`, `standee_headline`, `standee_size`) and logs every generated file in `print_files`.
+- Before ordering stickers in bulk, print one copy of each design and scan it with two or three phones from about 1 m.
