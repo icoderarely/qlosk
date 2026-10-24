@@ -104,6 +104,8 @@ export type PricingCard = {
   /** "1 month", "6 months", "1 year". */
   title: string;
   price: string;
+  /** The price in paise, for structured data. */
+  pricePaise: number;
   /** "/ month", "/ 6 months", "/ year". */
   per: string;
   /** What one month costs on this plan, in whole rupees: "₹167". */
@@ -149,6 +151,7 @@ export function pricingCard(row: PricingRow): PricingCard | null {
     months: row.months,
     title: planTitle(row.months),
     price: formatRupees(row.pricePaise),
+    pricePaise: row.pricePaise,
     per: perLabel(row.months),
     perMonth: formatRupees(perMonthPaise),
     perMonthPaise,

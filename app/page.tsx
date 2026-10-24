@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { BRAND_NAME, SITE_DESCRIPTION } from "@/lib/brand";
+import { BRAND_NAME, SITE_DESCRIPTION, SITE_URL, SUPPORT_EMAIL } from "@/lib/brand";
 import { loadLandingData } from "@/lib/landing-data";
 import { ClosingCta } from "@/components/landing/closing-cta";
 import { Faq } from "@/components/landing/faq";
+import { FAQS } from "@/components/landing/faq-data";
 import { Features } from "@/components/landing/features";
 import { LANDING_FONTS } from "@/components/landing/fonts";
 import { Footer } from "@/components/landing/footer";
@@ -12,7 +13,9 @@ import { Looks } from "@/components/landing/looks";
 import { MadeFor } from "@/components/landing/made-for";
 import { Navbar } from "@/components/landing/navbar";
 import { waFrom } from "@/components/landing/parts";
+import { JsonLd } from "@/components/seo/json-ld";
 import { cheapestMonth } from "@/services/plans";
+import { landingJsonLd } from "@/services/structured-data";
 import { Pricing } from "@/components/landing/pricing";
 import { Problem } from "@/components/landing/problem";
 import { Report } from "@/components/landing/report";
@@ -40,6 +43,13 @@ export default async function Home() {
 
   return (
     <div className={`l-root ${LANDING_FONTS}`}>
+      <JsonLd
+        data={landingJsonLd(
+          { name: BRAND_NAME, url: SITE_URL, description: SITE_DESCRIPTION, email: SUPPORT_EMAIL, whatsappNumber: data.whatsappNumber },
+          data.plans,
+          FAQS,
+        )}
+      />
       <Navbar whatsappHref={wa("navbar")} menuWhatsappHref={wa("menu")} />
       <main>
         <Hero whatsappHref={wa("hero")} fromPrice={cheapest?.perMonth ?? null} />

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { WHATSAPP_NUMBER } from "@/lib/brand";
+import { BRAND_NAME, SITE_DESCRIPTION, SITE_URL, SUPPORT_EMAIL, WHATSAPP_NUMBER } from "@/lib/brand";
 import { Suspense } from "react";
+import { JsonLd } from "@/components/seo/json-ld";
+import { playgroundJsonLd } from "@/services/structured-data";
 import { PlaygroundSection } from "@/components/playground/playground-section";
 import { parseLook } from "@/components/playground/look-url";
 import { loadSettings } from "@/lib/load-settings";
@@ -24,6 +26,13 @@ export const metadata: Metadata = {
 export default function PlaygroundPage({ searchParams }: PageProps<"/playground">) {
   return (
     <main className="min-h-dvh bg-neutral-50">
+      <JsonLd
+        data={playgroundJsonLd(
+          { name: BRAND_NAME, url: SITE_URL, description: SITE_DESCRIPTION, email: SUPPORT_EMAIL, whatsappNumber: WHATSAPP_NUMBER },
+          TITLE,
+          DESCRIPTION,
+        )}
+      />
       <Suspense fallback={<p className="p-6 text-neutral-700">Loading…</p>}>
         <Playground searchParams={searchParams} />
       </Suspense>
