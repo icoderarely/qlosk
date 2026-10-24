@@ -4,57 +4,60 @@ import { normalizeChoices } from "@/services/standee";
 
 const SCAN_WINDOW_DAYS = 30;
 
+/** One query for the shop and everything the page and editor need; by id or by slug. */
+export async function loadShop(db: PrismaClient, where: { id: string } | { slug: string }): Promise<StoredShop | null> {
+  const shop = await db.shop.findUnique({
+    where,
+    include: {
+      plan: true,
+      pages: true,
+      links: { orderBy: { position: "asc" } },
+      qrCodes: { where: { status: "assigned" }, take: 1 },
+    },
+  });
+  if (!shop) return null;
+  const draft = shop.pages.find((p) => p.state === "draft");
+  const published = shop.pages.find((p) => p.state === "published");
+  const stored: StoredShop = {
+    id: shop.id,
+    slug: shop.slug,
+    name: shop.name,
+    tagline: shop.tagline,
+    shopType: shop.shopType,
+    area: shop.area,
+    city: shop.city,
+    address: shop.address,
+    phone: shop.phone,
+    whatsapp: shop.whatsapp,
+    waMessage: shop.waMessage,
+    logoUrl: shop.logoUrl,
+    coverUrl: shop.coverUrl,
+    status: shop.status,
+    ownerName: shop.ownerName,
+    ownerWhatsapp: shop.ownerWhatsapp,
+    notes: shop.notes,
+    code: shop.qrCodes[0]?.code ?? null,
+    planName: shop.plan?.name ?? null,
+    planMonths: shop.plan?.months ?? null,
+    planStartedAt: shop.planStartedAt,
+    planEndsAt: shop.planEndsAt,
+    draft: draft?.config ?? null,
+    published: published?.config ?? null,
+    publishedAt: published?.publishedAt ?? null,
+    standee: normalizeChoices({
+      design: shop.standeeDesign,
+      theme: shop.standeeTheme,
+      headline: shop.standeeHeadline,
+      size: shop.standeeSize,
+    }),
+    linkRows: shop.links.map((l) => ({ id: l.id, type: l.type, label: l.label, target: l.target, enabled: l.enabled })),
+  };
+  return stored;
+}
+
 export function createEditorStore(db: PrismaClient): EditorStore {
   return {
-    async find(id) {
-      const shop = await db.shop.findUnique({
-        where: { id },
-        include: {
-          plan: true,
-          pages: true,
-          links: { orderBy: { position: "asc" } },
-          qrCodes: { where: { status: "assigned" }, take: 1 },
-        },
-      });
-      if (!shop) return null;
-      const draft = shop.pages.find((p) => p.state === "draft");
-      const published = shop.pages.find((p) => p.state === "published");
-      const stored: StoredShop = {
-        id: shop.id,
-        slug: shop.slug,
-        name: shop.name,
-        tagline: shop.tagline,
-        shopType: shop.shopType,
-        area: shop.area,
-        city: shop.city,
-        address: shop.address,
-        phone: shop.phone,
-        whatsapp: shop.whatsapp,
-        waMessage: shop.waMessage,
-        logoUrl: shop.logoUrl,
-        coverUrl: shop.coverUrl,
-        status: shop.status,
-        ownerName: shop.ownerName,
-        ownerWhatsapp: shop.ownerWhatsapp,
-        notes: shop.notes,
-        code: shop.qrCodes[0]?.code ?? null,
-        planName: shop.plan?.name ?? null,
-        planMonths: shop.plan?.months ?? null,
-        planStartedAt: shop.planStartedAt,
-        planEndsAt: shop.planEndsAt,
-        draft: draft?.config ?? null,
-        published: published?.config ?? null,
-        publishedAt: published?.publishedAt ?? null,
-        standee: normalizeChoices({
-          design: shop.standeeDesign,
-          theme: shop.standeeTheme,
-          headline: shop.standeeHeadline,
-          size: shop.standeeSize,
-        }),
-        linkRows: shop.links.map((l) => ({ id: l.id, type: l.type, label: l.label, target: l.target, enabled: l.enabled })),
-      };
-      return stored;
-    },
+    find: (id) => loadShop(db, { id }),
 
     async slugAvailable(slug, exceptShopId) {
       const [shop, old] = await Promise.all([

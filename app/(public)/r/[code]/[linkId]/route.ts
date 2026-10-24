@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { createTrackingStore } from "@/lib/tracking-store";
 import { trackingKeys } from "@/lib/tracking-env";
@@ -25,6 +25,9 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/r/[code]/[li
       skipLog: isIgnoredRequest(request.method, request.headers),
     },
     keys,
+    new Date(),
+    // Logging runs after the redirect is sent, so the visitor does not wait for it.
+    (work) => after(work),
   );
   const headers = { "cache-control": "no-store", "x-robots-tag": "noindex" };
 

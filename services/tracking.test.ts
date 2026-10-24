@@ -129,6 +129,18 @@ describe("handleScan", () => {
     assert.deepEqual([scans[0].isBot, scans[0].botReason], [false, null]);
   });
 
+  it("with defer, answers first and logs the same scan afterwards", async () => {
+    const { store, scans } = fake({ status: "assigned", shopId: "s1", liveSlug: "velvet" });
+    const queued: (() => Promise<void>)[] = [];
+    const out = await handleScan(store, "7kx2m9", visitor, "salt", NOW, (work) => queued.push(work));
+    assert.deepEqual(out, { kind: "redirect", slug: "velvet" });
+    assert.equal(scans.length, 0);
+    assert.equal(queued.length, 1);
+    await queued[0]();
+    assert.equal(scans.length, 1);
+    assert.deepEqual([scans[0].isBot, scans[0].botReason], [false, null]);
+  });
+
   it("never stores a raw IP, and stores no hash when there is no salt", async () => {
     const { store, scans } = fake({ status: "assigned", shopId: "s1", liveSlug: "velvet" });
     await handleScan(store, "7KX2M9", visitor, null, NOW);

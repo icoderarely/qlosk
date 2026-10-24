@@ -33,6 +33,8 @@ export default function Page({ params }: PageProps<"/s/[slug]">) {
 }
 
 async function Shop({ params }: { params: PageProps<"/s/[slug]">["params"] }) {
+  // Settings (for the desktop QR) load alongside the shop, not after it.
+  const settings = loadSettings().catch(() => null);
   const result = await lookup((await params).slug);
   if (result.kind === "redirect") permanentRedirect(`/s/${result.slug}`);
   if (result.kind === "notfound") notFound();
@@ -40,7 +42,7 @@ async function Shop({ params }: { params: PageProps<"/s/[slug]">["params"] }) {
   const { tokenKey } = trackingKeys();
   const now = new Date();
   const props = withTapLinks(result.props, result.code, (code, linkId) => signTapToken(tokenKey, code, linkId, now));
-  const qr = await shopQr(result.code);
+  const qr = await shopQr(result.code, settings);
   return (
     <DesktopFrame qr={qr}>
       <ShopPage {...props} />
@@ -50,10 +52,12 @@ async function Shop({ params }: { params: PageProps<"/s/[slug]">["params"] }) {
 
 // The shop's printed QR, drawn for the corner of the desktop view. Skipped when
 // the shop has no code or no QR address is set; the page works without it.
-async function shopQr(code: string | null) {
+async function shopQr(code: string | null, settings: Promise<Awaited<ReturnType<typeof loadSettings>> | null>) {
   if (!code) return null;
   try {
-    const base = qrBaseUrl((await loadSettings()).domain.qrBase);
+    const loaded = await settings;
+    if (!loaded) return null;
+    const base = qrBaseUrl(loaded.domain.qrBase);
     return { svg: qrSvg(qrTarget(base, code)), label: "QR code to open this page on your phone" };
   } catch {
     return null;

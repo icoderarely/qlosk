@@ -1,4 +1,5 @@
 {
+  "regions": ["sin1"],
   "crons": [
     { "path": "/api/cron/daily-stats", "schedule": "30 20 * * *" },
     { "path": "/api/cron/plan-expiry", "schedule": "0 21 * * *" }

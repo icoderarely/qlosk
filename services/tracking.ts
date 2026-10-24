@@ -214,23 +214,32 @@ export async function handleScan(
   visitor: Visitor,
   salt: string | null,
   now: Date = new Date(),
+  defer?: Defer,
 ): Promise<ScanOutcome> {
   const code = normalizeCode(rawCode);
   if (!isValidCode(code)) return { kind: "inactive" };
   const found = await store.findCode(code);
   if (!found) return { kind: "inactive" };
   if (!visitor.skipLog) {
-    try {
-      const ipHash = visitorHash(visitor, salt, now);
-      const shopId = found.status === "assigned" ? found.shopId : null;
-      const verdict = await flagScan(store, code, shopId, ipHash, visitor.userAgent, now);
-      await store.recordScan({ code, shopId, ipHash, uaFamily: uaFamily(visitor.userAgent), ...verdict });
-    } catch (error) {
-      console.error("scan not logged", error);
-    }
+    const log = async () => {
+      try {
+        const ipHash = visitorHash(visitor, salt, now);
+        const shopId = found.status === "assigned" ? found.shopId : null;
+        const verdict = await flagScan(store, code, shopId, ipHash, visitor.userAgent, now);
+        await store.recordScan({ code, shopId, ipHash, uaFamily: uaFamily(visitor.userAgent), ...verdict });
+      } catch (error) {
+        console.error("scan not logged", error);
+      }
+    };
+    // With `defer` the visitor is redirected first and the checks and the write finish afterwards.
+    if (defer) defer(log);
+    else await log();
   }
   return found.liveSlug ? { kind: "redirect", slug: found.liveSlug } : { kind: "inactive" };
 }
+
+/** Runs work after the response is sent (Next's `after`); the service stays free of Next imports. */
+export type Defer = (work: () => Promise<void>) => void;
 
 export type TapOutcome =
   | { kind: "redirect"; target: string }
@@ -246,6 +255,7 @@ export async function handleTap(
   visitor: Visitor,
   keys: { tokenKey: string; salt: string | null },
   now: Date = new Date(),
+  defer?: Defer,
 ): Promise<TapOutcome> {
   const code = normalizeCode(rawCode);
   if (!isValidCode(code) || !/^[0-9a-f-]{36}$/i.test(linkId)) return { kind: "notfound" };
@@ -257,17 +267,21 @@ export async function handleTap(
   if (!safe.ok || !safe.value) return { kind: "notfound" };
 
   if (!visitor.skipLog) {
-    try {
-      const ipHash = visitorHash(visitor, keys.salt, now);
-      const filters = await store.filterSettings();
-      let verdict: Flag = OK;
-      if (filters.crawlers && isCrawler(visitor.userAgent)) verdict = flag("crawler");
-      else if (filters.token && !verifyTapToken(keys.tokenKey, token, code, linkId, now)) verdict = flag("no_token");
-      else verdict = await rateAndRepeat(store, filters, "tap", link.linkId, ipHash, now);
-      await store.recordTap({ shopId: link.shopId, linkId: link.linkId, ipHash, ...verdict });
-    } catch (error) {
-      console.error("tap not logged", error);
-    }
+    const log = async () => {
+      try {
+        const ipHash = visitorHash(visitor, keys.salt, now);
+        const filters = await store.filterSettings();
+        let verdict: Flag = OK;
+        if (filters.crawlers && isCrawler(visitor.userAgent)) verdict = flag("crawler");
+        else if (filters.token && !verifyTapToken(keys.tokenKey, token, code, linkId, now)) verdict = flag("no_token");
+        else verdict = await rateAndRepeat(store, filters, "tap", link.linkId, ipHash, now);
+        await store.recordTap({ shopId: link.shopId, linkId: link.linkId, ipHash, ...verdict });
+      } catch (error) {
+        console.error("tap not logged", error);
+      }
+    };
+    if (defer) defer(log);
+    else await log();
   }
   return { kind: "redirect", target: safe.value };
 }

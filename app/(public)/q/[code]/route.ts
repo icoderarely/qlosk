@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { createTrackingStore } from "@/lib/tracking-store";
 import { trackingKeys } from "@/lib/tracking-env";
@@ -18,6 +18,9 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/q/[code]">) 
       skipLog: isIgnoredRequest(request.method, request.headers),
     },
     trackingKeys().salt,
+    new Date(),
+    // Logging runs after the redirect is sent, so the visitor does not wait for it.
+    (work) => after(work),
   );
   const to = outcome.kind === "redirect" ? `/s/${outcome.slug}` : "/not-activated";
   const response = NextResponse.redirect(new URL(to, request.url), 302);
