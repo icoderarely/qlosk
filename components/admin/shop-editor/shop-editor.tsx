@@ -24,8 +24,9 @@ import { QrPlanTab, type QrChoices } from "./qr-plan-tab";
 import type { EditorState, SetEditor } from "./state";
 import { StandeePreviewCard, StandeeTab, type StandeeQr } from "./standee-tab";
 
-export type TabId = "details" | "buttons" | "look" | "offers" | "standee" | "qrplan" | "activity";
-export const TAB_IDS: TabId[] = ["details", "buttons", "look", "offers", "standee", "qrplan", "activity"];
+import type { TabId } from "./tabs";
+
+export type { TabId };
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "details", label: "Details" },

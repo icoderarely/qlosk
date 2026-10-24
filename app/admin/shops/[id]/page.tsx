@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ShopEditor, TAB_IDS, type TabId } from "@/components/admin/shop-editor/shop-editor";
+import { ShopEditor } from "@/components/admin/shop-editor/shop-editor";
+import { TAB_IDS, type TabId } from "@/components/admin/shop-editor/tabs";
 import type { StandeeQr } from "@/components/admin/shop-editor/standee-tab";
 import { getDb } from "@/lib/db";
 import { createBillingStore } from "@/lib/billing-store";
