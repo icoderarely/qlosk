@@ -2,15 +2,18 @@ import { Chip } from "../chip";
 import { PhoneFrame } from "../phone-frame";
 import { ShopPage } from "../../shop-page/shop-page";
 import type { ShopLink } from "../../shop-page/types";
-import { LINK_DEFAULTS } from "@/services/links";
+import { LINK_DEFAULTS, resolveLinks } from "@/services/links";
 import type { EditorState } from "./state";
 
 // The real ShopPage, fed from the editor's local state, in the phone frame.
 export function Preview({ state }: { state: EditorState }) {
   const { details, links, look, offer, banner, wifi } = state;
 
-  const pageLinks: ShopLink[] = links
-    .filter((l) => l.enabled)
+  // Same rules as the live page: a button with nothing to open is left off, and
+  // Wi-Fi shows only once it has a network.
+  const hasWifi = wifi.enabled && wifi.network.trim() !== "";
+  const pageLinks: ShopLink[] = resolveLinks(links, details)
+    .links.filter((l) => l.enabled && (l.type === "wifi" ? hasWifi : l.target))
     .map((l) => ({
       id: l.id,
       type: l.type,
@@ -52,7 +55,7 @@ export function Preview({ state }: { state: EditorState }) {
                 }
               : null
           }
-          wifi={wifi.enabled ? { network: wifi.network, password: wifi.password } : null}
+          wifi={hasWifi ? { network: wifi.network, password: wifi.password } : null}
           banner={banner.enabled && banner.message.trim() ? { text: banner.message } : null}
         />
       </PhoneFrame>
