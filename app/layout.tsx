@@ -8,7 +8,6 @@ export const metadata: Metadata = {
   title: { default: BRAND_NAME, template: `%s | ${BRAND_NAME}` },
   description: SITE_DESCRIPTION,
   applicationName: BRAND_NAME,
-  icons: { icon: "/icon.svg" },
   openGraph: { siteName: BRAND_NAME, locale: "en_IN", type: "website" },
   twitter: { card: "summary_large_image" },
 };
