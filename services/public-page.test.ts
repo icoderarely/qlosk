@@ -230,3 +230,18 @@ describe("expired plan", () => {
     assert.ok(tapped.links.every((l) => l.href.startsWith("/r/ABC234/")));
   });
 });
+
+describe("pages whose config holds only the look (seeded or older)", () => {
+  const lookOnly = { theme: "blush", layout: "list", font: "editorial" };
+
+  it("shows the shop's saved button rows", () => {
+    const linkRows = [{ id: "00000000-0000-4000-8000-000000000009", type: "call" as const, label: "Call", target: "tel:+919800000001", enabled: true }];
+    const props = toPageProps(shop({ published: lookOnly, draft: lookOnly, linkRows }));
+    assert.deepEqual(props.links.map((l) => l.href), ["tel:+919800000001"]);
+  });
+
+  it("points Call and WhatsApp at the shop's own numbers when there are no rows", () => {
+    const props = toPageProps(shop({ published: lookOnly, draft: lookOnly, phone: "9800000002", whatsapp: "9800000003" }));
+    assert.deepEqual(props.links.map((l) => l.type), ["whatsapp", "call"]);
+  });
+});

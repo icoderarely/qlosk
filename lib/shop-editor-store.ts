@@ -11,6 +11,7 @@ export function createEditorStore(db: PrismaClient): EditorStore {
         include: {
           plan: true,
           pages: true,
+          links: { orderBy: { position: "asc" } },
           qrCodes: { where: { status: "assigned" }, take: 1 },
         },
       });
@@ -43,6 +44,7 @@ export function createEditorStore(db: PrismaClient): EditorStore {
         draft: draft?.config ?? null,
         published: published?.config ?? null,
         publishedAt: published?.publishedAt ?? null,
+        linkRows: shop.links.map((l) => ({ id: l.id, type: l.type, label: l.label, target: l.target, enabled: l.enabled })),
       };
       return stored;
     },

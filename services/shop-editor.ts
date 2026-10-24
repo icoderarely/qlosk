@@ -176,6 +176,8 @@ export type StoredShop = {
   draft: unknown;
   published: unknown;
   publishedAt: Date | null;
+  /** The shop's saved button rows, in order. Used when a page config has no links. */
+  linkRows?: LinkDraft[];
 };
 
 export type ShopColumns = {
@@ -271,6 +273,18 @@ export function toConfig(v: EditorValues, links: LinkDraft[]): Config {
   };
 }
 
+// Seeded or older pages hold no links in their config. Use the shop's saved
+// button rows, or else the starter buttons with Call and WhatsApp pointed at the
+// shop's own numbers, so the page is not left with nothing to tap.
+function fallbackLinks(shop: StoredShop, starter: LinkDraft[]): LinkDraft[] {
+  if (shop.linkRows && shop.linkRows.length > 0) return shop.linkRows;
+  return resolveLinks(starter, {
+    phone: shop.phone ?? "",
+    whatsapp: shop.whatsapp ?? "",
+    waMessage: shop.waMessage ?? "",
+  }).links;
+}
+
 // Reads a stored page back into editor values. Seeded or older rows may hold
 // only theme, layout and font, so every part falls back to the shop's own
 // columns or a default instead of failing.
@@ -294,7 +308,7 @@ export function readValues(shop: StoredShop): EditorValues {
         const r = shape.links.element.safeParse(l);
         return r.success ? [r.data] : [];
       })
-    : base.links;
+    : fallbackLinks(shop, base.links);
 
   return {
     details: {
