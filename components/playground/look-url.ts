@@ -103,7 +103,9 @@ export function whatsappLink(
   number: string,
 ): string {
   const who = look.name.trim() ? ` My shop is ${look.name.trim()} (${labels.type}).` : ` My shop is a ${labels.type.toLowerCase()}.`;
-  const text = `Hi, I would like a page like this for my shop.${who} Look: ${labels.theme} theme, ${labels.layout} layout, ${labels.font} font.`;
-  const digits = number.replace(/\D/g, "");
+  const text = `Hi, I tried your playground and I would like a page like this for my shop.${who} Look: ${labels.theme} theme, ${labels.layout} layout, ${labels.font} font.`;
+  let digits = number.replace(/\D/g, "");
+  // wa.me needs the country code; a plain 10-digit Indian mobile gets 91.
+  if (digits.length === 10) digits = `91${digits}`;
   return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
 }

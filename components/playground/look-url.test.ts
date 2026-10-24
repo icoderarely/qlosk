@@ -47,4 +47,9 @@ describe("playground look URL", () => {
     assert.ok(url.startsWith("https://wa.me/919876543210?text="));
     assert.ok(decodeURIComponent(url).includes("Blush theme, List layout, Clean font"));
   });
+
+  it("adds 91 to a plain 10-digit number", () => {
+    const url = whatsappLink(DEFAULT_LOOK, { theme: "A", layout: "B", font: "C", type: "Salon" }, "9334954096");
+    assert.ok(url.startsWith("https://wa.me/919334954096?text="));
+  });
 });
