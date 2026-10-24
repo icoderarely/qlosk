@@ -412,7 +412,7 @@ function Phone({ children }: { children: React.ReactNode }) {
           }}
         >
           <div
-            className="overflow-y-auto overflow-x-hidden overscroll-contain rounded-[34px]"
+            className="overflow-y-auto overflow-x-hidden overscroll-contain rounded-[34px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{ width: SCREEN_W, height: SCREEN_H, "--page-min-h": `${SCREEN_H}px` } as React.CSSProperties}
           >
             {children}
