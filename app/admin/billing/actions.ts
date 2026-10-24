@@ -5,7 +5,7 @@ import { z } from "zod";
 import { createBillingStore } from "@/lib/billing-store";
 import { getDb } from "@/lib/db";
 import { requireRole } from "@/lib/require-role";
-import { markPaid, savePrices } from "@/services/billing";
+import { markPaid, savePrices, undoPaid } from "@/services/billing";
 
 // Thin on purpose: role check first, then the service. A viewer's call throws
 // in requireRole before anything is read or written.
@@ -23,6 +23,15 @@ export async function markShopPaid(shopId: unknown): Promise<BillingActionResult
   const id = z.uuid().safeParse(shopId);
   if (!id.success) return { ok: false, error: "Choose a shop." };
   const result = await markPaid(createBillingStore(getDb()), id.data, user.email);
+  if (result.ok) refresh();
+  return result;
+}
+
+export async function undoShopPaid(shopId: unknown): Promise<BillingActionResult> {
+  const user = await requireRole("admin");
+  const id = z.uuid().safeParse(shopId);
+  if (!id.success) return { ok: false, error: "Choose a shop." };
+  const result = await undoPaid(createBillingStore(getDb()), id.data, user.email);
   if (result.ok) refresh();
   return result;
 }

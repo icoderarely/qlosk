@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@/generated/prisma/client";
-import type { BillingShop, BillingStore } from "@/services/billing";
+import { Prisma } from "@/generated/prisma/client";
+import type { BillingShop, BillingStore, PlanSnapshot } from "@/services/billing";
 
 const select = {
   id: true,
@@ -29,6 +30,12 @@ type Row = {
 
 const toShop = ({ pages, ...s }: Row): BillingShop => ({ ...s, hasPublished: pages.length > 0 });
 
+type Stored = { planStartedAt: string | null; planEndsAt: string | null; status: PlanSnapshot["status"] };
+type Payload = { kind: "renewal"; before: Stored; endsAfter: string };
+
+const iso = (d: Date | null) => (d ? d.toISOString() : null);
+const date = (s: string | null) => (s ? new Date(s) : null);
+
 export function createBillingStore(db: PrismaClient): BillingStore {
   return {
     async plans() {
@@ -45,9 +52,41 @@ export function createBillingStore(db: PrismaClient): BillingStore {
       return row ? toShop(row) : null;
     },
 
-    async renew({ shopId, planStartedAt, planEndsAt, status, what, userEmail }) {
+    async renew({ shopId, planStartedAt, planEndsAt, status, what, userEmail, before }) {
+      const undoPayload: Payload = {
+        kind: "renewal",
+        before: { planStartedAt: iso(before.planStartedAt), planEndsAt: iso(before.planEndsAt), status: before.status },
+        endsAfter: planEndsAt.toISOString(),
+      };
       await db.$transaction([
         db.shop.update({ where: { id: shopId }, data: { planStartedAt, planEndsAt, status } }),
+        db.changeLog.create({ data: { shopId, userEmail, what, undoPayload } }),
+      ]);
+    },
+
+    async lastRenewal(shopId) {
+      const row = await db.changeLog.findFirst({
+        where: { shopId, undoPayload: { path: ["kind"], equals: "renewal" } },
+        orderBy: { at: "desc" },
+      });
+      if (!row) return null;
+      const p = row.undoPayload as Payload;
+      return {
+        logId: row.id,
+        at: row.at,
+        before: { planStartedAt: date(p.before.planStartedAt), planEndsAt: date(p.before.planEndsAt), status: p.before.status },
+        endsAfter: new Date(p.endsAfter),
+      };
+    },
+
+    async undoRenewal({ shopId, logId, restore, what, userEmail }) {
+      await db.$transaction([
+        db.shop.update({
+          where: { id: shopId },
+          data: { planStartedAt: restore.planStartedAt, planEndsAt: restore.planEndsAt, status: restore.status },
+        }),
+        // A spent undo is cleared, so the next Undo reaches the renewal before it.
+        db.changeLog.update({ where: { id: logId }, data: { undoPayload: Prisma.DbNull } }),
         db.changeLog.create({ data: { shopId, userEmail, what } }),
       ]);
     },

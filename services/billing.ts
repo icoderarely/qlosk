@@ -32,6 +32,13 @@ export type BillingShop = {
   ownerWhatsapp: string | null;
 };
 
+export type PlanSnapshot = { planStartedAt: Date | null; planEndsAt: Date | null; status: DbShopStatus };
+
+export type LastRenewal = { logId: string; at: Date; before: PlanSnapshot; endsAfter: Date };
+
+/** How long Undo stays available after a Mark as paid. */
+export const UNDO_WINDOW_HOURS = 24;
+
 export type BillingStore = {
   plans(): Promise<PlanRow[]>;
   /** Shops that are not archived. */
@@ -44,7 +51,13 @@ export type BillingStore = {
     status: DbShopStatus;
     what: string;
     userEmail: string;
+    /** The plan dates and status before this renewal, kept in the change log so it can be undone. */
+    before: PlanSnapshot;
   }): Promise<void>;
+  /** The newest renewal for the shop that has not been undone, or null. */
+  lastRenewal(shopId: string): Promise<LastRenewal | null>;
+  /** Restores the dates and status, retires the renewal's undo and writes one change_log row, in one transaction. */
+  undoRenewal(args: { shopId: string; logId: string; restore: PlanSnapshot; what: string; userEmail: string }): Promise<void>;
   /** Writes the new prices and one change_log row, in one transaction. */
   setPrices(args: { prices: { id: string; pricePaise: number }[]; what: string; userEmail: string }): Promise<void>;
 };
@@ -55,6 +68,8 @@ export type RenewalRow = {
   plan: string;
   date: string;
   payment: PaymentState;
+  /** The end date Mark as paid would set, for the confirm step. */
+  renewsTo: string;
   /** wa.me link with a reminder filled in, or null when no owner number is saved. */
   remindHref: string | null;
   /** tel: link, or null when there is no number. */
@@ -137,6 +152,10 @@ export async function getBilling(store: BillingStore, now: Date = new Date()): P
       plan: plan.name,
       date: s.planEndsAt ? formatPlanDate(s.planEndsAt, now) : "Not started",
       payment: state,
+      renewsTo: formatPlanDate(
+        renewalDates({ planStartedAt: s.planStartedAt, planEndsAt: s.planEndsAt, months: plan.months, now }).planEndsAt,
+        now,
+      ),
       remindHref: state === "paid" ? null : remind,
       callHref: telTarget(s.ownerWhatsapp ?? s.phone ?? ""),
       canMarkPaid: true,
@@ -178,10 +197,39 @@ export async function markPaid(
     shopId,
     ...dates,
     status,
+    before: { planStartedAt: shop.planStartedAt, planEndsAt: shop.planEndsAt, status: shop.status },
     what: `Marked as paid: ${plan.name} plan${price} runs until ${until}${status !== shop.status ? ". Page is fully live again" : ""}`,
     userEmail,
   });
   return { ok: true, message: `${shop.name} is paid up until ${until}.` };
+}
+
+/**
+ * Undo the latest Mark as paid. Only while the shop's end date is still the one
+ * that renewal set and it is under UNDO_WINDOW_HOURS old, so it cannot overwrite
+ * later changes. Role checks belong to the caller.
+ */
+export async function undoPaid(
+  store: BillingStore,
+  shopId: string,
+  userEmail: string,
+  now: Date = new Date(),
+): Promise<{ ok: true; message: string } | { ok: false; error: string }> {
+  const [shop, last] = await Promise.all([store.find(shopId), store.lastRenewal(shopId)]);
+  if (!shop) return { ok: false, error: "This shop no longer exists." };
+  const stale = !last || now.getTime() - last.at.getTime() > UNDO_WINDOW_HOURS * 3600_000;
+  if (stale || shop.planEndsAt?.getTime() !== last.endsAfter.getTime()) {
+    return { ok: false, error: `There is no recent payment to undo for ${shop.name}.` };
+  }
+  const was = last.before.planEndsAt ? `ends ${formatPlanDate(last.before.planEndsAt, now)}` : "has no plan dates";
+  await store.undoRenewal({
+    shopId,
+    logId: last.logId,
+    restore: last.before,
+    what: `Undid the last payment: plan ${was} again`,
+    userEmail,
+  });
+  return { ok: true, message: `${shop.name}: payment undone, plan ${was}.` };
 }
 
 /** Saves the plan prices from the form: { planId: "1,499" }. Only changed prices are written. */

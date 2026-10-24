@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { markShopPaid } from "@/app/admin/billing/actions";
+import { markShopPaid, undoShopPaid } from "@/app/admin/billing/actions";
 import { Button, buttonClass } from "./button";
 import { Card } from "./card";
 import { DataTable, Td, Th } from "./data-table";
@@ -10,15 +10,29 @@ import type { RenewalRow } from "@/services/billing";
 import { notify } from "./notify";
 
 // Mark as paid renews the plan, so it asks first: the first click turns the
-// button into "Confirm paid", a second click does it, Cancel backs out.
+// button into "Confirm paid", a second click does it, Cancel backs out. A shop
+// that is already Paid gets "Renew early" and the confirm names the new end date.
+// Right after a payment the row offers Undo until the next action; the server
+// re-checks that the payment is recent and nothing has changed since.
 export function RenewalsTable({ rows, canEdit }: { rows: RenewalRow[]; canEdit: boolean }) {
   const [pending, startTransition] = useTransition();
   const [confirming, setConfirming] = useState<string | null>(null);
+  const [undoable, setUndoable] = useState<string | null>(null);
 
   function pay(row: RenewalRow) {
     setConfirming(null);
+    setUndoable(null);
     startTransition(async () => {
       const result = await markShopPaid(row.shopId);
+      if (result.ok) setUndoable(row.shopId);
+      notify(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
+    });
+  }
+
+  function undo(row: RenewalRow) {
+    setUndoable(null);
+    startTransition(async () => {
+      const result = await undoShopPaid(row.shopId);
       notify(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
     });
   }
@@ -72,17 +86,36 @@ export function RenewalsTable({ rows, canEdit }: { rows: RenewalRow[]; canEdit: 
                   ) : null}
                   {canEdit && confirming === r.shopId ? (
                     <>
-                      <Button variant="primary" disabled={pending} onClick={() => pay(r)} aria-label={`Confirm ${r.shop} is paid`}>
-                        Confirm paid
+                      <Button
+                        variant="primary"
+                        disabled={pending}
+                        onClick={() => pay(r)}
+                        aria-label={`Confirm ${r.shop} is paid, plan runs to ${r.renewsTo}`}
+                      >
+                        {r.payment === "paid" ? `Extend to ${r.renewsTo}` : "Confirm paid"}
                       </Button>
                       <Button disabled={pending} onClick={() => setConfirming(null)}>
                         Cancel
                       </Button>
                     </>
                   ) : canEdit ? (
-                    <Button disabled={pending} onClick={() => setConfirming(r.shopId)} aria-label={`Mark ${r.shop} as paid`}>
-                      Mark as paid
-                    </Button>
+                    <>
+                      {undoable === r.shopId ? (
+                        <Button disabled={pending} onClick={() => undo(r)} aria-label={`Undo the payment for ${r.shop}`}>
+                          Undo
+                        </Button>
+                      ) : null}
+                      <Button
+                        disabled={pending}
+                        onClick={() => {
+                          setUndoable(null);
+                          setConfirming(r.shopId);
+                        }}
+                        aria-label={r.payment === "paid" ? `Renew ${r.shop} early` : `Mark ${r.shop} as paid`}
+                      >
+                        {r.payment === "paid" ? "Renew early" : "Mark as paid"}
+                      </Button>
+                    </>
                   ) : null}
                 </div>
               </Td>

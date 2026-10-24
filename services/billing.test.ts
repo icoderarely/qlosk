@@ -4,11 +4,14 @@ import {
   formatPlanDate,
   getBilling,
   markPaid,
+  undoPaid,
   paiseFromRupees,
   rupeesFromPaise,
   savePrices,
   type BillingShop,
   type BillingStore,
+  type LastRenewal,
+  type PlanSnapshot,
   type PlanRow,
 } from "./billing.ts";
 
@@ -36,7 +39,9 @@ const shop = (id: string, name: string, planId: string | null, endsInDays: numbe
 });
 
 function fake(shops: BillingShop[], plans: PlanRow[] = PLANS) {
-  const renewed: { shopId: string; planStartedAt: Date; planEndsAt: Date; status: string; what: string }[] = [];
+  const renewed: { shopId: string; planStartedAt: Date; planEndsAt: Date; status: string; what: string; before: PlanSnapshot }[] = [];
+  const undone: { restore: PlanSnapshot; what: string }[] = [];
+  let last: LastRenewal | null = null;
   const priced: { id: string; pricePaise: number }[][] = [];
   const logs: string[] = [];
   const store: BillingStore = {
@@ -51,13 +56,20 @@ function fake(shops: BillingShop[], plans: PlanRow[] = PLANS) {
     },
     async renew(args) {
       renewed.push(args);
+      last = { logId: "log1", at: NOW, before: args.before, endsAfter: args.planEndsAt };
+    },
+    async lastRenewal() {
+      return last;
+    },
+    async undoRenewal(args) {
+      undone.push({ restore: args.restore, what: args.what });
     },
     async setPrices(args) {
       priced.push(args.prices);
       logs.push(args.what);
     },
   };
-  return { store, renewed, priced, logs };
+  return { store, renewed, undone, priced, logs, setLast: (l: LastRenewal | null) => (last = l) };
 }
 
 describe("prices", () => {
@@ -199,5 +211,33 @@ describe("savePrices", () => {
     const same = await savePrices(f.store, { "p-month": "499" }, "me");
     assert.deepEqual(same, { ok: true, message: "No price changed." });
     assert.equal(f.priced.length, 0);
+  });
+});
+
+describe("undoPaid", () => {
+  it("restores the dates from before the payment", async () => {
+    const f = fake([shop("a", "Kaveri", "p-month", 5)]);
+    await markPaid(f.store, "a", "me", NOW);
+    // the fake shop is not mutated, so show it the way the store would after the renewal
+    const renewedEnd = f.renewed[0].planEndsAt;
+    const after = fake([shop("a", "Kaveri", "p-month", 5, { planEndsAt: renewedEnd })]);
+    after.setLast({ logId: "log1", at: NOW, before: f.renewed[0].before, endsAfter: renewedEnd });
+    const result = await undoPaid(after.store, "a", "me", NOW);
+    assert.equal(result.ok, true);
+    assert.equal(after.undone[0].restore.planEndsAt?.getTime(), days(5).getTime());
+  });
+
+  it("refuses when the end date has changed since", async () => {
+    const f = fake([shop("a", "Kaveri", "p-month", 5)]);
+    f.setLast({ logId: "log1", at: NOW, before: { planStartedAt: null, planEndsAt: null, status: "live" }, endsAfter: days(99) });
+    assert.equal((await undoPaid(f.store, "a", "me", NOW)).ok, false);
+    assert.equal(f.undone.length, 0);
+  });
+
+  it("refuses when the payment is more than a day old, or there is none", async () => {
+    const f = fake([shop("a", "Kaveri", "p-month", 5)]);
+    assert.equal((await undoPaid(f.store, "a", "me", NOW)).ok, false);
+    f.setLast({ logId: "log1", at: days(-2), before: { planStartedAt: null, planEndsAt: null, status: "live" }, endsAfter: days(5) });
+    assert.equal((await undoPaid(f.store, "a", "me", NOW)).ok, false);
   });
 });
