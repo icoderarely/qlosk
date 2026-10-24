@@ -33,7 +33,7 @@ type Sample = {
   layout: string;
   font: string;
   code: string | null;
-  plan: "Monthly" | "Yearly" | "5 years" | null;
+  plan: "Monthly" | "Yearly" | null;
   /** Days from today until the plan ends. Negative means already ended. */
   endsInDays: number | null;
   /** Scans per day over the last 30 days; null for no stats. */
@@ -43,7 +43,7 @@ type Sample = {
 const SHOPS: Sample[] = [
   { name: "Velvet Salon & Spa", slug: "velvet-salon", type: "Salon and spa", area: "Bandra West", city: "Mumbai", phone: "+919800000001", status: "live", theme: "blush", layout: "list", font: "editorial", code: "7KX2M9", plan: "Yearly", endsInDays: 140, scansPerDay: 40 },
   { name: "Kaveri Sweets", slug: "kaveri-sweets", type: "Sweet shop", area: "T Nagar", city: "Chennai", phone: "+919800000002", status: "live", theme: "marigold", layout: "tiles", font: "clean", code: "R4PD8T", plan: "Monthly", endsInDays: 5, scansPerDay: 29 },
-  { name: "Iron House Gym", slug: "iron-house", type: "Gym", area: "Koramangala", city: "Bengaluru", phone: "+919800000003", status: "live", theme: "nightfall", layout: "index", font: "clean", code: "M2HC6W", plan: "5 years", endsInDays: 1750, scansPerDay: 21 },
+  { name: "Iron House Gym", slug: "iron-house", type: "Gym", area: "Koramangala", city: "Bengaluru", phone: "+919800000003", status: "live", theme: "nightfall", layout: "index", font: "clean", code: "M2HC6W", plan: "Yearly", endsInDays: 330, scansPerDay: 21 },
   { name: "Dr. Mehta Dental", slug: "dr-mehta-dental", type: "Clinic", area: "Navrangpura", city: "Ahmedabad", phone: "+919800000004", status: "quiet", theme: "daylight", layout: "list", font: "clean", code: "H8WQ5Z", plan: "Yearly", endsInDays: 70, scansPerDay: 0 },
   { name: "Noor Boutique", slug: "noor-boutique", type: "Boutique", area: "Banjara Hills", city: "Hyderabad", phone: "+919800000005", status: "live", theme: "blush", layout: "cover", font: "rounded", code: "C3TY7K", plan: "Yearly", endsInDays: 118, scansPerDay: 10 },
   { name: "Bright Minds Classes", slug: "bright-minds", type: "Coaching", area: "Kothrud", city: "Pune", phone: "+919800000006", status: "live", theme: "daylight", layout: "tiles", font: "clean", code: "P6LD2N", plan: "Monthly", endsInDays: 12, scansPerDay: 7 },
@@ -59,7 +59,6 @@ const PLANS = [
   { name: "Monthly", months: 1, custom: false },
   { name: "Half yearly", months: 6, custom: false },
   { name: "Yearly", months: 12, custom: false },
-  { name: "5 years", months: 60, custom: true },
 ];
 
 const DAY = 86_400_000;

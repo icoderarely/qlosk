@@ -171,7 +171,7 @@ describe("planNote", () => {
     assert.equal(planNote({ ...base, planEndsAt: new Date("2027-03-14T06:00:00Z") }, now), "Renews 14 Mar");
   });
 
-  it("shows month and year for a five-year plan", () => {
+  it("shows month and year for a multi-year plan", () => {
     assert.equal(
       planNote({ ...base, planMonths: 60, planEndsAt: new Date("2031-08-10T06:00:00Z") }, now),
       "Ends Aug 2031",

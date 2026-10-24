@@ -24,7 +24,7 @@ const days = (n: number) => new Date(NOW.getTime() + n * 24 * 3600_000);
 const PLANS: PlanRow[] = [
   { id: "p-month", name: "Monthly", months: 1, pricePaise: 49900, isCustom: false },
   { id: "p-year", name: "Yearly", months: 12, pricePaise: 0, isCustom: false },
-  { id: "p-five", name: "5 years", months: 60, pricePaise: 0, isCustom: true },
+  { id: "p-custom", name: "17 months", months: 17, pricePaise: 0, isCustom: true },
 ];
 
 const shop = (id: string, name: string, planId: string | null, endsInDays: number | null, extra: Partial<BillingShop> = {}): BillingShop => ({
@@ -113,7 +113,7 @@ describe("getBilling", () => {
     shop("a", "Kaveri Sweets", "p-month", 5, { ownerWhatsapp: "98200 12345", ownerName: "Kaveri" }),
     shop("b", "Green Leaf", "p-month", -3, { ownerWhatsapp: "98200 54321" }),
     shop("c", "Noor Boutique", "p-year", 118),
-    shop("d", "Iron House", "p-five", 1750),
+    shop("d", "Iron House", "p-custom", 1750),
     shop("e", "No plan yet", null, null),
     shop("f", "Archived", "p-year", -100, { status: "archived" }),
   ];
@@ -196,9 +196,9 @@ describe("markPaid", () => {
   });
 
   it("starts the plan for a shop that never started", async () => {
-    const f = fake([shop("a", "New", "p-five", null)]);
+    const f = fake([shop("a", "New", "p-custom", null)]);
     await markPaid(f.store, "a", "me", NOW);
-    assert.equal(f.renewed[0].planEndsAt.toISOString().slice(0, 10), "2031-10-24");
+    assert.equal(f.renewed[0].planEndsAt.toISOString().slice(0, 10), "2028-03-24");
   });
 
   it("refuses a shop with no plan or no longer there", async () => {
@@ -212,7 +212,7 @@ describe("markPaid", () => {
 describe("savePrices", () => {
   it("writes only the prices that changed and logs them", async () => {
     const f = fake([]);
-    const result = await savePrices(f.store, { "p-month": "499", "p-year": "4,999", "p-five": "" }, "me@example.com");
+    const result = await savePrices(f.store, { "p-month": "499", "p-year": "4,999", "p-custom": "" }, "me@example.com");
     assert.deepEqual(result, { ok: true, message: "Prices saved." });
     assert.deepEqual(f.priced[0], [{ id: "p-year", pricePaise: 499900 }]);
     assert.equal(f.logs[0], "Plan prices changed: Yearly not set to ₹4,999");
@@ -303,10 +303,10 @@ describe("custom plans", () => {
   });
 
   it("shows a shop's custom plan in the form and counts custom shops together", async () => {
-    const f = fake([shop("a", "Iron", "p-five", 400)]);
+    const f = fake([shop("a", "Iron", "p-custom", 400)]);
     const data = await getShopPlan(f.store, "a", NOW);
-    assert.deepEqual(data?.custom, { months: 60, rupees: "" });
-    assert.equal(data?.options.some((o) => o.name === "5 years"), false);
+    assert.deepEqual(data?.custom, { months: 17, rupees: "" });
+    assert.equal(data?.options.some((o) => o.name === "17 months"), false);
     const billing = await getBilling(f.store, NOW);
     assert.deepEqual(billing.planCounts.at(-1), { plan: "Custom", shops: 1 });
   });
