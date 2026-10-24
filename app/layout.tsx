@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { BRAND_NAME } from "@/lib/brand";
+import { BRAND_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/brand";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: BRAND_NAME,
+  metadataBase: new URL(SITE_URL),
+  title: { default: BRAND_NAME, template: `%s | ${BRAND_NAME}` },
+  description: SITE_DESCRIPTION,
   applicationName: BRAND_NAME,
   icons: { icon: "/icon.svg" },
+  openGraph: { siteName: BRAND_NAME, locale: "en_IN", type: "website" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en">
+    <html lang="en-IN">
       <body suppressHydrationWarning>{children}
         <Script
           src="https://cloud.umami.is/script.js"

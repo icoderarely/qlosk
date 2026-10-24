@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BRAND_NAME } from "@/lib/brand";
+import { BRAND_NAME, SITE_DESCRIPTION } from "@/lib/brand";
 import { loadLandingData } from "@/lib/landing-data";
 import { ClosingCta } from "@/components/landing/closing-cta";
 import { Faq } from "@/components/landing/faq";
@@ -20,13 +20,14 @@ import { Trust } from "@/components/landing/trust";
 import { TryIt } from "@/components/landing/try-it";
 import "@/components/landing/landing.css";
 
-const DESCRIPTION =
-  "One QR code for your whole shop: Call, WhatsApp, Google review, Wi-Fi, Maps and your latest offer. We build the page, print the standee and send a monthly report.";
+const TITLE = `${BRAND_NAME}: one QR code for your whole shop`;
 
 export const metadata: Metadata = {
-  title: `${BRAND_NAME}: one QR for your whole shop`,
-  description: DESCRIPTION,
-  openGraph: { title: `${BRAND_NAME}: one QR for your whole shop`, description: DESCRIPTION, type: "website" },
+  title: { absolute: TITLE },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: { title: TITLE, description: SITE_DESCRIPTION, url: "/" },
+  twitter: { card: "summary_large_image", title: TITLE, description: SITE_DESCRIPTION },
 };
 
 // Server-rendered and cached for a minute: prices and settings come from the

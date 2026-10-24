@@ -6,9 +6,17 @@ import { parseLook } from "@/components/playground/look-url";
 import { loadSettings } from "@/lib/load-settings";
 import { playgroundOptions } from "@/lib/playground-options";
 
+const TITLE = "Try a look for your shop";
+const DESCRIPTION =
+  "Free playground: try every theme, layout and font on a sample shop page and see how your Qlosk QR page could look on a phone.";
+
+// The look lives in ?theme=…&layout=…; every variant canonicalises to the clean URL.
 export const metadata: Metadata = {
-  title: "Try a look for your shop",
-  description: "Try every theme, layout and font on a sample shop page.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/playground" },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: "/playground", images: ["/opengraph-image"] },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: ["/opengraph-image"] },
 };
 
 // Public, no login, nothing stored. The look comes from the URL and is
