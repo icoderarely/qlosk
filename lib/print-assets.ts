@@ -1,20 +1,30 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
+import { FACE_FILES, type FaceId } from "@/components/standee/faces";
 import type { PrintFonts } from "@/services/print";
 
-// Fonts live in assets/fonts (DM Sans and Noto Sans Devanagari, SIL OFL, licences
-// alongside). next.config.ts includes them in the print routes' bundle.
+// Fonts live in assets/fonts (Fraunces, Manrope, DM Sans, Nunito and Noto Sans
+// Devanagari, SIL OFL, licences alongside). next.config.ts includes them in the
+// print routes' bundle. The PDF wants the bytes; the PNG renderer wants paths.
 const dir = () => path.join(process.cwd(), "assets", "fonts");
 
 let fonts: Promise<PrintFonts> | null = null;
 export function loadPrintFonts(): Promise<PrintFonts> {
-  fonts ??= Promise.all(
-    ["DMSans-Regular", "DMSans-Bold", "NotoSansDevanagari-Regular", "NotoSansDevanagari-Bold"].map((n) =>
-      readFile(path.join(dir(), `${n}.woff`)),
-    ),
-  ).then(([regular, bold, indicRegular, indicBold]) => ({ regular, bold, indicRegular, indicBold }));
-  fonts.catch(() => (fonts = null));
+  if (fonts) return fonts;
+  const load = (async (): Promise<PrintFonts> => {
+    const ids = Object.keys(FACE_FILES) as FaceId[];
+    const files = ids.map((id) => path.join(dir(), FACE_FILES[id]));
+    const loaded = await Promise.all(files.map((f) => readFile(f)));
+    return {
+      bytes: Object.fromEntries(ids.map((id, i) => [id, new Uint8Array(loaded[i])])) as PrintFonts["bytes"],
+      files,
+    };
+  })();
+  load.catch(() => {
+    fonts = null;
+  });
+  fonts = load;
   return fonts;
 }
 

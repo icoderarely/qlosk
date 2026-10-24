@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { assignQrCode, deleteQrCodes, reassignQrCode, retireQrCode } from "@/app/admin/qr/actions";
-import { Button, DownloadButton } from "./button";
+import { Button, DownloadButton, LinkButton } from "./button";
 import { Card } from "./card";
 import { Chip } from "./chip";
 import { DataTable, Td, Th } from "./data-table";
@@ -321,12 +321,9 @@ function CodeRow({
         <Td className="pr-4 text-right">
           <div className="inline-flex flex-wrap justify-end gap-2">
             {assigned && row.shopId ? (
-              <DownloadButton
-                href={`/admin/print/shop/${row.shopId}/a5`}
-                aria-label={`Download print file for ${row.code}`}
-              >
-                Download
-              </DownloadButton>
+              <LinkButton href={`/admin/shops/${row.shopId}?tab=standee`} aria-label={`Open the standee for ${row.code}`}>
+                Standee
+              </LinkButton>
             ) : null}
             {row.status === "unassigned" ? (
               <DownloadButton href={`/admin/print/code/${row.code}`} aria-label={`Download QR for ${row.code}`}>

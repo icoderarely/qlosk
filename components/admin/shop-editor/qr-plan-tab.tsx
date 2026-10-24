@@ -40,7 +40,15 @@ export function QrPlanTab({
   choices,
   billing,
   canEdit,
-}: TabProps & { info: QrPlanInfo; choices: QrChoices; billing: ShopPlanData | null; canEdit: boolean }) {
+  onOpenStandee,
+}: TabProps & {
+  info: QrPlanInfo;
+  choices: QrChoices;
+  billing: ShopPlanData | null;
+  canEdit: boolean;
+  /** Switches the editor to the Standee tab. */
+  onOpenStandee: () => void;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [pick, setPick] = useState("");
@@ -102,10 +110,9 @@ export function QrPlanTab({
             <>
               {info.code ? (
                 <div className="flex flex-wrap gap-2.5">
-                  <DownloadButton variant="primary" icon={ICON_DOWNLOAD} href={`/admin/print/shop/${id}/a5`}>
-                    A5 print file
-                  </DownloadButton>
-                  <DownloadButton href={`/admin/print/shop/${id}/card`}>4x6 card</DownloadButton>
+                  <Button variant="primary" icon={ICON_DOWNLOAD} onClick={onOpenStandee}>
+                    Design and download standee
+                  </Button>
                   <DownloadButton href={`/admin/print/shop/${id}/svg`}>QR as SVG</DownloadButton>
                 </div>
               ) : null}

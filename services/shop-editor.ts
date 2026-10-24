@@ -23,6 +23,7 @@ import { checkButtonColor, contrastReason } from "./look.ts";
 import { undoableIds, type ChangeEntry, type UndoPayload } from "./undo.ts";
 import { checkSlug, freeSlug, slugify } from "./slug.ts";
 import type { DbShopStatus } from "./shops.ts";
+import { DEFAULT_CHOICES, type StandeeChoices } from "../components/standee/types.ts";
 
 export const LANGUAGES = ["English", "Hindi", "Marathi"] as const;
 export type Language = (typeof LANGUAGES)[number];
@@ -178,6 +179,8 @@ export type StoredShop = {
   publishedAt: Date | null;
   /** The shop's saved button rows, in order. Used when a page config has no links. */
   linkRows?: LinkDraft[];
+  /** The standee designer's saved choices; the defaults when the store gives none. */
+  standee?: StandeeChoices;
 };
 
 export type ShopColumns = {
@@ -376,6 +379,8 @@ export type ShopEditorData = {
   code: string | null;
   plan: { name: string; renewsOn: string; started: string } | null;
   values: EditorValues;
+  /** Saved on the shop itself, apart from the draft and the published page. */
+  standee: StandeeChoices;
   published: boolean;
   hasUnpublished: boolean;
   changes: ChangeRow[];
@@ -405,6 +410,7 @@ export function newShopData(): ShopEditorData {
     code: null,
     plan: null,
     values: newShopValues(),
+    standee: DEFAULT_CHOICES,
     published: false,
     hasUnpublished: false,
     changes: [],
@@ -429,6 +435,7 @@ export async function getShopEditor(store: EditorStore, id: string): Promise<Sho
         }
       : null,
     values: readValues(shop),
+    standee: shop.standee ?? DEFAULT_CHOICES,
     published: shop.published != null,
     hasUnpublished: hasUnpublishedChanges(shop.draft, shop.published),
     changes: changes.slice(0, 20).map((c) => ({

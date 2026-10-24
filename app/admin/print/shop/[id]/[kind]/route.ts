@@ -1,30 +1,26 @@
 import { getDb } from "@/lib/db";
 import { loadSettings } from "@/lib/load-settings";
-import { loadLogoPng, loadPrintFonts, qrBaseUrl } from "@/lib/print-assets";
+import { qrBaseUrl } from "@/lib/print-assets";
 import { shopForPrint } from "@/lib/print-store";
 import { requireRole } from "@/lib/require-role";
-import { buildShopPrint, printFileName, qrSvg, qrTarget } from "@/services/print";
+import { qrSvg, qrTarget } from "@/services/print";
 
-// Download for one shop's QR: A5 standee, 4x6 card or the bare SVG. Any signed-in
-// admin account may download; the file only contains what is already printed.
+// The bare QR of one shop as an SVG, for a sticker maker. The standee files are
+// made on /admin/shops/[id]/standee.pdf and .png. Any signed-in admin account may
+// download this; it only contains what is already printed.
 export async function GET(_request: Request, ctx: RouteContext<"/admin/print/shop/[id]/[kind]">) {
   await requireRole("viewer");
   const { id, kind } = await ctx.params;
-  if (!/^[0-9a-f-]{36}$/i.test(id) || (kind !== "a5" && kind !== "card" && kind !== "svg")) {
-    return new Response("Not found", { status: 404 });
-  }
+  if (!/^[0-9a-f-]{36}$/i.test(id) || kind !== "svg") return new Response("Not found", { status: 404 });
   const shop = await shopForPrint(getDb(), id);
   if (!shop) return new Response("This shop has no QR code assigned.", { status: 404 });
 
   const base = qrBaseUrl((await loadSettings()).domain.qrBase);
-  const headers = {
-    "cache-control": "private, no-store",
-    "content-disposition": `attachment; filename="${printFileName(kind, shop.code)}"`,
-  };
-  if (kind === "svg") {
-    return new Response(qrSvg(qrTarget(base, shop.code)), { headers: { ...headers, "content-type": "image/svg+xml" } });
-  }
-  const [fonts, logo] = await Promise.all([loadPrintFonts(), loadLogoPng(shop.logoUrl)]);
-  const pdf = await buildShopPrint(kind, { name: shop.name, code: shop.code, logo }, base, fonts);
-  return new Response(Buffer.from(pdf), { headers: { ...headers, "content-type": "application/pdf" } });
+  return new Response(qrSvg(qrTarget(base, shop.code)), {
+    headers: {
+      "cache-control": "private, no-store",
+      "content-disposition": `attachment; filename="qr-${shop.code}.svg"`,
+      "content-type": "image/svg+xml",
+    },
+  });
 }

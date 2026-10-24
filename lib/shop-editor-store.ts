@@ -1,5 +1,6 @@
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import type { EditorStore, StoredShop } from "@/services/shop-editor";
+import { normalizeChoices } from "@/services/standee";
 
 const SCAN_WINDOW_DAYS = 30;
 
@@ -44,6 +45,12 @@ export function createEditorStore(db: PrismaClient): EditorStore {
         draft: draft?.config ?? null,
         published: published?.config ?? null,
         publishedAt: published?.publishedAt ?? null,
+        standee: normalizeChoices({
+          design: shop.standeeDesign,
+          theme: shop.standeeTheme,
+          headline: shop.standeeHeadline,
+          size: shop.standeeSize,
+        }),
         linkRows: shop.links.map((l) => ({ id: l.id, type: l.type, label: l.label, target: l.target, enabled: l.enabled })),
       };
       return stored;

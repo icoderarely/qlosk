@@ -4,6 +4,7 @@ import type { ShopPlanData } from "@/services/billing";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { publishShopPage, saveShopDraft } from "@/app/admin/shops/editor-actions";
+import { saveStandee } from "@/app/admin/shops/standee-actions";
 import { Button, LinkButton } from "../button";
 import { Chip } from "../chip";
 import { ICON_ARROW_LEFT, ICON_EXTERNAL } from "../icons";
@@ -17,17 +18,21 @@ import { ButtonsTab } from "./buttons-tab";
 import { DetailsTab } from "./details-tab";
 import { LookTab } from "./look-tab";
 import { OffersTab } from "./offers-tab";
+import { notify } from "../notify";
 import { Preview } from "./preview";
 import { QrPlanTab, type QrChoices } from "./qr-plan-tab";
 import type { EditorState, SetEditor } from "./state";
+import { StandeePreviewCard, StandeeTab, type StandeeQr } from "./standee-tab";
 
-type TabId = "details" | "buttons" | "look" | "offers" | "qrplan" | "activity";
+export type TabId = "details" | "buttons" | "look" | "offers" | "standee" | "qrplan" | "activity";
+export const TAB_IDS: TabId[] = ["details", "buttons", "look", "offers", "standee", "qrplan", "activity"];
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "details", label: "Details" },
   { id: "buttons", label: "Buttons" },
   { id: "look", label: "Look" },
   { id: "offers", label: "Offers and Wi-Fi" },
+  { id: "standee", label: "Standee" },
   { id: "qrplan", label: "QR and plan" },
   { id: "activity", label: "Activity" },
 ];
@@ -46,6 +51,8 @@ export function ShopEditor({
   enabledLayouts,
   qrChoices,
   billing,
+  standeeQr,
+  initialTab,
 }: {
   data: ShopEditorData;
   shopTypes: ShopTypeOption[];
@@ -54,11 +61,15 @@ export function ShopEditor({
   enabledLayouts: LayoutId[];
   qrChoices: QrChoices;
   billing: ShopPlanData | null;
+  /** The shop's QR as drawn on the standee (or why there is none). */
+  standeeQr: StandeeQr;
+  /** From ?tab= on the address, such as the QR codes list opening the Standee tab. */
+  initialTab?: TabId;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [shopId, setShopId] = useState(data.id);
-  const [tab, setTab] = useState<TabId>(data.id === null ? "details" : "buttons");
+  const [tab, setTab] = useState<TabId>(data.id === null ? "details" : (initialTab ?? "buttons"));
   const [state, setState] = useState<EditorState>(data.values);
   const [saved, setSaved] = useState(() => JSON.stringify(data.values));
   const [hasUnpublished, setHasUnpublished] = useState(data.hasUnpublished);
@@ -66,6 +77,12 @@ export function ShopEditor({
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const dirty = JSON.stringify(state) !== saved;
+
+  // The standee's choices are saved on the shop itself, apart from the draft page.
+  const [standee, setStandee] = useState(data.standee);
+  const [standeeSaved, setStandeeSaved] = useState(() => JSON.stringify(data.standee));
+  const [savingStandee, startSavingStandee] = useTransition();
+  const standeeDirty = JSON.stringify(standee) !== standeeSaved;
 
   // The page data is reloaded after a save, an Undo or a status change. When it
   // changes and there are no unsaved edits, take it (an Undo changes the draft);
@@ -81,14 +98,24 @@ export function ShopEditor({
       setSaved(serverJson);
     }
   }
+  const serverStandee = JSON.stringify(data.standee);
+  const [seenStandee, setSeenStandee] = useState(serverStandee);
+  if (seenStandee !== serverStandee) {
+    setSeenStandee(serverStandee);
+    if (!standeeDirty) {
+      setStandee(data.standee);
+      setStandeeSaved(serverStandee);
+    }
+  }
 
   // Leaving with edits that were never saved loses them, so ask first.
+  const unsaved = dirty || standeeDirty;
   useEffect(() => {
-    if (!dirty) return;
+    if (!unsaved) return;
     const warn = (e: BeforeUnloadEvent) => e.preventDefault();
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty]);
+  }, [unsaved]);
 
   const set: SetEditor = (key, value) => {
     setMessage(null);
@@ -96,6 +123,22 @@ export function ShopEditor({
   };
   const suggestion = shopTypes.find((t) => t.label === state.details.shopType) ?? null;
   const name = state.details.name.trim() || "New shop";
+
+  function saveStandeeChoices() {
+    if (shopId === null) return;
+    startSavingStandee(async () => {
+      try {
+        const result = await saveStandee(shopId, standee);
+        notify(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
+        if (result.ok) {
+          setStandeeSaved(JSON.stringify(standee));
+          router.refresh();
+        }
+      } catch {
+        notify({ ok: false, text: "You do not have permission to change shops." });
+      }
+    });
+  }
 
   function submit(kind: "save" | "publish") {
     setMessage(null);
@@ -217,8 +260,24 @@ export function ShopEditor({
               />
             ) : null}
             {tab === "offers" ? <OffersTab state={state} set={set} /> : null}
+            {tab === "standee" ? (
+              shopId === null ? (
+                <p className="m-0 text-[13px] text-muted">Save the shop first, then assign a QR code to design its standee.</p>
+              ) : (
+                <StandeeTab
+                  state={state}
+                  set={set}
+                  choices={standee}
+                  setChoices={setStandee}
+                  code={data.code}
+                  dirty={standeeDirty}
+                  saving={savingStandee}
+                  onSave={saveStandeeChoices}
+                  canEdit={canEdit}
+                />
+              )
+            ) : null}
             {tab === "qrplan" ? (
-              (
               <QrPlanTab
                 state={state}
                 set={set}
@@ -226,8 +285,8 @@ export function ShopEditor({
                 choices={qrChoices}
                 billing={billing}
                 canEdit={canEdit}
+                onOpenStandee={() => setTab("standee")}
               />
-            )
             ) : null}
             {tab === "activity" ? (
               <ActivityTab shopId={shopId} changes={data.changes} traffic={data.traffic} canEdit={canEdit} />
@@ -235,7 +294,11 @@ export function ShopEditor({
           </div>
         </fieldset>
 
-        <Preview state={state} />
+        {tab === "standee" && shopId !== null ? (
+          <StandeePreviewCard state={state} set={set} choices={standee} qr={standeeQr} shopId={shopId} canDownload={canEdit} />
+        ) : (
+          <Preview state={state} />
+        )}
       </div>
     </>
   );

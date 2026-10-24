@@ -3,7 +3,7 @@ import { loadSettings } from "@/lib/load-settings";
 import { qrBaseUrl } from "@/lib/print-assets";
 import { createQrStore } from "@/lib/qr-store";
 import { requireRole } from "@/lib/require-role";
-import { printFileName, qrSvg, qrTarget } from "@/services/print";
+import { qrSvg, qrTarget } from "@/services/print";
 import { isValidCode, normalizeCode } from "@/services/qr";
 
 // SVG for one code that has no shop yet, so it can be printed or sent to a
@@ -19,7 +19,7 @@ export async function GET(_request: Request, ctx: RouteContext<"/admin/print/cod
   return new Response(qrSvg(qrTarget(base, code)), {
     headers: {
       "content-type": "image/svg+xml",
-      "content-disposition": `attachment; filename="${printFileName("svg", code)}"`,
+      "content-disposition": `attachment; filename="qr-${code}.svg"`,
       "cache-control": "private, no-store",
     },
   });
