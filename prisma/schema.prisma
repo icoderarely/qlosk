@@ -90,13 +90,15 @@ enum Role {
 }
 
 model Plan {
-  id         String @id @default(uuid()) @db.Uuid
-  name       String
-  months     Int
-  pricePaise Int    @map("price_paise")
+  id             String  @id @default(uuid()) @db.Uuid
+  name           String
+  months         Int
+  pricePaise     Int     @map("price_paise")
+  // The regular price shown struck out on the landing page. Empty means no strike-through.
+  compareAtPaise Int?    @map("compare_at_paise")
   // The standard plans (Monthly, Half yearly, Yearly) are not custom. A custom
   // plan is a length in months set for one shop, such as 17 months.
-  isCustom   Boolean @default(false) @map("is_custom")
+  isCustom       Boolean @default(false) @map("is_custom")
 
   shops Shop[]
 

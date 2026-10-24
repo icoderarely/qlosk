@@ -36,6 +36,12 @@ export type PlaygroundProps = {
   whatsappNumber?: string;
   /** Keep the look in the address bar. Turn off when embedded in another page. */
   syncUrl?: boolean;
+  /**
+   * "page" is /playground. "landing" is the section inside the landing page: same
+   * controls and the same ShopPage, with the landing page's styles and no heading of
+   * its own (the landing page supplies it).
+   */
+  variant?: "page" | "landing";
 };
 
 const FOCUS =
@@ -55,7 +61,9 @@ export function PlaygroundSection({
   suggestions = {},
   whatsappNumber = "",
   syncUrl = true,
+  variant = "page",
 }: PlaygroundProps) {
+  const landing = variant === "landing";
   const [look, setLook] = useState<PlaygroundLook>(initial);
   const themes = THEME_OPTIONS.filter((t) => !enabledThemes || enabledThemes.includes(t.id));
   const layouts = LAYOUT_OPTIONS.filter((l) => !enabledLayouts || enabledLayouts.includes(l.id));
@@ -89,68 +97,100 @@ export function PlaygroundSection({
   const name = look.name.trim() || sample.shop.name;
   const tagline = look.tagline.trim() || sample.shop.tagline || null;
 
-  return (
-    <section aria-labelledby="pg-title" className="mx-auto w-full max-w-[1100px] px-4 pb-24 pt-5 lg:pb-0">
-      <h1 id="pg-title" className="m-0 text-2xl font-bold tracking-tight text-neutral-900">
-        Try a look for your shop
-      </h1>
+  const shopTypes = SHOP_TYPE_IDS.map((id) => {
+    const on = look.type === id;
+    return (
+      <button
+        key={id}
+        type="button"
+        aria-pressed={on}
+        onClick={() => pickType(id)}
+        className={
+          landing
+            ? `l-chip${on ? " l-chip-on" : ""}`
+            : `min-h-11 cursor-pointer rounded-full border-2 px-4 font-semibold ${FOCUS} ${
+                on ? "border-neutral-900 bg-neutral-900 text-white" : "border-neutral-300 bg-white text-neutral-900"
+              }`
+        }
+      >
+        {SAMPLES[id].label}
+      </button>
+    );
+  });
 
-      <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="flex min-w-0 flex-1 flex-col gap-5 lg:gap-4">
-          <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
-          <Group title="Shop type">
-            <div className="flex flex-wrap gap-2">
-              {SHOP_TYPE_IDS.map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  aria-pressed={look.type === id}
-                  onClick={() => pickType(id)}
-                  className={`min-h-11 cursor-pointer rounded-full border-2 px-4 font-semibold ${FOCUS} ${
-                    look.type === id
-                      ? "border-neutral-900 bg-neutral-900 text-white"
-                      : "border-neutral-300 bg-white text-neutral-900"
-                  }`}
-                >
-                  {SAMPLES[id].label}
-                </button>
-              ))}
-            </div>
+  const fields = (
+    <>
+      <div className={landing ? undefined : "min-w-0 flex-[1_1_220px]"}>
+        <label htmlFor="pg-name" className={landing ? "l-lab" : "mb-1.5 block text-sm font-bold text-neutral-900"}>
+          Your shop name
+        </label>
+        <input
+          id="pg-name"
+          type="text"
+          value={look.name}
+          maxLength={MAX_NAME_LENGTH}
+          placeholder={sample.shop.name}
+          onChange={(e) => update({ name: cleanName(e.target.value) })}
+          className={landing ? "l-in" : `box-border min-h-11 w-full rounded-[10px] border border-neutral-400 bg-white px-3 text-neutral-900 placeholder:text-neutral-600 ${FOCUS}`}
+        />
+      </div>
+      <div className={landing ? undefined : "min-w-0 flex-[1_1_220px]"}>
+        <label htmlFor="pg-tagline" className={landing ? "l-lab" : "mb-1.5 block text-sm font-bold text-neutral-900"}>
+          Your tagline
+        </label>
+        <input
+          id="pg-tagline"
+          type="text"
+          value={look.tagline}
+          maxLength={MAX_TAGLINE_LENGTH}
+          placeholder={sample.shop.tagline ?? undefined}
+          onChange={(e) => update({ tagline: cleanTagline(e.target.value) })}
+          className={landing ? "l-in" : `box-border min-h-11 w-full rounded-[10px] border border-neutral-400 bg-white px-3 text-neutral-900 placeholder:text-neutral-600 ${FOCUS}`}
+        />
+      </div>
+    </>
+  );
+
+  const preview = (
+    <ShopPage
+      theme={look.theme}
+      layout={look.layout}
+      font={look.font}
+      shop={{ ...sample.shop, name, tagline }}
+      links={sample.links}
+      offer={sample.offer}
+      wifi={sample.wifi}
+      banner={sample.banner}
+      nameTag={landing ? "h3" : "h1"}
+    />
+  );
+
+  const controlsClass = landing ? "l-try-ctl" : "flex min-w-0 flex-1 flex-col gap-5 lg:gap-4";
+
+  return (
+    <section
+      aria-labelledby={landing ? undefined : "pg-title"}
+      aria-label={landing ? "Try a look for your shop" : undefined}
+      className={landing ? "l-try" : "mx-auto w-full max-w-[1100px] px-4 pb-24 pt-5 lg:pb-0"}
+    >
+      {landing ? null : (
+        <h1 id="pg-title" className="m-0 text-2xl font-bold tracking-tight text-neutral-900">
+          Try a look for your shop
+        </h1>
+      )}
+
+      <div className={landing ? "contents" : "mt-4 flex flex-col gap-6 lg:flex-row lg:items-start"}>
+        <div className={controlsClass}>
+          <div className={landing ? "contents" : "flex flex-wrap items-end gap-x-6 gap-y-4"}>
+          <Group title="Shop type" landing={landing}>
+            <div className={landing ? "l-chips" : "flex flex-wrap gap-2"}>{shopTypes}</div>
           </Group>
 
-          <div className="min-w-0 flex-[1_1_220px]">
-            <label htmlFor="pg-name" className="mb-1.5 block text-sm font-bold text-neutral-900">
-              Your shop name
-            </label>
-            <input
-              id="pg-name"
-              type="text"
-              value={look.name}
-              maxLength={MAX_NAME_LENGTH}
-              placeholder={sample.shop.name}
-              onChange={(e) => update({ name: cleanName(e.target.value) })}
-              className={`box-border min-h-11 w-full rounded-[10px] border border-neutral-400 bg-white px-3 text-neutral-900 placeholder:text-neutral-600 ${FOCUS}`}
-            />
+          {landing ? <div className="l-fields">{fields}</div> : fields}
           </div>
 
-          <div className="min-w-0 flex-[1_1_220px]">
-            <label htmlFor="pg-tagline" className="mb-1.5 block text-sm font-bold text-neutral-900">
-              Your tagline
-            </label>
-            <input
-              id="pg-tagline"
-              type="text"
-              value={look.tagline}
-              maxLength={MAX_TAGLINE_LENGTH}
-              placeholder={sample.shop.tagline ?? undefined}
-              onChange={(e) => update({ tagline: cleanTagline(e.target.value) })}
-              className={`box-border min-h-11 w-full rounded-[10px] border border-neutral-400 bg-white px-3 text-neutral-900 placeholder:text-neutral-600 ${FOCUS}`}
-            />
-          </div>
-          </div>
-
-          <Group title="Theme">
-            <Grid fiveAcross>
+          <Group title="Theme" landing={landing}>
+            <Grid fiveAcross landing={landing}>
               {themes.map((t) => {
                 const sw = themeSwatch(t.id);
                 const on = look.theme === t.id;
@@ -160,11 +200,11 @@ export function PlaygroundSection({
                     type="button"
                     aria-pressed={on}
                     onClick={() => update({ theme: t.id })}
-                    className={`${PICK} ${on ? "border-neutral-900" : "border-neutral-200"}`}
+                    className={landing ? `l-opt${on ? " l-opt-on" : ""}` : `${PICK} ${on ? "border-neutral-900" : "border-neutral-200"}`}
                   >
                     <span
                       aria-hidden="true"
-                      className="flex flex-col gap-1.5 rounded-lg border border-neutral-200 p-2.5"
+                      className={landing ? "l-swatch" : "flex flex-col gap-1.5 rounded-lg border border-neutral-200 p-2.5"}
                       style={{ background: sw.bg }}
                     >
                       <span className="h-3 rounded-md" style={{ background: sw.btn }} />
@@ -178,8 +218,8 @@ export function PlaygroundSection({
             </Grid>
           </Group>
 
-          <Group title="Layout">
-            <Grid fiveAcross>
+          <Group title="Layout" landing={landing}>
+            <Grid fiveAcross landing={landing}>
               {layouts.map((l) => {
                 const on = look.layout === l.id;
                 return (
@@ -188,11 +228,15 @@ export function PlaygroundSection({
                     type="button"
                     aria-pressed={on}
                     onClick={() => update({ layout: l.id })}
-                    className={`${PICK} ${on ? "border-neutral-900" : "border-neutral-200"}`}
+                    className={landing ? `l-opt${on ? " l-opt-on" : ""}` : `${PICK} ${on ? "border-neutral-900" : "border-neutral-200"}`}
                   >
-                    <svg viewBox="0 0 64 44" aria-hidden="true" className="block h-auto w-full rounded-lg bg-neutral-100">
-                      <path d={l.d2} fill="#C9CED8" />
-                      <path d={l.d1} fill="#16181D" />
+                    <svg
+                      viewBox="0 0 64 44"
+                      aria-hidden="true"
+                      className={landing ? "l-wire" : "block h-auto w-full rounded-lg bg-neutral-100"}
+                    >
+                      <path d={l.d2} className={landing ? "l-wire-rest" : undefined} fill={landing ? undefined : "#C9CED8"} />
+                      <path d={l.d1} className={landing ? "l-wire-main" : undefined} fill={landing ? undefined : "#16181D"} />
                     </svg>
                     <span className="font-bold">{l.name}{on ? <span className="sr-only"> (selected)</span> : null}</span>
                   </button>
@@ -201,8 +245,8 @@ export function PlaygroundSection({
             </Grid>
           </Group>
 
-          <Group title="Font">
-            <Grid min={150}>
+          <Group title="Font" landing={landing}>
+            <Grid min={150} landing={landing} threeAcross>
               {FONT_OPTIONS.map((f) => {
                 const on = look.font === f.id;
                 const pack = FONT_PACKS[f.id];
@@ -212,18 +256,18 @@ export function PlaygroundSection({
                     type="button"
                     aria-pressed={on}
                     onClick={() => update({ font: f.id as FontId })}
-                    className={`${PICK} ${on ? "border-neutral-900" : "border-neutral-200"}`}
+                    className={landing ? `l-opt${on ? " l-opt-on" : ""}` : `${PICK} ${on ? "border-neutral-900" : "border-neutral-200"}`}
                   >
                     <span className={pack.className} aria-hidden="true">
                       <span
-                        className="block text-[22px] leading-[1.3]"
+                        className={landing ? "l-font-sample" : "block text-[22px] leading-[1.3]"}
                         style={{ fontFamily: pack.head, fontWeight: f.id === "rounded" ? 800 : 700 }}
                       >
                         Aa Gg
                       </span>
                     </span>
                     <span className="font-bold">{f.name}{on ? <span className="sr-only"> (selected)</span> : null}</span>
-                    <span className="-mt-1 text-xs text-neutral-700">{f.note}</span>
+                    <span className={landing ? "l-optnote" : "-mt-1 text-xs text-neutral-700"}>{f.note}</span>
                   </button>
                 );
               })}
@@ -234,37 +278,37 @@ export function PlaygroundSection({
             href={whatsappLink(look, labels, whatsappNumber)}
             target="_blank"
             rel="noopener noreferrer"
-            className={`mt-3 inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#0B6B3A] px-6 text-lg font-extrabold text-white shadow-lg ring-4 ring-[#0B6B3A]/20 hover:bg-[#095c32] max-lg:mt-0 max-lg:fixed max-lg:inset-x-4 max-lg:bottom-4 max-lg:z-10 max-lg:w-auto ${FOCUS}`}
+            className={
+              landing
+                ? "l-btn l-btn-p l-btn-wide"
+                : `mt-3 inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#0B6B3A] px-6 text-lg font-extrabold text-white shadow-lg ring-4 ring-[#0B6B3A]/20 hover:bg-[#095c32] max-lg:mt-0 max-lg:fixed max-lg:inset-x-4 max-lg:bottom-4 max-lg:z-10 max-lg:w-auto ${FOCUS}`
+            }
           >
             Get this for my shop
             <span aria-hidden="true">→</span>
             <span className="sr-only"> (opens WhatsApp with your choices)</span>
           </a>
+          {landing ? (
+            <p className="l-try-note">Opens WhatsApp with your choices filled in. You can change everything later.</p>
+          ) : null}
         </div>
 
-        <div className="flex flex-none justify-center lg:sticky lg:top-4 lg:w-[434px]">
-          <Phone>
-            <ShopPage
-              theme={look.theme}
-              layout={look.layout}
-              font={look.font}
-              shop={{ ...sample.shop, name, tagline }}
-              links={sample.links}
-              offer={sample.offer}
-              wifi={sample.wifi}
-              banner={sample.banner}
-            />
-          </Phone>
+        <div className={landing ? "l-try-view" : "flex flex-none justify-center lg:sticky lg:top-4 lg:w-[434px]"}>
+          {landing ? <LandingPhone>{preview}</LandingPhone> : <Phone>{preview}</Phone>}
         </div>
       </div>
     </section>
   );
 }
 
-function Group({ title, children }: { title: string; children: React.ReactNode }) {
+function Group({ title, landing, children }: { title: string; landing: boolean; children: React.ReactNode }) {
   return (
     <div role="group" aria-label={title}>
-      <h2 className="m-0 mb-2.5 text-sm font-bold uppercase tracking-wider text-neutral-700">{title}</h2>
+      {landing ? (
+        <div aria-hidden="true" className="l-lab">{title}</div>
+      ) : (
+        <h2 className="m-0 mb-2.5 text-sm font-bold uppercase tracking-wider text-neutral-700">{title}</h2>
+      )}
       {children}
     </div>
   );
@@ -273,13 +317,19 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 function Grid({
   min = 130,
   fiveAcross = false,
+  threeAcross = false,
+  landing = false,
   children,
 }: {
   min?: number;
   /** Five options on one line from the sm breakpoint up. */
   fiveAcross?: boolean;
+  /** Landing page only: three equal columns (they scroll sideways on phones). */
+  threeAcross?: boolean;
+  landing?: boolean;
   children: React.ReactNode;
 }) {
+  if (landing) return <div className={`l-optgrid${threeAcross ? " l-optgrid-3" : ""}`}>{children}</div>;
   return (
     <div
       className={`grid gap-2.5 ${fiveAcross ? "grid-cols-2 sm:grid-cols-5" : ""}`}
@@ -290,6 +340,25 @@ function Grid({
       }
     >
       {children}
+    </div>
+  );
+}
+
+// The landing page's frame (docs/design/LandingV2.dc.html). Scaled with CSS only,
+// so the server-rendered preview is already the right size and nothing shifts.
+function LandingPhone({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="l-pframe">
+      <div
+        role="group"
+        aria-label="Preview of the shop page"
+        onClickCapture={(e) => {
+          if ((e.target as HTMLElement).closest("a")) e.preventDefault();
+        }}
+        className="l-pscreen"
+      >
+        <div className="l-pinner">{children}</div>
+      </div>
     </div>
   );
 }

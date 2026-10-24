@@ -1,7 +1,7 @@
 import { CopyCode } from "../copy-code";
 import { Icon, LINK_ICON } from "../icons";
 import { locationLine, safeHref } from "../links";
-import { Footer, HEAD, IconCircle, Logo, LocationLine, PrimaryButton, WifiChip } from "../parts";
+import { Footer, HEAD, IconCircle, Logo, LocationLine, PrimaryButton, WifiChip, ShopName } from "../parts";
 import { STRINGS } from "../strings";
 import type { ShopLayoutProps } from "../types";
 import { WifiReveal } from "../wifi-reveal";
@@ -9,14 +9,14 @@ import { WifiReveal } from "../wifi-reveal";
 const ROW =
   "flex min-h-14 items-center gap-3 px-3.5 text-sp-text no-underline";
 
-export function ListLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProps) {
+export function ListLayout({ shop, primary, rest, offer, wifi, nameTag }: ShopLayoutProps) {
   return (
     <div className="flex flex-1 flex-col gap-5 px-5 pb-6 pt-8">
       <div className="flex flex-col items-center gap-1.5 text-center">
         <Logo shop={shop} className="size-[72px] text-[26px]" />
-        <h1 className={`m-0 mt-2 text-[28px] font-bold leading-[1.15] ${HEAD}`}>
+        <ShopName tag={nameTag} className={`m-0 mt-2 text-[28px] font-bold leading-[1.15] ${HEAD}`}>
           {shop.name}
-        </h1>
+        </ShopName>
         {shop.tagline ? <p className="m-0 text-sp-muted">{shop.tagline}</p> : null}
         <LocationLine text={locationLine(shop.area, shop.city)} />
       </div>

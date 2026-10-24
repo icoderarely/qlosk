@@ -6,6 +6,7 @@
 import { telTarget, whatsappTarget } from "./links.ts";
 import {
   DUE_WINDOW_DAYS,
+  formatRupees,
   graceEnds,
   paymentState,
   renewalDates,
@@ -149,10 +150,6 @@ export function paiseFromRupees(raw: string): number | null {
   const rupees = Number(text);
   if (rupees > MAX_PRICE_RUPEES) return null;
   return Math.round(rupees * 100);
-}
-
-function formatRupees(paise: number): string {
-  return `₹${new Intl.NumberFormat("en-IN").format(paise / 100)}`;
 }
 
 /** The picker's lines: price, per month, and the saving against paying the 1-month plan again and again. */

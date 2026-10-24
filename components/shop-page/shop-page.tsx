@@ -31,6 +31,7 @@ export function ShopPage({
   wifi = null,
   banner = null,
   buttonColor = null,
+  nameTag = "h1",
 }: ShopPageProps) {
   const pack = FONT_PACKS[font] ?? FONT_PACKS.clean;
   const Layout = LAYOUTS[layout] ?? ListLayout;
@@ -60,7 +61,7 @@ export function ShopPage({
           </div>
         ) : null}
         {layout === "cover" || layout === "chat" ? null : <TopBar />}
-        <Layout shop={shop} primary={primary} rest={rest} offer={offer} wifi={wifi} />
+        <Layout shop={shop} primary={primary} rest={rest} offer={offer} wifi={wifi} nameTag={nameTag} />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import Image from "next/image";
 import { CopyCode } from "../copy-code";
 import { Icon, LINK_ICON } from "../icons";
 import { locationLine, safeHref } from "../links";
-import { Footer, HEAD, IconCircle, Logo, LocationLine, PrimaryButton, TopBar, WifiChip } from "../parts";
+import { Footer, HEAD, IconCircle, Logo, LocationLine, PrimaryButton, TopBar, WifiChip, ShopName } from "../parts";
 import { STRINGS } from "../strings";
 import type { ShopLayoutProps } from "../types";
 import { WifiReveal } from "../wifi-reveal";
@@ -11,7 +11,7 @@ const ROW =
   "flex min-h-14 items-center gap-3 px-3.5 text-sp-text no-underline";
 const ROW_BOX = "rounded-[14px] border border-sp-line bg-sp-card";
 
-export function CoverLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProps) {
+export function CoverLayout({ shop, primary, rest, offer, wifi, nameTag }: ShopLayoutProps) {
   return (
     <div className="flex flex-1 flex-col">
       <div
@@ -37,9 +37,9 @@ export function CoverLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProp
         {/* The logo is positioned (z-10) so the cover, which is also positioned, cannot paint over it. */}
         <div className="-mt-[38px] flex flex-col gap-1">
           <Logo shop={shop} className="relative z-10 size-[76px] border-4 border-sp-bg text-[26px]" />
-          <h1 className={`m-0 mt-2 text-[28px] font-bold leading-[1.15] ${HEAD}`}>
+          <ShopName tag={nameTag} className={`m-0 mt-2 text-[28px] font-bold leading-[1.15] ${HEAD}`}>
             {shop.name}
-          </h1>
+          </ShopName>
           {shop.tagline ? <p className="m-0 text-sp-muted">{shop.tagline}</p> : null}
           <LocationLine text={locationLine(shop.area, shop.city)} />
         </div>

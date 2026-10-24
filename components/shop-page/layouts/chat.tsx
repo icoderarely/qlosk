@@ -1,7 +1,7 @@
 import { CopyCode } from "../copy-code";
 import { Icon, LINK_ICON } from "../icons";
 import { safeHref } from "../links";
-import { Footer, HEAD, Logo, TopBar } from "../parts";
+import { Footer, HEAD, Logo, TopBar, ShopName } from "../parts";
 import { STRINGS, asSentence } from "../strings";
 import type { ShopLayoutProps } from "../types";
 import { WifiReveal } from "../wifi-reveal";
@@ -11,7 +11,7 @@ const BUBBLE =
 const PILL =
   "flex min-h-11 items-center gap-2.5 rounded-full border-[1.5px] border-sp-iconfg px-4 font-semibold text-sp-iconfg no-underline";
 
-export function ChatLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProps) {
+export function ChatLayout({ shop, primary, rest, offer, wifi, nameTag }: ShopLayoutProps) {
   const sub = [shop.tagline, shop.area].filter(Boolean).join(" · ");
 
   return (
@@ -22,9 +22,9 @@ export function ChatLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProps
         <header className="flex items-center gap-3 p-5">
           <Logo shop={shop} className="size-12 text-[18px]" />
           <div className="min-w-0">
-            <h1 className={`m-0 text-[20px] font-bold leading-[1.2] ${HEAD}`}>
+            <ShopName tag={nameTag} className={`m-0 text-[20px] font-bold leading-[1.2] ${HEAD}`}>
               {shop.name}
-            </h1>
+            </ShopName>
             {sub ? <div className="text-[13px] text-sp-muted">{sub}</div> : null}
           </div>
         </header>

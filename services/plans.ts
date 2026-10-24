@@ -2,7 +2,7 @@
 // fully live for 15 days, then shows only the shop name, a Call button and
 // Directions. The rules here are pure; the daily job and the public page both
 // use them, so the page is right even on a day the job did not run.
-// No Next.js imports.
+// Also the landing page pricing cards (section 10). No Next.js imports.
 import type { DbShopStatus } from "./shops.ts";
 
 export const GRACE_DAYS = 15;
@@ -88,4 +88,81 @@ export async function runPlanExpiry(store: ExpiryStore, now: Date = new Date()):
   );
   if (due.length > 0) await store.markExpired(due);
   return { expired: due.map((s) => s.name) };
+}
+
+// ---- Landing page pricing ----------------------------------------------------------
+
+export type PricingRow = { id: string; months: number; pricePaise: number; compareAtPaise: number | null };
+
+export type PricingStore = {
+  /** The standard (not custom) plans, any order. */
+  standardPlans(): Promise<PricingRow[]>;
+};
+
+export type PricingCard = {
+  months: number;
+  /** "1 month", "6 months", "1 year". */
+  title: string;
+  price: string;
+  /** "/ month", "/ 6 months", "/ year". */
+  per: string;
+  /** Struck-out regular price. Null unless the plan has a higher compare-at price. */
+  was: string | null;
+  /** Under the price, such as "₹167 a month · save 44%". Empty when there is nothing true to say. */
+  note: string;
+  bestValue: boolean;
+};
+
+/** Rupees with Indian digit grouping: 359900 paise is "₹3,599". */
+export function formatRupees(paise: number): string {
+  return `₹${new Intl.NumberFormat("en-IN").format(paise / 100)}`;
+}
+
+export function planTitle(months: number): string {
+  if (months === 12) return "1 year";
+  return months === 1 ? "1 month" : `${months} months`;
+}
+
+function perLabel(months: number): string {
+  if (months === 1) return "/ month";
+  return months === 12 ? "/ year" : `/ ${months} months`;
+}
+
+/**
+ * What the pricing section shows for one plan. A struck price appears only when
+ * compare-at is set and higher than the price; the saving is worked out from it.
+ * A plan with no price set yet is left out, so the page never shows "₹0".
+ */
+export function pricingCard(row: PricingRow): PricingCard | null {
+  if (row.pricePaise <= 0) return null;
+  const struck = row.compareAtPaise !== null && row.compareAtPaise > row.pricePaise ? row.compareAtPaise : null;
+  const parts: string[] = [];
+  if (row.months > 1) parts.push(`${formatRupees(Math.round(row.pricePaise / row.months / 100) * 100)} a month`);
+  if (struck !== null) {
+    parts.push(row.months > 1 ? `save ${Math.round((1 - row.pricePaise / struck) * 100)}%` : "Launch price");
+  }
+  return {
+    months: row.months,
+    title: planTitle(row.months),
+    price: formatRupees(row.pricePaise),
+    per: perLabel(row.months),
+    was: struck === null ? null : formatRupees(struck),
+    note: parts.join(" · "),
+    bestValue: row.months === 12,
+  };
+}
+
+/** The three standard plans as cards, shortest first. */
+export async function landingPlans(store: PricingStore): Promise<PricingCard[]> {
+  const rows = await store.standardPlans();
+  return [1, 6, 12].flatMap((months) => {
+    const row = rows.find((r) => r.months === months);
+    const card = row ? pricingCard(row) : null;
+    return card ? [card] : [];
+  });
+}
+
+/** The note under the cards applies only when a 6 month or 1 year card shows a struck price. */
+export function showsMultiMonthStrike(cards: PricingCard[]): boolean {
+  return cards.some((c) => c.months > 1 && c.was !== null);
 }

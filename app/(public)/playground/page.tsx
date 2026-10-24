@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { PlaygroundSection } from "@/components/playground/playground-section";
 import { parseLook } from "@/components/playground/look-url";
-import { SAMPLES, SHOP_TYPE_IDS, type ShopTypeId } from "@/components/playground/samples";
-import { LAYOUT_IDS, THEME_IDS } from "@/components/shop-page/types";
 import { loadSettings } from "@/lib/load-settings";
+import { playgroundOptions } from "@/lib/playground-options";
 
 export const metadata: Metadata = {
   title: "Try a look for your shop",
@@ -30,15 +29,7 @@ async function Playground({
 }) {
   const [params, settings] = await Promise.all([searchParams, loadSettings()]);
 
-  const themes = THEME_IDS.filter((t) => settings.enabledThemes[t]);
-  const layouts = LAYOUT_IDS.filter((l) => settings.enabledLayouts[l]);
-
-  // Suggested look per shop type comes from Settings.
-  const suggestions: Partial<Record<ShopTypeId, { theme: (typeof THEME_IDS)[number]; layout: (typeof LAYOUT_IDS)[number] }>> = {};
-  for (const id of SHOP_TYPE_IDS) {
-    const s = settings.shopTypes.find((t) => t.label === SAMPLES[id].settingsType)?.suggested;
-    if (s) suggestions[id] = s;
-  }
+  const { themes, layouts, suggestions } = playgroundOptions(settings);
 
   const initial = parseLook(params, { themes, layouts, suggest: (t) => suggestions[t] ?? null });
 

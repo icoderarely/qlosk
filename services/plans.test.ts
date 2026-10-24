@@ -4,9 +4,12 @@ import {
   addMonths,
   graceEnds,
   isReduced,
+  landingPlans,
+  pricingCard,
   paymentState,
   renewalDates,
   runPlanExpiry,
+  showsMultiMonthStrike,
   statusAfterRenewal,
   type ExpiryStore,
 } from "./plans.ts";
@@ -112,5 +115,50 @@ describe("runPlanExpiry", () => {
     const { store, expired } = fake([{ id: "d", name: "Running", status: "live", planEndsAt: daysFromNow(90) }]);
     assert.deepEqual((await runPlanExpiry(store, NOW)).expired, []);
     assert.deepEqual(expired, []);
+  });
+});
+
+describe("landing pricing cards", () => {
+  const row = (months: number, pricePaise: number, compareAtPaise: number | null = null) => ({
+    id: String(months),
+    months,
+    pricePaise,
+    compareAtPaise,
+  });
+
+  it("strikes the compare-at price only when it is set and higher", () => {
+    assert.equal(pricingCard(row(1, 29900))?.was, null);
+    assert.equal(pricingCard(row(12, 199900, null))?.was, null);
+    assert.equal(pricingCard(row(12, 199900, 199900))?.was, null);
+    assert.equal(pricingCard(row(12, 199900, 358800))?.was, "₹3,588");
+  });
+
+  it("works out the monthly rate and the saving from the data", () => {
+    const year = pricingCard(row(12, 199900, 358800));
+    assert.equal(year?.price, "₹1,999");
+    assert.equal(year?.per, "/ year");
+    assert.equal(year?.note, "₹167 a month · save 44%");
+    assert.equal(year?.bestValue, true);
+    const half = pricingCard(row(6, 119900, 179400));
+    assert.equal(half?.note, "₹200 a month · save 33%");
+    assert.equal(half?.title, "6 months");
+  });
+
+  it("calls a struck 1-month price a launch price and says nothing without one", () => {
+    assert.equal(pricingCard(row(1, 29900, 39900))?.note, "Launch price");
+    assert.equal(pricingCard(row(1, 29900))?.note, "");
+  });
+
+  it("leaves out a plan with no price", () => {
+    assert.equal(pricingCard(row(6, 0)), null);
+  });
+
+  it("returns 1 month, 6 months and 1 year in that order and ignores other lengths", async () => {
+    const cards = await landingPlans({
+      standardPlans: async () => [row(12, 199900, 358800), row(3, 50000), row(1, 29900), row(6, 119900, 179400)],
+    });
+    assert.deepEqual(cards.map((c) => c.months), [1, 6, 12]);
+    assert.equal(showsMultiMonthStrike(cards), true);
+    assert.equal(showsMultiMonthStrike(cards.filter((c) => c.months === 1)), false);
   });
 });

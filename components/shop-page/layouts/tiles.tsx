@@ -1,7 +1,7 @@
 import { CopyCode } from "../copy-code";
 import { LINK_ICON } from "../icons";
 import { locationLine, safeHref } from "../links";
-import { Footer, HEAD, IconCircle, Logo, LocationLine, PrimaryButton } from "../parts";
+import { Footer, HEAD, IconCircle, Logo, LocationLine, PrimaryButton, ShopName } from "../parts";
 import { STRINGS } from "../strings";
 import type { ShopLayoutProps } from "../types";
 import { WifiReveal } from "../wifi-reveal";
@@ -10,14 +10,14 @@ const TILE =
   "flex min-h-28 flex-col justify-between gap-4 p-4 text-sp-text no-underline";
 const TILE_BOX = "rounded-[18px] border border-sp-line bg-sp-card";
 
-export function TilesLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProps) {
+export function TilesLayout({ shop, primary, rest, offer, wifi, nameTag }: ShopLayoutProps) {
   return (
     <div className="flex flex-1 flex-col gap-4 px-5 pb-6 pt-8">
       <div className="flex flex-col items-center gap-1.5 text-center">
         <Logo shop={shop} className="size-[72px] text-[26px]" />
-        <h1 className={`m-0 mt-2 text-[28px] font-bold leading-[1.15] ${HEAD}`}>
+        <ShopName tag={nameTag} className={`m-0 mt-2 text-[28px] font-bold leading-[1.15] ${HEAD}`}>
           {shop.name}
-        </h1>
+        </ShopName>
         {shop.tagline ? <p className="m-0 text-sp-muted">{shop.tagline}</p> : null}
         <LocationLine text={locationLine(shop.area, shop.city)} />
       </div>

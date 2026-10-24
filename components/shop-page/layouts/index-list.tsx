@@ -1,7 +1,7 @@
 import { CopyCode } from "../copy-code";
 import { Icon } from "../icons";
 import { locationLine, safeHref } from "../links";
-import { Footer, HEAD, Logo, WifiChip } from "../parts";
+import { Footer, HEAD, Logo, WifiChip, ShopName } from "../parts";
 import { STRINGS } from "../strings";
 import type { ShopLayoutProps } from "../types";
 import { WifiReveal } from "../wifi-reveal";
@@ -9,7 +9,7 @@ import { WifiReveal } from "../wifi-reveal";
 const ROW =
   "flex min-h-[60px] items-center gap-3.5 text-sp-text no-underline border-t border-sp-line";
 
-export function IndexLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProps) {
+export function IndexLayout({ shop, primary, rest, offer, wifi, nameTag }: ShopLayoutProps) {
   const sub = [shop.tagline, locationLine(shop.area, shop.city)]
     .filter(Boolean)
     .join(" · ");
@@ -18,11 +18,11 @@ export function IndexLayout({ shop, primary, rest, offer, wifi }: ShopLayoutProp
     <div className="flex flex-1 flex-col gap-4 px-5 pb-6 pt-7">
       <div className="flex flex-col gap-1.5">
         <Logo shop={shop} className="size-[52px] text-[20px]" />
-        <h1
+        <ShopName tag={nameTag}
           className={`m-0 mt-2.5 text-[34px] font-bold leading-[1.08] tracking-[-0.01em] ${HEAD}`}
         >
           {shop.name}
-        </h1>
+        </ShopName>
         {sub ? <p className="m-0 text-[15px] text-sp-muted">{sub}</p> : null}
       </div>
 

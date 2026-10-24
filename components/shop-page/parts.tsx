@@ -5,7 +5,7 @@ import { Icon, LINK_ICON, type IconName } from "./icons";
 import { initials, safeHref } from "./links";
 import { ShareButton } from "./share-button";
 import { STRINGS } from "./strings";
-import type { ShopInfo, ShopLink } from "./types";
+import type { NameTag, ShopInfo, ShopLink } from "./types";
 
 export const HEAD = "font-sp-head";
 
@@ -37,6 +37,11 @@ export function Logo({
       {initials(shop.name)}
     </div>
   );
+}
+
+/** The shop name, as an h1 unless the page says otherwise. */
+export function ShopName({ tag: Tag, className, children }: { tag: NameTag; className: string; children: React.ReactNode }) {
+  return <Tag className={className}>{children}</Tag>;
 }
 
 export function LocationLine({ text }: { text: string }) {

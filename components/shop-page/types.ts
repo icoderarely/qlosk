@@ -74,7 +74,11 @@ export type ShopPageProps = {
   banner?: Banner | null;
   /** Hex that replaces the theme's button colour. Callers check contrast first. */
   buttonColor?: string | null;
+  /** Element for the shop name. h1 on the shop's own page; the landing page uses a lower one so it keeps a single h1. */
+  nameTag?: NameTag;
 };
+
+export type NameTag = "h1" | "h2" | "h3" | "div";
 
 /** What every layout component receives (ShopPage prepares it). */
 export type ShopLayoutProps = {
@@ -83,4 +87,5 @@ export type ShopLayoutProps = {
   rest: ShopLink[];
   offer: Offer | null;
   wifi: WifiInfo | null;
+  nameTag: NameTag;
 };
