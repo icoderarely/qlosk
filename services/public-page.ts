@@ -4,6 +4,7 @@
 import type { ShopPageProps } from "../components/shop-page/types.ts";
 import { LINK_DEFAULTS } from "./links.ts";
 import { checkButtonColor } from "./look.ts";
+import { isReduced } from "./plans.ts";
 import { tapHref } from "./tracking.ts";
 import { readValues, type StoredShop } from "./shop-editor.ts";
 import { checkSlug } from "./slug.ts";
@@ -68,6 +69,22 @@ export function toPageProps(shop: StoredShop): ShopPageProps {
 }
 
 /**
+ * A shop whose plan ended more than 15 days ago (spec section 4): only the shop
+ * name, a Call button and Directions. The look is kept; the logo, cover,
+ * tagline, offer, Wi-Fi and banner are not shown.
+ */
+export function reducedProps(props: ShopPageProps): ShopPageProps {
+  return {
+    ...props,
+    shop: { name: props.shop.name, tagline: null, area: null, logoUrl: null, coverUrl: null },
+    links: props.links.filter((l) => l.type === "call" || l.type === "maps"),
+    offer: null,
+    wifi: null,
+    banner: null,
+  };
+}
+
+/**
  * When the shop has a QR code, its buttons go through /r/<code>/<linkId> with a
  * token, so a tap can be counted. Without a code they link straight to the
  * target. Wi-Fi never links out.
@@ -99,7 +116,9 @@ export async function lookupPublicPage(store: PublicStore, rawSlug: string): Pro
   const shop = await store.findBySlug(slug);
   if (shop) {
     if (!isPublic(shop)) return { kind: "notfound" };
-    const props = toPageProps(shop);
+    // Read after the data, so the time is request time.
+    const full = toPageProps(shop);
+    const props = isReduced(shop, new Date()) ? reducedProps(full) : full;
     return {
       kind: "page",
       props,

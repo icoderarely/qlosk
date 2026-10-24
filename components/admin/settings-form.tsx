@@ -1,97 +1,94 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "./button";
+import { useState, useTransition } from "react";
+import { saveAllSettings } from "@/app/admin/settings/actions";
+import { buttonClass, DownloadButton } from "./button";
 import { Card, CardHeading } from "./card";
-import { Chip, type ChipTone } from "./chip";
-import { FieldRow, TextField } from "./form-field";
-import { ICON_PLUS } from "./icons";
-import { LAYOUT_OPTIONS, THEME_OPTIONS, lookLabel } from "./look-options";
-import { PageHeader } from "./page-header";
+import { FieldRow, SelectField, TextField } from "./form-field";
+import { LAYOUT_OPTIONS, THEME_OPTIONS } from "./look-options";
 import { Switch } from "./switch";
-import type { LayoutId, ThemeId } from "../shop-page/types";
-import type { SettingsData } from "@/services/settings";
-
-const ROLE: Record<SettingsData["accounts"][number]["role"], { label: string; tone: ChipTone }> = {
-  owner: { label: "Owner", tone: "green" },
-  admin: { label: "Admin", tone: "blue" },
-  viewer: { label: "Viewer", tone: "neutral" },
-};
+import { LAYOUT_IDS, THEME_IDS, type LayoutId, type ThemeId } from "../shop-page/types";
+import type { SettingsData, SuggestedLook } from "@/services/settings";
 
 function Row({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-3 border-t border-line-soft py-2.5">
-      {children}
-    </div>
-  );
+  return <div className="flex items-center justify-between gap-3 border-t border-line-soft py-2.5">{children}</div>;
 }
 
 function ToggleRow({
   label,
   switchLabel,
   checked,
+  disabled,
   onChange,
 }: {
   label: string;
   switchLabel: string;
   checked: boolean;
+  disabled: boolean;
   onChange: (next: boolean) => void;
 }) {
   return (
     <Row>
       <span className="font-semibold">{label}</span>
-      <Switch
-        checked={checked}
-        onChange={onChange}
-        label={`${switchLabel} ${checked ? "on" : "off"}`}
-      />
+      <Switch checked={checked} disabled={disabled} onChange={onChange} label={`${switchLabel} ${checked ? "on" : "off"}`} />
     </Row>
   );
 }
 
 function ColumnLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mt-2 text-xs font-bold uppercase tracking-[0.08em] text-muted">{children}</div>
-  );
+  return <div className="mt-2 text-xs font-bold uppercase tracking-[0.08em] text-muted">{children}</div>;
 }
 
-// Settings page body. Switches and fields hold local state; nothing is saved
-// until slice 9.
-export function SettingsForm({ settings }: { settings: SettingsData }) {
+// Themes and layouts, suggested looks, traffic filtering, and the QR address and
+// WhatsApp number, saved together. `canEdit` is admin or owner; the QR address
+// and WhatsApp number are the owner's alone (they are printed on every standee).
+export function SettingsForm({
+  settings,
+  canEdit,
+  isOwner,
+}: {
+  settings: SettingsData;
+  canEdit: boolean;
+  isOwner: boolean;
+}) {
+  const [pending, startTransition] = useTransition();
   const [themes, setThemes] = useState(settings.enabledThemes);
   const [layouts, setLayouts] = useState(settings.enabledLayouts);
-  const [filters, setFilters] = useState(
-    Object.fromEntries(settings.filtering.map((f) => [f.id, f.enabled])),
+  const [filters, setFilters] = useState(Object.fromEntries(settings.filtering.map((f) => [f.id, f.enabled])));
+  const [suggestions, setSuggestions] = useState<Record<string, SuggestedLook | null>>(
+    Object.fromEntries(settings.shopTypes.map((t) => [t.label, t.suggested])),
   );
   const [domain, setDomain] = useState(settings.domain);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
-  const suggested = settings.shopTypes.filter((t) => t.suggested);
+  const enabledLayouts = LAYOUT_OPTIONS.filter((l) => layouts[l.id]);
+
+  function setSuggestion(label: string, change: Partial<{ theme: ThemeId | ""; layout: LayoutId | "" }>) {
+    setSuggestions((s) => {
+      const now = s[label];
+      const theme = change.theme !== undefined ? change.theme : (now?.theme ?? "");
+      const layout = change.layout !== undefined ? change.layout : (now?.layout ?? "");
+      if (theme === "") return { ...s, [label]: null };
+      return { ...s, [label]: { theme, layout: layout || (enabledLayouts[0]?.id ?? "list") } };
+    });
+  }
+
+  function save() {
+    setMessage(null);
+    startTransition(async () => {
+      const result = await saveAllSettings({
+        themes,
+        layouts,
+        filtering: filters,
+        suggestions,
+        ...(isOwner ? { domain } : {}),
+      });
+      setMessage(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
+    });
+  }
 
   return (
     <>
-      <PageHeader title="Settings" subtitle="Team access, defaults and how traffic is counted." />
-
-      <Card className="flex flex-col gap-2 p-5">
-        <CardHeading
-          title="Team accounts"
-          description="Accounts that can sign in. Only the owner can add or remove them."
-          action={
-            // TODO(slice 9): add, change and remove accounts (owner only)
-            <Button icon={ICON_PLUS}>Add account</Button>
-          }
-        />
-        <ul className="m-0 mt-1 list-none p-0">
-          {settings.accounts.map((a) => (
-            <li key={a.username}>
-              <Row>
-                <span className="font-semibold">{a.username}</span>
-                <Chip tone={ROLE[a.role].tone}>{ROLE[a.role].label}</Chip>
-              </Row>
-            </li>
-          ))}
-        </ul>
-      </Card>
-
       <Card className="flex flex-col gap-2 p-5">
         <CardHeading
           title="Themes and layouts"
@@ -106,6 +103,7 @@ export function SettingsForm({ settings }: { settings: SettingsData }) {
                 label={t.name}
                 switchLabel={t.name}
                 checked={themes[t.id]}
+                disabled={!canEdit}
                 onChange={(on) => setThemes((s: Record<ThemeId, boolean>) => ({ ...s, [t.id]: on }))}
               />
             ))}
@@ -118,21 +116,54 @@ export function SettingsForm({ settings }: { settings: SettingsData }) {
                 label={l.name}
                 switchLabel={l.name}
                 checked={layouts[l.id]}
-                onChange={(on) =>
-                  setLayouts((s: Record<LayoutId, boolean>) => ({ ...s, [l.id]: on }))
-                }
+                disabled={!canEdit}
+                onChange={(on) => setLayouts((s: Record<LayoutId, boolean>) => ({ ...s, [l.id]: on }))}
               />
             ))}
           </div>
-          <div className="min-w-0 flex-[1_1_280px]">
+          <div className="min-w-0 flex-[1_1_320px]">
             <ColumnLabel>Suggested look by shop type</ColumnLabel>
-            {/* TODO(slice 9): edit the suggested look per shop type */}
-            {suggested.map((t) => (
-              <Row key={t.label}>
-                <span className="font-semibold">{t.label}</span>
-                <Chip>{t.suggested ? lookLabel(t.suggested.theme, t.suggested.layout) : ""}</Chip>
-              </Row>
-            ))}
+            {settings.shopTypes.map((t) => {
+              const look = suggestions[t.label];
+              return (
+                <Row key={t.label}>
+                  <span className="font-semibold">{t.label}</span>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <SelectField
+                      block
+                      hideLabel
+                      label={`Suggested theme for ${t.plural}`}
+                      value={look?.theme ?? ""}
+                      disabled={!canEdit}
+                      onChange={(e) => setSuggestion(t.label, { theme: e.target.value as ThemeId | "" })}
+                    >
+                      <option value="">No suggestion</option>
+                      {THEME_IDS.filter((id) => themes[id] || look?.theme === id).map((id) => (
+                        <option key={id} value={id}>
+                          {THEME_OPTIONS.find((o) => o.id === id)?.name}
+                        </option>
+                      ))}
+                    </SelectField>
+                    {look ? (
+                      <SelectField
+                        block
+                        hideLabel
+                        label={`Suggested layout for ${t.plural}`}
+                        value={look.layout}
+                        disabled={!canEdit}
+                        onChange={(e) => setSuggestion(t.label, { layout: e.target.value as LayoutId })}
+                      >
+                        {LAYOUT_IDS.filter((id) => layouts[id] || look.layout === id).map((id) => (
+                          <option key={id} value={id}>
+                            {LAYOUT_OPTIONS.find((o) => o.id === id)?.name}
+                          </option>
+                        ))}
+                      </SelectField>
+                    ) : null}
+                  </div>
+                </Row>
+              );
+            })}
           </div>
         </div>
       </Card>
@@ -146,6 +177,7 @@ export function SettingsForm({ settings }: { settings: SettingsData }) {
               label={f.label}
               switchLabel={f.switchLabel}
               checked={filters[f.id]}
+              disabled={!canEdit}
               onChange={(on) => setFilters((s) => ({ ...s, [f.id]: on }))}
             />
           ))}
@@ -157,27 +189,40 @@ export function SettingsForm({ settings }: { settings: SettingsData }) {
         <FieldRow>
           <TextField
             label="QR address base"
-            placeholder="[yourdomain.in]"
+            placeholder="https://yourdomain.in"
+            inputMode="url"
+            autoCapitalize="none"
+            spellCheck={false}
+            readOnly={!isOwner}
             value={domain.qrBase}
             onChange={(e) => setDomain((d) => ({ ...d, qrBase: e.target.value }))}
           />
           <TextField
-            label="WhatsApp sender number"
+            label="WhatsApp number for customers"
             type="tel"
-            placeholder="[business number]"
+            placeholder="98200 12345"
+            readOnly={!isOwner}
             value={domain.whatsappSender}
             onChange={(e) => setDomain((d) => ({ ...d, whatsappSender: e.target.value }))}
           />
         </FieldRow>
         <p className="m-0 text-[13px] text-muted">
-          The QR address base is on every printed code. Keep this domain renewed for as long as any
-          plan is active.
+          The QR address base is on every printed code. Keep this domain renewed for as long as any plan is active.
+          Codes already printed keep their old address.{isOwner ? "" : " Only the owner can change these two."}
         </p>
-        {/* TODO(slice 9): export all shop data; save settings */}
-        <div className="flex flex-wrap gap-2.5 border-t border-line-soft pt-3.5">
-          <Button>Export all shop data</Button>
-          <Button variant="primary">Save settings</Button>
-        </div>
+        <p role="status" className={`m-0 min-h-5 text-[13px] font-semibold ${message?.ok === false ? "text-chip-over-fg" : "text-chip-live-fg"}`}>
+          {message?.text}
+        </p>
+        {canEdit ? (
+          <div className="flex flex-wrap gap-2.5 border-t border-line-soft pt-3.5">
+            <DownloadButton href="/admin/settings/export">Export all shop data</DownloadButton>
+            <button type="button" disabled={pending} onClick={save} className={buttonClass("primary")}>
+              {pending ? "Saving…" : "Save settings"}
+            </button>
+          </div>
+        ) : (
+          <p className="m-0 border-t border-line-soft pt-3.5 text-[13px] text-muted">Only an admin can change settings.</p>
+        )}
       </Card>
     </>
   );

@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db";
+import { loadSettings } from "@/lib/load-settings";
 import { loadLogoPng, loadPrintFonts, qrBaseUrl } from "@/lib/print-assets";
 import { shopForPrint } from "@/lib/print-store";
 import { requireRole } from "@/lib/require-role";
@@ -15,7 +16,7 @@ export async function GET(_request: Request, ctx: RouteContext<"/admin/print/sho
   const shop = await shopForPrint(getDb(), id);
   if (!shop) return new Response("This shop has no QR code assigned.", { status: 404 });
 
-  const base = qrBaseUrl();
+  const base = qrBaseUrl((await loadSettings()).domain.qrBase);
   const headers = {
     "cache-control": "private, no-store",
     "content-disposition": `attachment; filename="${printFileName(kind, shop.code)}"`,

@@ -4,9 +4,11 @@ export function Switch({
   checked,
   onChange,
   label,
+  disabled = false,
 }: {
   checked: boolean;
   onChange: (next: boolean) => void;
+  disabled?: boolean;
   /** Names the control for screen readers, e.g. "Offer on". */
   label: string;
 }) {
@@ -16,8 +18,9 @@ export function Switch({
       role="switch"
       aria-checked={checked}
       aria-label={label}
+      disabled={disabled}
       onClick={() => onChange(!checked)}
-      className="flex min-h-11 w-11 flex-none cursor-pointer items-center justify-center border-0 bg-transparent p-0"
+      className="flex min-h-11 w-11 flex-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 items-center justify-center border-0 bg-transparent p-0"
     >
       <span
         aria-hidden="true"

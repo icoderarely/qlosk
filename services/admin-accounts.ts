@@ -9,6 +9,18 @@ export function normalizeUsername(username: string): string {
 export const MIN_PASSWORD_LENGTH = 12;
 export const MAX_PASSWORD_LENGTH = 128;
 
+// Returns a list of problems; empty means the password is acceptable.
+export function checkPassword(password: string): string[] {
+  const problems: string[] = [];
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    problems.push(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+  }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    problems.push(`Password must be at most ${MAX_PASSWORD_LENGTH} characters.`);
+  }
+  return problems;
+}
+
 // Returns a list of problems; empty means the credentials are acceptable.
 export function checkNewCredentials(username: string, password: string): string[] {
   const problems: string[] = [];
@@ -19,11 +31,5 @@ export function checkNewCredentials(username: string, password: string): string[
   if (!/^[a-z0-9_.]*$/.test(name)) {
     problems.push("Username may use letters, digits, underscore and dot only.");
   }
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    problems.push(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
-  }
-  if (password.length > MAX_PASSWORD_LENGTH) {
-    problems.push(`Password must be at most ${MAX_PASSWORD_LENGTH} characters.`);
-  }
-  return problems;
+  return [...problems, ...checkPassword(password)];
 }

@@ -174,3 +174,59 @@ describe("withTapLinks", () => {
     assert.equal(props.links.find((l) => l.type === "call")?.href, "tel:+919820012345");
   });
 });
+
+describe("expired plan", () => {
+  const DAY = 24 * 3600_000;
+
+  // A full page: logo, tagline, offer, Wi-Fi, banner and five buttons.
+  function fullShop(extra: Partial<StoredShop>): StoredShop {
+    const v = newShopValues();
+    v.details = { ...v.details, name: "Velvet Salon", tagline: "Hair and skin", logoUrl: "https://example.com/logo.png", coverUrl: "https://example.com/cover.png" };
+    v.links = [
+      { id: "00000000-0000-4000-8000-000000000001", type: "call", label: "Call us", target: "tel:+919820012345", enabled: true },
+      { id: "00000000-0000-4000-8000-000000000002", type: "maps", label: "Directions", target: "https://maps.example.com/velvet", enabled: true },
+      { id: "00000000-0000-4000-8000-000000000003", type: "website", label: "Site", target: "https://example.com", enabled: true },
+      { id: "00000000-0000-4000-8000-000000000004", type: "wifi", label: "Wi-Fi", target: "wifi", enabled: true },
+      { id: "00000000-0000-4000-8000-000000000005", type: "instagram", label: "Instagram", target: "https://instagram.com/velvet", enabled: true },
+    ];
+    v.wifi = { enabled: true, network: "Velvet", password: "pw" };
+    v.offer = { enabled: true, title: "10% off", code: "", note: "", validUntil: "" };
+    v.banner = { enabled: true, message: "Diwali hours", period: "" };
+    const config = toConfig(v, v.links);
+    return shop({ draft: config, published: config, ...extra });
+  }
+
+  it("shows only the name, Call and Directions once the 15 days are over", async () => {
+    const ended = fullShop({ planEndsAt: new Date(Date.now() - 40 * DAY) });
+    const r = await lookupPublicPage(store([ended]), "velvet");
+    assert.equal(r.kind, "page");
+    if (r.kind !== "page") return;
+    assert.equal(r.props.shop.name, "Velvet Salon");
+    assert.equal(r.props.shop.tagline, null);
+    assert.equal(r.props.shop.logoUrl, null);
+    assert.equal(r.props.shop.coverUrl, null);
+    assert.equal(r.props.offer, null);
+    assert.equal(r.props.wifi, null);
+    assert.equal(r.props.banner, null);
+    assert.deepEqual(r.props.links.map((l) => l.type), ["call", "maps"]);
+  });
+
+  it("does the same for a shop whose status is expired", async () => {
+    const r = await lookupPublicPage(store([fullShop({ status: "expired" })]), "velvet");
+    assert.equal(r.kind === "page" && r.props.links.length, 2);
+  });
+
+  it("keeps the whole page during the 15 days", async () => {
+    const r = await lookupPublicPage(store([fullShop({ planEndsAt: new Date(Date.now() - 5 * DAY) })]), "velvet");
+    assert.equal(r.kind === "page" && r.props.links.length, 5);
+    assert.equal(r.kind === "page" && r.props.offer?.title, "10% off");
+  });
+
+  it("keeps the tap links on the two buttons that remain", async () => {
+    const r = await lookupPublicPage(store([fullShop({ planEndsAt: new Date(Date.now() - 40 * DAY), code: "ABC234" })]), "velvet");
+    assert.equal(r.kind, "page");
+    if (r.kind !== "page") return;
+    const tapped = withTapLinks(r.props, r.code, () => "tok");
+    assert.ok(tapped.links.every((l) => l.href.startsWith("/r/ABC234/")));
+  });
+});

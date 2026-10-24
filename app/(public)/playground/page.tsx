@@ -4,7 +4,7 @@ import { PlaygroundSection } from "@/components/playground/playground-section";
 import { parseLook } from "@/components/playground/look-url";
 import { SAMPLES, SHOP_TYPE_IDS, type ShopTypeId } from "@/components/playground/samples";
 import { LAYOUT_IDS, THEME_IDS } from "@/components/shop-page/types";
-import { getSettings } from "@/services/settings";
+import { loadSettings } from "@/lib/load-settings";
 
 export const metadata: Metadata = {
   title: "Try a look for your shop",
@@ -28,7 +28,7 @@ async function Playground({
 }: {
   searchParams: PageProps<"/playground">["searchParams"];
 }) {
-  const [params, settings] = await Promise.all([searchParams, getSettings()]);
+  const [params, settings] = await Promise.all([searchParams, loadSettings()]);
 
   const themes = THEME_IDS.filter((t) => settings.enabledThemes[t]);
   const layouts = LAYOUT_IDS.filter((l) => settings.enabledLayouts[l]);

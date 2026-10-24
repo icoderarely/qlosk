@@ -18,13 +18,15 @@ export function loadPrintFonts(): Promise<PrintFonts> {
   return fonts;
 }
 
-// QR_BASE_URL is the domain printed into every code. Production must set it: a
-// code printed with the wrong address cannot be fixed. Development falls back to
-// the local address so the files can be tried.
-export function qrBaseUrl(): string {
+// The domain printed into every code: the QR address saved in Settings, else
+// QR_BASE_URL. Production must have one of them: a code printed with the wrong
+// address cannot be fixed. Development falls back to the local address so the
+// files can be tried.
+export function qrBaseUrl(saved?: string): string {
+  if (saved?.trim()) return saved.trim();
   const set = process.env.QR_BASE_URL?.trim();
   if (set) return set;
-  if (process.env.NODE_ENV === "production") throw new Error("QR_BASE_URL is not set. See .env.example.");
+  if (process.env.NODE_ENV === "production") throw new Error("The QR address is not set. Add it in Settings or set QR_BASE_URL.");
   return process.env.BETTER_AUTH_URL || "http://localhost:3000";
 }
 

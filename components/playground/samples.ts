@@ -1,6 +1,6 @@
 // Fake sample shops for the playground, one per shop type. Nothing here is a
 // real business. The suggested look per type is the one Settings holds
-// (lib/mock/settings.ts today, the settings table later) and is passed in.
+// (services/settings.ts reads the settings table) and is passed in.
 import type {
   Banner,
   Offer,

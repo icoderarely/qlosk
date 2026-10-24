@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getSettings } from "@/services/settings";
+import { loadSettings } from "@/lib/load-settings";
 
 export const metadata: Metadata = {
   title: "Not activated yet",
@@ -26,7 +26,7 @@ export default function Page() {
 }
 
 async function Contact() {
-  const settings = await getSettings();
+  const settings = await loadSettings();
   const digits = (settings.domain.whatsappSender || process.env.WHATSAPP_NUMBER || "").replace(/\D/g, "");
   if (digits.length < 8) return null;
   const text = encodeURIComponent("Hi, I scanned a QR code that is not activated yet.");
