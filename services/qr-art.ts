@@ -104,7 +104,7 @@ export const MARK_SHAPES = {
 };
 
 /** SVG markup for the mark, placed in module units. */
-function markSvg(mark: QrArt["mark"]): string {
+export function markSvg(mark: QrArt["mark"]): string {
   const s = mark.size / MARK_SPAN.size;
   const { frame, dot, tail } = MARK_SHAPES;
   return (

@@ -325,7 +325,7 @@ function CodeRow({
                 Standee
               </LinkButton>
             ) : null}
-            {row.status === "unassigned" ? (
+            {row.status !== "retired" ? (
               <DownloadButton href={`/admin/print/code/${row.code}`} aria-label={`Download QR for ${row.code}`}>
                 Download
               </DownloadButton>
