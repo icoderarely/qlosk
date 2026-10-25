@@ -24,7 +24,7 @@ export const TERMS: LegalDoc = {
     {
       title: "Plans and payment",
       blocks: [
-        "Plans run for one month, six months or one year from the day your page goes live. The price we quote you before you pay is the price for that whole period. Prices are in Indian rupees and include GST where it applies. We give you a receipt or invoice for every payment.",
+        "Plans run for one month, six months or one year from the day your page goes live. The price we quote you before you pay is the price for that whole period. Prices are in Indian rupees. We give you a receipt for every payment.",
         "You see your preview before you pay. We share payment details on WhatsApp once you approve it. We do not ask for card or bank details on this website.",
         "We remind you on WhatsApp before your plan ends. If it ends, your page stays fully live for 15 more days. After that it shows only your shop name, a Call button and Directions until you renew. Your QR code is never changed or given to anyone else.",
       ],
