@@ -45,6 +45,10 @@ const ITEMS: { label: string; icon: string }[] = [
 ];
 
 const BOLD = `font-family="Manrope ExtraBold"`;
+const HEADLINE = "Everything about us, one scan away.";
+const HEADLINE_SIZE = 66;
+/** The headline fills at most the width between the card's 72-unit side margins. */
+const HEADLINE_FIT = V - 2 * 72;
 const CREDIT = 40;
 const LOGO = 46;
 
@@ -77,6 +81,11 @@ function creditSvg(x: number, y: number): string {
 
 const r = (v: number) => Math.round(v * 100) / 100;
 
+function headlineSize(): number {
+  const width = measure("manrope800", HEADLINE_SIZE, HEADLINE);
+  return r(Math.min(HEADLINE_SIZE, (HEADLINE_SIZE * HEADLINE_FIT) / width));
+}
+
 /** Everything on the sticker, in the 1120-unit square (no outer svg, so a sheet can place it). */
 export function stickerBody(art: QrArt, code: string): string {
   const cell = QR_WIDTH / art.modules;
@@ -98,7 +107,7 @@ export function stickerBody(art: QrArt, code: string): string {
   return (
     `<rect width="${V}" height="${V}" fill="#fff"/>` +
     `<rect x="2" y="2" width="${V - 4}" height="${V - 4}" rx="72" fill="#fff" stroke="#D9D9D9" stroke-width="4"/>` +
-    `<text x="${V / 2}" y="136" text-anchor="middle" ${BOLD} font-size="66" fill="${INK}">Call, chat or find us. One Scan.</text>` +
+    `<text x="${V / 2}" y="136" text-anchor="middle" ${BOLD} font-size="${headlineSize()}" fill="${INK}">${HEADLINE}</text>` +
     qr +
     items +
     `<rect x="72" y="992" width="976" height="3" fill="${RULE}"/>` +
