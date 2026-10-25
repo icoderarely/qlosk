@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: "/playground" },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: "/playground", images: ["/opengraph-image"] },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: "/playground", siteName: BRAND_NAME, locale: "en_IN", type: "website", images: ["/opengraph-image"] },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: ["/opengraph-image"] },
 };
 

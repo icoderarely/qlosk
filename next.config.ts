@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
     "/admin/shops/[id]": ["./assets/fonts/**"], // the editor's QR check runs here
     "/s/[slug]/og": ["./assets/fonts/**"], // the link-preview card
     "/dev/share-card/image": ["./assets/fonts/**"],
+    "/opengraph-image": ["./assets/fonts/**"], // the site-wide card
   },
   // Native or file-reading packages the standee downloads use: load them from node_modules.
   serverExternalPackages: ["@resvg/resvg-js", "@napi-rs/canvas", "pdfkit", "svg-to-pdfkit", "pdfjs-dist"],

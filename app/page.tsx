@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
-  openGraph: { title: TITLE, description: SITE_DESCRIPTION, url: "/" },
+  openGraph: { title: TITLE, description: SITE_DESCRIPTION, url: "/", siteName: BRAND_NAME, locale: "en_IN", type: "website" },
   twitter: { card: "summary_large_image", title: TITLE, description: SITE_DESCRIPTION },
 };
 

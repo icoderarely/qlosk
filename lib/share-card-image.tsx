@@ -192,9 +192,9 @@ export async function renderShopCard(m: ShareCardModel, opts: { cacheControl?: s
   return respond(image, opts.cacheControl ?? CACHE);
 }
 
-/** The card for a slug that is unpublished, paused, archived or unknown: ours, with nothing of the shop's. */
+/** Our card, just the mark and name: the landing page, and any slug that is unpublished, paused, archived or unknown. */
 export async function renderGenericCard(opts: { cacheControl?: string } = {}): Promise<Response> {
-  const fonts = await fontsFor(["dmRegular", "fraunces"]);
+  const fonts = await fontsFor(["fraunces"]);
   const image = new ImageResponse(
     (
       <div
@@ -211,11 +211,8 @@ export async function renderGenericCard(opts: { cacheControl?: string } = {}): P
         }}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Mark size={120} />
-          <span style={{ marginLeft: 28, fontFamily: "Fraunces", fontSize: 110, fontWeight: 700 }}>{BRAND_NAME}</span>
-        </div>
-        <div style={{ marginTop: 36, fontSize: 40, color: "#35514b", textAlign: "center", width: SAFE_WIDTH, justifyContent: "center", display: "flex" }}>
-          One QR code for your whole shop.
+          <Mark size={170} />
+          <span style={{ marginLeft: 36, fontFamily: "Fraunces", fontSize: 150, fontWeight: 700 }}>{BRAND_NAME}</span>
         </div>
       </div>
     ),
