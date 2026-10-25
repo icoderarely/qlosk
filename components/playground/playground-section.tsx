@@ -403,16 +403,18 @@ function Phone({ children }: { children: React.ReactNode }) {
           onClickCapture={(e) => {
             if ((e.target as HTMLElement).closest("a")) e.preventDefault();
           }}
-          className="origin-top-left overflow-hidden rounded-[44px] bg-neutral-900"
+          className="iphone origin-top-left rounded-[52px] bg-neutral-900"
           style={{
             width: SCREEN_W + FRAME_PAD * 2,
             height: SCREEN_H + FRAME_PAD * 2,
             padding: FRAME_PAD,
+            "--fw": `${SCREEN_W + FRAME_PAD * 2}px`,
+            "--pad": `${FRAME_PAD}px`,
             transform: `scale(${scale})`,
-          }}
+          } as React.CSSProperties}
         >
           <div
-            className="overflow-y-auto overflow-x-hidden overscroll-contain rounded-[34px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="overflow-y-auto overflow-x-hidden overscroll-contain rounded-[42px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{ width: SCREEN_W, height: SCREEN_H, "--page-min-h": `${SCREEN_H}px` } as React.CSSProperties}
           >
             {children}

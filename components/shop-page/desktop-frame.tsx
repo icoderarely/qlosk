@@ -9,7 +9,7 @@ const dataUri = (svg: string) => `data:image/svg+xml;charset=utf-8,${encodeURICo
 export function DesktopFrame({ qr, children }: { qr?: { svg: string; label: string } | null; children: React.ReactNode }) {
   return (
     <div className="desk-wrap">
-      <div className="desk-bezel">
+      <div className="desk-bezel iphone">
         <div className="desk-screen">
           {children}
         </div>
