@@ -73,9 +73,9 @@ export function renderPng(svg: string, width: number, fonts: PrintFonts): Uint8A
   return resvg.render().asPng();
 }
 
-type Pixels = { data: Uint8ClampedArray; width: number; height: number };
+export type Pixels = { data: Uint8ClampedArray; width: number; height: number };
 
-function readPixels({ data, width, height }: Pixels): string | null {
+export function readPixels({ data, width, height }: Pixels): string | null {
   return jsQR(data, width, height, { inversionAttempts: "dontInvert" })?.data ?? null;
 }
 
@@ -110,7 +110,7 @@ export async function readPdfQr(pdf: Uint8Array, pageNumber = 1, scale = PDF_CHE
 }
 
 /** The part of an image inside a rectangle (pixels). */
-function crop(img: Pixels, x: number, y: number, w: number, h: number): Pixels {
+export function crop(img: Pixels, x: number, y: number, w: number, h: number): Pixels {
   const x0 = Math.max(0, Math.floor(x));
   const y0 = Math.max(0, Math.floor(y));
   const cw = Math.min(img.width - x0, Math.ceil(w));
@@ -171,10 +171,10 @@ export async function buildStandeePng(input: StandeeInput, fonts: PrintFonts): P
   return png;
 }
 
-type Doc = InstanceType<typeof PDFDocument>;
+export type Doc = InstanceType<typeof PDFDocument>;
 
 /** Runs a PDFKit document to the end and collects its bytes. */
-function collect(doc: Doc): Promise<Uint8Array> {
+export function collect(doc: Doc): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
     doc.on("data", (c: Buffer) => chunks.push(c));
@@ -184,7 +184,7 @@ function collect(doc: Doc): Promise<Uint8Array> {
 }
 
 /** Registers the font files and tells the SVG converter which one each family and weight means. */
-function embedFonts(doc: Doc, fonts: PrintFonts) {
+export function embedFonts(doc: Doc, fonts: PrintFonts) {
   const byKey = new Map<string, FaceId>();
   for (const id of Object.keys(FILE_FACES) as FaceId[]) {
     doc.registerFont(id, fonts.bytes[id]);
@@ -199,7 +199,7 @@ function embedFonts(doc: Doc, fonts: PrintFonts) {
   };
 }
 
-function drawSvg(doc: Doc, svg: string, widthPt: number, heightPt: number, fontFor: ReturnType<typeof embedFonts>) {
+export function drawSvg(doc: Doc, svg: string, widthPt: number, heightPt: number, fontFor: ReturnType<typeof embedFonts>) {
   const warnings: string[] = [];
   SVGtoPDF(doc, svg, 0, 0, {
     width: widthPt,

@@ -14,6 +14,7 @@ import {
   standeeFileName,
 } from "./print.ts";
 import { buildQrArt, qrTarget, type QrArt } from "./qr-art.ts";
+import { buildStickerSheet, stickerSheetFileName } from "./sticker.ts";
 import { hasRole, type Role } from "./admin-roles.ts";
 import type { EditorValues } from "./shop-editor.ts";
 import { standeeInput } from "./standee.ts";
@@ -86,4 +87,15 @@ export async function downloadCodeSheet(
   const fileUrl = await deps.storage.put(key("sheets", "pdf"), bytes, "application/pdf");
   await deps.log.insert({ shopId: null, kind: "sheet", design: null, theme: null, size: args.size, createdBy: args.userEmail, fileUrl });
   return { bytes, fileName: `unassigned-codes-${args.size}.pdf`, contentType: "application/pdf", fileUrl };
+}
+
+/** A4 sheet of 7 x 7 cm stickers for the chosen codes, in the order given (services/sticker.ts). */
+export async function downloadStickerSheet(
+  deps: PrintDeps,
+  args: { codes: string[]; baseUrl: string; userEmail: string },
+): Promise<Download> {
+  const bytes = await buildStickerSheet(args.codes, args.baseUrl, deps.fonts, deps.makeArt);
+  const fileUrl = await deps.storage.put(key("stickers", "pdf"), bytes, "application/pdf");
+  await deps.log.insert({ shopId: null, kind: "sheet", design: "sticker", theme: null, size: "A4x8", createdBy: args.userEmail, fileUrl });
+  return { bytes, fileName: stickerSheetFileName(args.codes.length), contentType: "application/pdf", fileUrl };
 }

@@ -1,12 +1,26 @@
 // The trial sticker (spec section 8): a 7 x 7 cm white card with the headline, the
 // QR with the Qlosk Q mark, the five things a scan opens and the credit line. Every
-// QR download in the admin is this file. It is drawn in the 1120-unit space of
-// docs/design/ reference and rendered at 600 dpi (1654 px for 7 cm); before it is
-// returned the QR is decoded back out of the picture and must read the address.
-// No Next.js imports.
+// QR download in the admin is this design: one code as a PNG, or many as an A4 PDF
+// to cut out. It is drawn in a 1120-unit square (docs/design/ reference). Before a
+// file is returned the QR is decoded back out of the finished picture and must read
+// the address. No Next.js imports.
+import PDFDocument from "pdfkit";
 import sharp from "sharp";
+import { measure } from "../components/standee/text.ts";
 import { QR_BORDER, QR_INK, buildQrArt, markSvg, qrTarget, type QrArt } from "./qr-art.ts";
-import { assertQrReads, renderPng, type PrintFonts } from "./print.ts";
+import {
+  MM,
+  QrCheckError,
+  assertQrReads,
+  collect,
+  crop,
+  drawSvg,
+  embedFonts,
+  rasterisePdf,
+  readPixels,
+  renderPng,
+  type PrintFonts,
+} from "./print.ts";
 
 export const STICKER_MM = 70;
 export const STICKER_DPI = 600;
@@ -31,13 +45,45 @@ const ITEMS: { label: string; icon: string }[] = [
 ];
 
 const BOLD = `font-family="Manrope ExtraBold"`;
+const CREDIT = 40;
+const LOGO = 46;
 
-/** The sticker as SVG, 1120 units square. */
-export function stickerSvg(art: QrArt, code: string): string {
+/** The Qlosk logo tile (components/brand-mark.tsx) at `size` units with its top-left at (x, y). */
+function logoSvg(x: number, y: number, size: number): string {
+  return (
+    `<g transform="translate(${x} ${y}) scale(${size / 48})">` +
+    `<rect width="48" height="48" rx="14" fill="#FBF1B5"/>` +
+    `<rect x="9" y="9" width="26" height="26" rx="9" fill="none" stroke="${QR_INK}" stroke-width="6"/>` +
+    `<rect x="18" y="18" width="8" height="8" rx="2" fill="${QR_INK}"/>` +
+    `<rect x="28.5" y="28.5" width="12" height="12" rx="3.2" fill="${QR_INK}" stroke="#FBF1B5" stroke-width="3"/>` +
+    `</g>`
+  );
+}
+
+/** "Powered by [logo] Qlosk · qlosk.com", left edge at x, text baseline at y. */
+function creditSvg(x: number, y: number): string {
+  const by = measure("dmsans400", CREDIT, "Powered by");
+  const logoX = x + by + 14;
+  const wordX = logoX + LOGO + 10;
+  const dotX = wordX + measure("dmsans700", CREDIT, "Qlosk") + measure("dmsans400", CREDIT, " ");
+  const text = `font-family="DM Sans" font-size="${CREDIT}"`;
+  return (
+    `<text x="${x}" y="${y}" ${text} font-weight="400" fill="${MUTED}">Powered by</text>` +
+    logoSvg(r(logoX), r(y - 28 - (LOGO - 28) / 2), LOGO) +
+    `<text x="${r(wordX)}" y="${y}" ${text} font-weight="700" fill="${INK}">Qlosk</text>` +
+    `<text x="${r(dotX)}" y="${y}" ${text} font-weight="400" fill="${MUTED}">· qlosk.com</text>`
+  );
+}
+
+const r = (v: number) => Math.round(v * 100) / 100;
+
+/** Everything on the sticker, in the 1120-unit square (no outer svg, so a sheet can place it). */
+export function stickerBody(art: QrArt, code: string): string {
   const cell = QR_WIDTH / art.modules;
+  const size = art.modules + 2 * QR_BORDER;
   const qr =
-    `<g transform="translate(${QR_LEFT - QR_BORDER * cell} ${QR_TOP - QR_BORDER * cell}) scale(${cell})">` +
-    `<rect width="${art.modules + 2 * QR_BORDER}" height="${art.modules + 2 * QR_BORDER}" fill="#fff"/>` +
+    `<g transform="translate(${r(QR_LEFT - QR_BORDER * cell)} ${r(QR_TOP - QR_BORDER * cell)}) scale(${cell})">` +
+    `<rect width="${size}" height="${size}" fill="#fff"/>` +
     `<g transform="translate(${QR_BORDER} ${QR_BORDER})"><path d="${art.path}" fill="${QR_INK}"/>${markSvg(art.mark)}</g></g>`;
 
   const colW = 193;
@@ -50,18 +96,20 @@ export function stickerSvg(art: QrArt, code: string): string {
   }).join("");
 
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${V} ${V}" width="${V}" height="${V}">` +
     `<rect width="${V}" height="${V}" fill="#fff"/>` +
     `<rect x="2" y="2" width="${V - 4}" height="${V - 4}" rx="72" fill="#fff" stroke="#D9D9D9" stroke-width="4"/>` +
     `<text x="${V / 2}" y="136" text-anchor="middle" ${BOLD} font-size="66" fill="${INK}">Call, chat or find us. One Scan.</text>` +
-    `<title>QR code ${code}</title>` +
     qr +
     items +
     `<rect x="72" y="992" width="976" height="3" fill="${RULE}"/>` +
-    `<text x="72" y="1056" font-family="DM Sans" font-size="40" fill="${MUTED}">Powered by <tspan font-weight="700" fill="${INK}">Qlosk</tspan> · qlosk.com</text>` +
-    `<text x="1048" y="1056" text-anchor="end" ${BOLD} font-size="38" fill="${INK}">No. ${code}</text>` +
-    `</svg>`
+    creditSvg(72, 1056) +
+    `<text x="1048" y="1056" text-anchor="end" ${BOLD} font-size="38" fill="${INK}">No. ${code}</text>`
   );
+}
+
+/** The sticker as SVG, 1120 units square. */
+export function stickerSvg(art: QrArt, code: string): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${V} ${V}" width="${V}" height="${V}">${stickerBody(art, code)}</svg>`;
 }
 
 export function stickerFileName(code: string): string {
@@ -79,4 +127,108 @@ export async function buildStickerPng(
   const png = renderPng(stickerSvg(art, code), STICKER_PX, fonts);
   await assertQrReads(png, art.url, "sticker");
   return new Uint8Array(await sharp(png).withMetadata({ density: STICKER_DPI }).png().toBuffer());
+}
+
+// ---- A4 sheet of stickers --------------------------------------------------------
+
+// 2 across x 4 down is the most 70 mm squares an A4 holds (3 across is 210 mm). They
+// sit edge to edge, so one cut separates two neighbours; crop marks in the margins
+// show where to cut.
+const A4 = { w: 210, h: 297 };
+export const SHEET_COLS = 2;
+export const SHEET_ROWS = 4;
+export const STICKERS_PER_SHEET = SHEET_COLS * SHEET_ROWS;
+const LEFT = (A4.w - SHEET_COLS * STICKER_MM) / 2;
+const TOP = (A4.h - SHEET_ROWS * STICKER_MM) / 2;
+const MARK_GAP = 1.5;
+const MARK_LEN = 4;
+const MARK_WIDTH = 0.25 / MM; // 0.25 pt, in mm
+/** Pixels per PDF point the finished PDF is drawn at to be read back: 9 to 15 per module. */
+const SHEET_CHECK_SCALES = [3, 4, 3.5, 5, 2.5];
+
+export function stickerSheetFileName(count: number): string {
+  return `qlosk-stickers-${count}-${count === 1 ? "code" : "codes"}-a4.pdf`;
+}
+
+/** One line per cut: ticks outside the grid where each vertical and horizontal cut meets the edge. */
+function cropMarks(): string {
+  const xs = Array.from({ length: SHEET_COLS + 1 }, (_, i) => LEFT + i * STICKER_MM);
+  const ys = Array.from({ length: SHEET_ROWS + 1 }, (_, i) => TOP + i * STICKER_MM);
+  const right = LEFT + SHEET_COLS * STICKER_MM;
+  const bottom = TOP + SHEET_ROWS * STICKER_MM;
+  let d = "";
+  for (const x of xs) d += `M${x} ${TOP - MARK_GAP - MARK_LEN}V${TOP - MARK_GAP}M${x} ${bottom + MARK_GAP}V${bottom + MARK_GAP + MARK_LEN}`;
+  for (const y of ys) d += `M${LEFT - MARK_GAP - MARK_LEN} ${y}H${LEFT - MARK_GAP}M${right + MARK_GAP} ${y}H${right + MARK_GAP + MARK_LEN}`;
+  return `<path d="${d}" fill="none" stroke="#000" stroke-width="${r(MARK_WIDTH * 1000) / 1000}"/>`;
+}
+
+function sheetPageSvg(cells: { code: string; art: QrArt }[]): string {
+  const stickers = cells
+    .map((cell, i) => {
+      const x = LEFT + (i % SHEET_COLS) * STICKER_MM;
+      const y = TOP + Math.floor(i / SHEET_COLS) * STICKER_MM;
+      return `<g transform="translate(${x} ${y}) scale(${STICKER_MM / V})">${stickerBody(cell.art, cell.code)}</g>`;
+    })
+    .join("");
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${A4.w} ${A4.h}" width="${r(A4.w * MM)}" height="${r(A4.h * MM)}">` +
+    `<rect width="${A4.w}" height="${A4.h}" fill="#fff"/>${stickers}${cropMarks()}</svg>`
+  );
+}
+
+/**
+ * A4 PDF of stickers, 8 to a page in the order given, with crop marks. Text is
+ * embedded and the QR is vector. Every code is read back from the finished PDF.
+ */
+export async function buildStickerSheet(
+  codes: string[],
+  baseUrl: string,
+  fonts: PrintFonts,
+  makeArt: (url: string) => QrArt = buildQrArt,
+): Promise<Uint8Array> {
+  if (codes.length === 0) throw new Error("Pick at least one code.");
+  const cells = codes.map((code) => ({ code, art: makeArt(qrTarget(baseUrl, code)) }));
+  const pages = Array.from({ length: Math.ceil(cells.length / STICKERS_PER_SHEET) }, (_, p) =>
+    cells.slice(p * STICKERS_PER_SHEET, (p + 1) * STICKERS_PER_SHEET),
+  );
+
+  const doc = new PDFDocument({
+    size: [A4.w * MM, A4.h * MM],
+    margin: 0,
+    autoFirstPage: false,
+    info: { Title: "Qlosk trial stickers", Author: "Qlosk", Producer: "Qlosk", Creator: "Qlosk" },
+  });
+  const done = collect(doc);
+  const fontFor = embedFonts(doc, fonts);
+  for (const page of pages) {
+    doc.addPage({ size: [A4.w * MM, A4.h * MM], margin: 0 });
+    drawSvg(doc, sheetPageSvg(page), A4.w * MM, A4.h * MM, fontFor);
+  }
+  doc.end();
+  const bytes = await done;
+
+  // Draw each page of the finished PDF and read every sticker's QR from its own square.
+  // jsQR is sensitive to the exact pixel grid (see CHECK_WIDTHS in print.ts), so a cell
+  // that does not read at one drawing size is tried at the next; a wrong address fails at once.
+  for (const [p, page] of pages.entries()) {
+    let pending = page.map((cell, i) => ({ cell, i }));
+    for (const scale of SHEET_CHECK_SCALES) {
+      if (pending.length === 0) break;
+      const picture = await rasterisePdf(bytes, p + 1, scale);
+      const side = STICKER_MM * MM * scale;
+      pending = pending.filter(({ cell, i }) => {
+        const x = (LEFT + (i % SHEET_COLS) * STICKER_MM) * MM * scale;
+        const y = (TOP + Math.floor(i / SHEET_COLS) * STICKER_MM) * MM * scale;
+        const got = readPixels(crop(picture, x, y, side, side));
+        if (got !== null && got !== cell.art.url) {
+          throw new QrCheckError(`The QR code for ${cell.code} on the sticker sheet reads ${got} instead of ${cell.art.url}. Nothing was saved.`);
+        }
+        return got === null;
+      });
+    }
+    if (pending.length > 0) {
+      throw new QrCheckError(`The QR code for ${pending[0].cell.code} on the sticker sheet could not be read back. Nothing was saved.`);
+    }
+  }
+  return bytes;
 }

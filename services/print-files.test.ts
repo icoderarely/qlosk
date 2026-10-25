@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { DEFAULT_CHOICES } from "../components/standee/types.ts";
 import { QrCheckError, readPdfQr, readQr } from "./print.ts";
-import { type PrintFileRow, type PrintDeps, canDownloadPrintFiles, downloadCodeSheet, downloadStandee } from "./print-files.ts";
+import { type PrintFileRow, type PrintDeps, canDownloadPrintFiles, downloadCodeSheet, downloadStandee, downloadStickerSheet } from "./print-files.ts";
 import { BASE, testFonts, testShop } from "./print-test-helpers.ts";
 import { artFromMatrix, clearCentre, rawMatrix } from "./qr-art.ts";
 
@@ -85,6 +85,21 @@ describe("downloading the sheet of unassigned codes", () => {
   it("a damaged code stops it before anything is saved", async () => {
     const { all, saved, rows } = await deps({ makeArt: damaged });
     await assert.rejects(downloadCodeSheet(all, { size: "card", codes: ["7KX2M9"], baseUrl: BASE, userEmail: "a@b.in" }), QrCheckError);
+    assert.equal(saved.length + rows.length, 0);
+  });
+});
+
+describe("downloading a sticker sheet", () => {
+  it("saves it and logs one sheet row with no shop", async () => {
+    const { all, saved, rows } = await deps();
+    const file = await downloadStickerSheet(all, { codes: ["7KX2M9", "R4PD8T"], baseUrl: BASE, userEmail: "admin@qlosk.com" });
+    assert.equal(file.fileName, "qlosk-stickers-2-codes-a4.pdf");
+    assert.equal(saved.length, 1);
+    assert.deepEqual(rows, [{ shopId: null, kind: "sheet", design: "sticker", theme: null, size: "A4x8", createdBy: "admin@qlosk.com", fileUrl: file.fileUrl }]);
+  });
+  it("a damaged code stops it before anything is saved", async () => {
+    const { all, saved, rows } = await deps({ makeArt: damaged });
+    await assert.rejects(downloadStickerSheet(all, { codes: ["7KX2M9"], baseUrl: BASE, userEmail: "a@b.in" }), QrCheckError);
     assert.equal(saved.length + rows.length, 0);
   });
 });

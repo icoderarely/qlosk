@@ -118,6 +118,10 @@ export function createQrStore(db: PrismaClient): QrStore {
       return db.qrCode.findUnique({ where: { code }, select: { code: true, status: true, shopId: true } });
     },
 
+    async findMany(codes) {
+      return db.qrCode.findMany({ where: { code: { in: codes } }, select: { code: true, status: true, shopId: true } });
+    },
+
     async assign({ code, shopId, userEmail }) {
       if (!uuid.test(shopId)) return unknownShop;
       return db.$transaction(async (tx) => {

@@ -60,9 +60,12 @@ export function QrCodesTable({
     return { code: r.code, shopName: r.shopName, shopId: r.shopId, url: `${qrBase}/q/${r.code}`, svg, inStock: r.status === "unassigned" };
   }
 
-  // Only codes in stock can be deleted, so only those get a checkbox.
-  const deletable = rows.filter((r) => r.status === "unassigned").map((r) => r.code);
-  const allSelected = deletable.length > 0 && deletable.every((c) => selected.has(c));
+  // Any code that is not retired can go on a sticker sheet; only codes in stock can be deleted.
+  // Only the rows on this page count, even if the selection outlives a page change.
+  const pickable = rows.filter((r) => r.status !== "retired").map((r) => r.code);
+  const chosen = rows.filter((r) => selected.has(r.code));
+  const onlyStock = chosen.every((r) => r.status === "unassigned");
+  const allSelected = pickable.length > 0 && pickable.every((c) => selected.has(c));
 
   function toggle(code: string) {
     setConfirmDelete(false);
@@ -73,13 +76,13 @@ export function QrCodesTable({
 
   function toggleAll() {
     setConfirmDelete(false);
-    setSelected(allSelected ? new Set() : new Set(deletable));
+    setSelected(allSelected ? new Set() : new Set(pickable));
   }
 
   function deleteSelected() {
     startDelete(async () => {
       try {
-        const r = await deleteQrCodes([...selected]);
+        const r = await deleteQrCodes(chosen.map((c) => c.code));
         notify(r.ok ? { ok: true, text: r.message } : { ok: false, text: r.error });
         if (r.ok) setSelected(new Set());
       } catch {
@@ -131,15 +134,15 @@ export function QrCodesTable({
         </form>
       </div>
 
-      {canEdit && selected.size > 0 ? (
+      {canEdit && chosen.length > 0 ? (
         <div className="flex flex-wrap items-center gap-3 border-b border-line-soft bg-head px-4 py-2.5">
           <span className="font-bold">
-            {selected.size} selected
+            {chosen.length} selected
           </span>
           {confirmDelete ? (
             <>
               <span className="font-bold">
-                Delete {selected.size} {selected.size === 1 ? "code" : "codes"} for good?
+                Delete {chosen.length} {chosen.length === 1 ? "code" : "codes"} for good?
               </span>
               <Button variant="danger" disabled={deleting} onClick={deleteSelected}>
                 {deleting ? "Deleting" : "Yes, delete"}
@@ -150,7 +153,19 @@ export function QrCodesTable({
             </>
           ) : (
             <>
-              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+              <DownloadButton
+                variant="primary"
+                href={`/admin/print/stickers?codes=${chosen.map((c) => c.code).join(",")}`}
+                aria-label={`Download an A4 sheet of ${chosen.length} stickers, 8 per page`}
+              >
+                Download sticker sheet ({chosen.length})
+              </DownloadButton>
+              <Button
+                variant="danger"
+                disabled={!onlyStock}
+                title={onlyStock ? undefined : "Only unassigned codes can be deleted"}
+                onClick={() => setConfirmDelete(true)}
+              >
                 Delete selected
               </Button>
               <Button variant="ghost" onClick={() => setSelected(new Set())}>
@@ -169,9 +184,9 @@ export function QrCodesTable({
             {canEdit ? (
               <Th className="w-11 pl-4">
                 <Check
-                  label="Select all unassigned codes on this page"
+                  label="Select all codes on this page that are not retired"
                   checked={allSelected}
-                  disabled={deletable.length === 0}
+                  disabled={pickable.length === 0}
                   onChange={toggleAll}
                 />
               </Th>
@@ -292,9 +307,9 @@ function CodeRow({
           <Td className="w-11 pl-4">
             <Check
               label={`Select code ${row.code}`}
-              title={row.status === "unassigned" ? undefined : "Only unassigned codes can be deleted"}
+              title={row.status === "retired" ? "Retired codes are never printed again" : undefined}
               checked={selected}
-              disabled={row.status !== "unassigned"}
+              disabled={row.status === "retired"}
               onChange={onSelect}
             />
           </Td>

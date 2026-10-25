@@ -21,6 +21,16 @@ export function normalizeCode(raw: string): string {
   return raw.replace(/\s+/g, "").toUpperCase();
 }
 
+/** The codes in `?codes=A,B,C`: normalised, no repeats, at most MAX_BATCH, in the order given. */
+export function parseCodeList(raw: string | null): { ok: true; codes: string[] } | { ok: false; error: string } {
+  const codes = [...new Set((raw ?? "").split(",").map(normalizeCode).filter(Boolean))];
+  if (codes.length === 0) return { ok: false, error: "Pick at least one code." };
+  if (codes.length > MAX_BATCH) return { ok: false, error: `Pick at most ${MAX_BATCH} codes at a time.` };
+  const bad = codes.find((c) => !isValidCode(c));
+  if (bad) return { ok: false, error: `${bad} is not a valid code.` };
+  return { ok: true, codes };
+}
+
 /** `count` distinct random codes. `pick` is injectable so tests are repeatable. */
 export function generateCodes(count: number, pick: (max: number) => number = (n) => randomInt(n)): string[] {
   const out = new Set<string>();
@@ -99,6 +109,8 @@ export type QrStore = {
   /** Removes these codes, but only the ones still unassigned. Returns how many went. */
   deleteUnassigned(codes: string[]): Promise<number>;
   find(code: string): Promise<QrRecord | null>;
+  /** The records for these codes; codes that do not exist are left out. */
+  findMany(codes: string[]): Promise<QrRecord[]>;
 };
 
 export type QrListQuery = { status: QrStatus | "all"; q: string; page: number };
