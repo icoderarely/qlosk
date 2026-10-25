@@ -42,6 +42,10 @@ export const REFUNDS: LegalDoc = {
       blocks: ["Approved refunds go back to the account or UPI ID you paid from, usually within 7 working days of approval. Your bank may take a little longer to show it."],
     },
     {
+      title: "Payment problems",
+      blocks: ["If you were charged twice, or money left your account but we have no record of it, message us with a screenshot of the payment. We will check and return any duplicate or unmatched amount in full."],
+    },
+    {
       title: "How to ask",
       blocks: ["Message us on WhatsApp or email us with your shop name and the payment reference. Our contact details are at the bottom of this page."],
     },

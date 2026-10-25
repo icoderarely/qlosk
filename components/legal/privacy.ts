@@ -92,7 +92,7 @@ export const PRIVACY: LegalDoc = {
     },
     {
       title: "Grievances and contact",
-      blocks: ["For privacy questions or complaints, use the contact details at the bottom of this page. Tell us your shop name and what you need, and we will reply within 7 days."],
+      blocks: ["For privacy questions or complaints, write to our grievance contact at the bottom of this page. Tell us your shop name and what you need, and we will reply within 7 days. If you are not satisfied with our reply, you may complain to the Data Protection Board of India."],
     },
     {
       title: "Changes",

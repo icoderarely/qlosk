@@ -24,7 +24,7 @@ export const TERMS: LegalDoc = {
     {
       title: "Plans and payment",
       blocks: [
-        "Plans run for one month, six months or one year from the day your page goes live. The price we quote you before you pay is the price for that whole period. Prices are in Indian rupees.",
+        "Plans run for one month, six months or one year from the day your page goes live. The price we quote you before you pay is the price for that whole period. Prices are in Indian rupees and include GST where it applies. We give you a receipt or invoice for every payment.",
         "You see your preview before you pay. We share payment details on WhatsApp once you approve it. We do not ask for card or bank details on this website.",
         "We remind you on WhatsApp before your plan ends. If it ends, your page stays fully live for 15 more days. After that it shows only your shop name, a Call button and Directions until you renew. Your QR code is never changed or given to anyone else.",
       ],
@@ -34,6 +34,12 @@ export const TERMS: LegalDoc = {
       blocks: [
         "You keep ownership of everything you give us. You let us store, resize and display it for as long as needed to run your page and print your standee.",
         "Your page must not contain anything unlawful, misleading, abusive or that infringes someone else's rights, and must not link to such material. If it does, we may pause the page, and we will tell you why.",
+      ],
+    },
+    {
+      title: "Our brand and the QR code",
+      blocks: [
+        `The ${BRAND_NAME} name, logo, page designs and software belong to us. Your shop page and standee carry a small "Powered by ${BRAND_NAME}" credit, which you may not remove. The QR code number stays ours to issue, and it always points to your page while your plan is active.`,
       ],
     },
     {
@@ -77,7 +83,7 @@ export const TERMS: LegalDoc = {
     {
       title: "Law and disputes",
       blocks: [
-        `These terms are governed by the laws of India. Courts in ${LEGAL_CITY} have jurisdiction, subject to any rights you have under consumer protection law. Please message us first. Most problems are solved quickly.`,
+        `These terms are governed by the laws of India. ${LEGAL_CITY ? `Courts in ${LEGAL_CITY}` : "The courts of India"} have jurisdiction, subject to any rights you have under consumer protection law. Please message us first. Most problems are solved quickly.`,
       ],
     },
     {

@@ -10,8 +10,17 @@ export const SUPPORT_EMAIL = "support@qlosk.com";
 export const SITE_URL = (process.env.SITE_URL ?? "https://qlosk.com").replace(/\/+$/, "");
 export const SITE_DESCRIPTION =
   "One QR code for your whole shop: Call, WhatsApp, Google review, Wi-Fi, Maps and your latest offer. We build the page, print the standee and send a monthly report.";
-// Placeholders on the legal pages (privacy, terms, refunds), to replace before launch.
-export const LEGAL_ENTITY = "[registered business name]";
-export const LEGAL_CITY = "[city]";
+// Details on the legal pages. Set them in the environment on Vercel (see .env.example).
+// Anything left empty is simply left out of the pages, so no placeholder text is shown.
+// Registered business name; falls back to the brand name until one is set.
+export const LEGAL_ENTITY = process.env.LEGAL_ENTITY || BRAND_NAME;
+// City whose courts handle disputes. Empty means the terms name no city.
+export const LEGAL_CITY = process.env.LEGAL_CITY ?? "";
+// Registered office address, shown in the contact card.
+export const LEGAL_ADDRESS = process.env.LEGAL_ADDRESS ?? "";
+// GSTIN, shown in the contact card once the business is registered for GST.
+export const LEGAL_GSTIN = process.env.LEGAL_GSTIN ?? "";
+// Person who handles privacy complaints (DPDP Act); defaults to the support team.
+export const GRIEVANCE_OFFICER = process.env.GRIEVANCE_OFFICER ?? "";
 /** Shown as "Last updated" on all three legal pages. Change it whenever the wording changes. */
-export const LEGAL_UPDATED = "24 October 2026";
+export const LEGAL_UPDATED = "26 October 2026";

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
 import { WhatsAppLogo } from "@/components/landing/parts";
-import { BRAND_NAME, LEGAL_UPDATED, SUPPORT_EMAIL } from "@/lib/brand";
+import { BRAND_NAME, GRIEVANCE_OFFICER, LEGAL_ADDRESS, LEGAL_ENTITY, LEGAL_GSTIN, LEGAL_UPDATED, SUPPORT_EMAIL } from "@/lib/brand";
 import type { LegalBlock, LegalDoc } from "./types";
 import { LEGAL_DOCS } from "./docs";
 
@@ -55,6 +55,12 @@ export function LegalPage({ doc, whatsappHref }: { doc: LegalDoc; whatsappHref: 
             <aside className="lg-contact" aria-labelledby="lg-contact-h">
               <h2 id="lg-contact-h" className="l-serif">Questions about this page?</h2>
               <p>Message us with your shop name. Most things are sorted the same day.</p>
+              <p>
+                {LEGAL_ENTITY}
+                {LEGAL_ADDRESS ? `, ${LEGAL_ADDRESS}` : ""}
+                {LEGAL_GSTIN ? ` · GSTIN ${LEGAL_GSTIN}` : ""}
+                {GRIEVANCE_OFFICER ? ` · Grievance contact: ${GRIEVANCE_OFFICER}` : ""}
+              </p>
               <div className="lg-contact-row">
                 <a className="l-btn l-btn-p" href={whatsappHref}><WhatsAppLogo />Chat on WhatsApp</a>
                 {hasEmail ? <a className="l-btn l-btn-s" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> : null}
