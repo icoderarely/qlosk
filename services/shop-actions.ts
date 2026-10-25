@@ -7,7 +7,7 @@ import type { Decision, QrRecord, QrStore } from "./qr.ts";
 
 import { parseUndo, undoableIds, type ChangeEntry, type UndoPayload } from "./undo.ts";
 
-export type StatusOp = "pause" | "resume" | "archive" | "restore";
+export type StatusOp = "pause" | "resume" | "archive" | "restore" | "golive";
 
 const no = (error: string): Decision => ({ ok: false, error });
 
@@ -27,6 +27,9 @@ export function nextStatus(
         : { ok: true, status: "paused" };
     case "resume":
       return current === "paused" ? { ok: true, status: back } : { ok: false, error: "This shop is not paused." };
+    case "golive":
+      if (current !== "building" && current !== "preview") return { ok: false, error: "This shop is not waiting to go live." };
+      return hasPublished ? { ok: true, status: "live" } : { ok: false, error: "Publish the page before taking the shop live." };
     case "archive":
       return current === "archived" ? { ok: false, error: "This shop is already archived." } : { ok: true, status: "archived" };
     case "restore":
@@ -39,6 +42,7 @@ const WHAT: Record<StatusOp, string> = {
   resume: "Shop resumed",
   archive: "Shop archived. The public page is hidden.",
   restore: "Shop restored from the archive",
+  golive: "Shop is live. The public page is reachable.",
 };
 
 export type ShopActionsStore = {

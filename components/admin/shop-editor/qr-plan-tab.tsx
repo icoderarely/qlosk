@@ -402,7 +402,7 @@ export function QrPlanTab({
               </Button>
             ) : (
               <>
-                <Button disabled={disabled} onClick={() => run(async () => ({ ...(await changeShopStatusAction(id, "pause")), message: "Shop paused. Its public page is hidden." }))}>
+                <Button disabled={disabled} onClick={() => run(async () => ({ ...(await changeShopStatusAction(id, "pause")), message: "Shop is offline. Its public page is hidden." }))}>
                   Pause this shop
                 </Button>
                 {confirm === "archive" ? (

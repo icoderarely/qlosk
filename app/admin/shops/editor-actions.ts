@@ -73,7 +73,7 @@ export type SimpleResult = { ok: true } | { ok: false; error: string };
 export async function changeShopStatusAction(shopId: unknown, op: unknown): Promise<SimpleResult> {
   const user = await requireRole("admin");
   const id = z.uuid().safeParse(shopId);
-  const o = z.enum(["pause", "resume", "archive", "restore"]).safeParse(op);
+  const o = z.enum(["pause", "resume", "archive", "restore", "golive"]).safeParse(op);
   if (!id.success || !o.success) return { ok: false, error: "Unknown shop." };
   const result = await changeShopStatus(createShopActionsStore(getDb()), id.data, o.data, user.email);
   if (result.ok) {

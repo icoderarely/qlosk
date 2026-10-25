@@ -3,7 +3,7 @@
 import type { ShopPlanData } from "@/services/billing";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { publishShopPage, saveShopDraft } from "@/app/admin/shops/editor-actions";
+import { changeShopStatusAction, publishShopPage, saveShopDraft } from "@/app/admin/shops/editor-actions";
 import { saveStandee } from "@/app/admin/shops/standee-actions";
 import { Button, LinkButton } from "../button";
 import { Chip } from "../chip";
@@ -141,6 +141,28 @@ export function ShopEditor({
     });
   }
 
+  // Go live / Take offline. Both act on the saved shop, not on unsaved edits.
+  const [changingStatus, startStatusChange] = useTransition();
+  function changeStatus(op: "golive" | "resume" | "pause") {
+    if (shopId === null) return;
+    startStatusChange(async () => {
+      try {
+        const result = await changeShopStatusAction(shopId, op);
+        notify(
+          result.ok
+            ? { ok: true, text: op === "pause" ? "Shop is offline. Its public page and QR are not reachable." : "Shop is live." }
+            : { ok: false, text: result.error },
+        );
+        if (result.ok) router.refresh();
+      } catch {
+        notify({ ok: false, text: "You do not have permission to change shops." });
+      }
+    });
+  }
+  const offline = data.status === "paused";
+  const canGoLive = offline || data.status === "building" || data.status === "preview";
+  const canTakeOffline = data.status === "live" || data.status === "quiet" || data.status === "expired";
+
   function submit(kind: "save" | "publish") {
     setMessage(null);
     startTransition(async () => {
@@ -199,6 +221,20 @@ export function ShopEditor({
             >
               Open live page
             </LinkButton>
+          ) : null}
+          {canEdit && shopId !== null && canGoLive ? (
+            <Button
+              disabled={pending || changingStatus || (!offline && !published)}
+              onClick={() => changeStatus(offline ? "resume" : "golive")}
+              className="disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Go live
+            </Button>
+          ) : null}
+          {canEdit && shopId !== null && canTakeOffline ? (
+            <Button disabled={pending || changingStatus} onClick={() => changeStatus("pause")}>
+              Take offline
+            </Button>
           ) : null}
           {canEdit ? (
             <>

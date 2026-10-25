@@ -19,6 +19,10 @@ describe("nextStatus", () => {
   });
 
   it("brings a paused or archived shop back to live if it has a published page, else building", () => {
+    assert.deepEqual(nextStatus("building", "golive", true), { ok: true, status: "live" });
+    assert.deepEqual(nextStatus("preview", "golive", true), { ok: true, status: "live" });
+    assert.equal(nextStatus("building", "golive", false).ok, false);
+    assert.equal(nextStatus("live", "golive", true).ok, false);
     assert.deepEqual(nextStatus("paused", "resume", true), { ok: true, status: "live" });
     assert.deepEqual(nextStatus("paused", "resume", false), { ok: true, status: "building" });
     assert.deepEqual(nextStatus("archived", "restore", true), { ok: true, status: "live" });

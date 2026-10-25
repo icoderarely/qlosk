@@ -181,6 +181,16 @@ export function createEditorStore(db: PrismaClient): EditorStore {
           });
         }
         await tx.changeLog.create({ data: { shopId: id, userEmail, what: "Published page" } });
+
+        // Publishing makes a new shop live. Paused, archived and expired shops
+        // keep their status; an admin changes those on purpose.
+        const wentLive = await tx.shop.updateMany({
+          where: { id, status: { in: ["building", "preview"] } },
+          data: { status: "live" },
+        });
+        if (wentLive.count > 0) {
+          await tx.changeLog.create({ data: { shopId: id, userEmail, what: "Shop is live" } });
+        }
       });
     },
   };
