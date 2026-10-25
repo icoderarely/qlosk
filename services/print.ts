@@ -39,6 +39,12 @@ export const MIN_QR_MM = 30;
 export const PNG_WIDTH = 1080;
 /** Width the QR is checked at: 20 px or more per module for every code we make. */
 const CHECK_WIDTH = 1600;
+/**
+ * jsQR's finder search is sensitive to the exact pixel grid, so a code that reads at most
+ * sizes can fail at one (the round badge with a two-line headline fails at 1600). The check
+ * draws at these widths in turn and passes when one reads; a wrong address always fails.
+ */
+const CHECK_WIDTHS = [CHECK_WIDTH, 1400, 2000, 1200, 1800];
 /** The PDF is drawn at 3 pixels per point (216 dpi) for its check: about 18 px per module. */
 const PDF_CHECK_SCALE = 3;
 
@@ -147,8 +153,15 @@ export function standeeFileName(kind: "pdf" | "png", code: string, input: Pick<S
 
 /** Decodes the QR from a rendering of this very standee. Used before saving and by the preview's "QR checked" line. */
 export async function checkStandeeQr(input: StandeeInput, fonts: PrintFonts): Promise<void> {
-  const png = renderPng(renderStandeeSvg(standeeProps(input, false)), CHECK_WIDTH, fonts);
-  await assertQrReads(png, input.content.art.url, "standee");
+  const svg = renderStandeeSvg(standeeProps(input, false));
+  const expected = input.content.art.url;
+  for (const width of CHECK_WIDTHS) {
+    const got = await readQr(renderPng(svg, width, fonts));
+    if (got === null) continue;
+    if (got !== expected) throw new QrCheckError(`The QR code in the standee reads ${got} instead of ${expected}. Nothing was saved.`);
+    return;
+  }
+  throw new QrCheckError("The QR code in the standee could not be read back. Nothing was saved.");
 }
 
 /** 1080 px wide PNG of the standee, for WhatsApp. The PNG itself is what gets decoded. */

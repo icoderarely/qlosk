@@ -147,6 +147,11 @@ describe("the QR reads back (done when a printed copy scans)", () => {
   it("the check passes for a good standee", async () => {
     await checkStandeeQr(input(), await testFonts());
   });
+  it("the check passes for a round badge with a long headline (jsQR misses it at 1600 px)", async () => {
+    const long = input({ design: "badge" });
+    long.content = { ...long.content, headline: "Scan for everything about our shop now" };
+    await checkStandeeQr(long, await testFonts());
+  });
 });
 
 describe("a QR that does not read back fails loudly", () => {
