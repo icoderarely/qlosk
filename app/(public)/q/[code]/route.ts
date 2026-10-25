@@ -5,8 +5,8 @@ import { trackingKeys } from "@/lib/tracking-env";
 import { clientIp, handleScan, isIgnoredRequest } from "@/services/tracking";
 
 // What the printed QR code opens (spec section 3): log the scan, then 302 to the
-// shop's page. A code that is not assigned to a live shop shows the "not
-// activated yet" page instead. Never cached: every scan must reach this code.
+// shop's page. A retired code shows the "no longer in use" page and any other code
+// that is not assigned to a live shop shows the "not activated yet" page. Never cached: every scan must reach this code.
 export async function GET(request: NextRequest, ctx: RouteContext<"/q/[code]">) {
   const { code } = await ctx.params;
   const outcome = await handleScan(
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/q/[code]">) 
     // Logging runs after the redirect is sent, so the visitor does not wait for it.
     (work) => after(work),
   );
-  const to = outcome.kind === "redirect" ? `/s/${outcome.slug}` : "/not-activated";
+  const to = outcome.kind === "redirect" ? `/s/${outcome.slug}` : outcome.kind === "retired" ? "/code-retired" : "/not-activated";
   const response = NextResponse.redirect(new URL(to, request.url), 302);
   response.headers.set("cache-control", "no-store");
   response.headers.set("x-robots-tag", "noindex");

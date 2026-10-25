@@ -119,7 +119,7 @@ export type TrackingStore = {
   holdScans(shopId: string, since: Date): Promise<void>;
 };
 
-export type ScanOutcome = { kind: "redirect"; slug: string } | { kind: "inactive" };
+export type ScanOutcome = { kind: "redirect"; slug: string } | { kind: "inactive" } | { kind: "retired" };
 
 /** `skipLog`: a HEAD or prefetch request, answered but never stored. */
 export type Visitor = { ip: string | null; userAgent: string | null; skipLog?: boolean };
@@ -235,6 +235,7 @@ export async function handleScan(
     if (defer) defer(log);
     else await log();
   }
+  if (found.status === "retired") return { kind: "retired" };
   return found.liveSlug ? { kind: "redirect", slug: found.liveSlug } : { kind: "inactive" };
 }
 

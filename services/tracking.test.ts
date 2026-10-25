@@ -154,6 +154,12 @@ describe("handleScan", () => {
     assert.equal((scans[0] as { shopId: unknown }).shopId, null);
   });
 
+  it("shows the retired page for a retired code, and still logs the scan", async () => {
+    const { store, scans } = fake({ status: "retired", shopId: null, liveSlug: null });
+    assert.deepEqual(await handleScan(store, "7KX2M9", visitor, "s", NOW), { kind: "retired" });
+    assert.equal(scans.length, 1);
+  });
+
   it("does the same for a shop that is not live (unpublished, paused)", async () => {
     const { store } = fake({ status: "assigned", shopId: "s1", liveSlug: null });
     assert.deepEqual(await handleScan(store, "7KX2M9", visitor, "s", NOW), { kind: "inactive" });
