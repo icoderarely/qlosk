@@ -131,17 +131,19 @@ export async function buildStickerPng(
 
 // ---- A4 sheet of stickers --------------------------------------------------------
 
-// 2 across x 3 down with a 10 mm gap, so the stickers are not crowded and each one is
-// cut on its own four edges. Crop marks sit in the margins at every cut line; a short
-// header and footer line fit in the margins too.
+// 2 across x 3 down. Each sticker sits in an 80 mm cell with 5 mm of white around its
+// border, and the crop marks sit on the cell lines, so every cut falls in the middle of
+// the space between two stickers (or 5 mm outside the outer ones). A short header and
+// footer line fit in the margins.
 const A4 = { w: 210, h: 297 };
 export const SHEET_COLS = 2;
 export const SHEET_ROWS = 3;
 export const STICKERS_PER_SHEET = SHEET_COLS * SHEET_ROWS;
 const GAP = 10;
 const PITCH = STICKER_MM + GAP;
-const LEFT = (A4.w - (SHEET_COLS * STICKER_MM + (SHEET_COLS - 1) * GAP)) / 2;
-const TOP = (A4.h - (SHEET_ROWS * STICKER_MM + (SHEET_ROWS - 1) * GAP)) / 2;
+/** Where the first sticker starts: the grid of cells is centred, and the sticker sits half a gap inside its cell. */
+const LEFT = (A4.w - SHEET_COLS * PITCH) / 2 + GAP / 2;
+const TOP = (A4.h - SHEET_ROWS * PITCH) / 2 + GAP / 2;
 const MARK_GAP = 1.5;
 const MARK_LEN = 4;
 const MARK_WIDTH = 0.25 / MM; // 0.25 pt, in mm
@@ -156,14 +158,13 @@ export function stickerSheetFileName(count: number): string {
 const xAt = (col: number) => LEFT + col * PITCH;
 const yAt = (row: number) => TOP + row * PITCH;
 
-/** Ticks outside the grid where every cut line meets the edge: two per sticker side. */
+/** Ticks outside the grid of cells where every cut line meets the edge. */
 function cropMarks(): string {
-  const xs = Array.from({ length: SHEET_COLS }, (_, i) => [xAt(i), xAt(i) + STICKER_MM]).flat();
-  const ys = Array.from({ length: SHEET_ROWS }, (_, i) => [yAt(i), yAt(i) + STICKER_MM]).flat();
-  const top = yAt(0);
-  const bottom = yAt(SHEET_ROWS - 1) + STICKER_MM;
-  const left = xAt(0);
-  const right = xAt(SHEET_COLS - 1) + STICKER_MM;
+  const cut = (start: number, n: number) => Array.from({ length: n + 1 }, (_, i) => start - GAP / 2 + i * PITCH);
+  const xs = cut(LEFT, SHEET_COLS);
+  const ys = cut(TOP, SHEET_ROWS);
+  const [left, right] = [xs[0], xs[xs.length - 1]];
+  const [top, bottom] = [ys[0], ys[ys.length - 1]];
   let d = "";
   for (const x of xs) d += `M${x} ${top - MARK_GAP - MARK_LEN}V${top - MARK_GAP}M${x} ${bottom + MARK_GAP}V${bottom + MARK_GAP + MARK_LEN}`;
   for (const y of ys) d += `M${left - MARK_GAP - MARK_LEN} ${y}H${left - MARK_GAP}M${right + MARK_GAP} ${y}H${right + MARK_GAP + MARK_LEN}`;
