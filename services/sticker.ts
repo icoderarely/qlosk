@@ -131,15 +131,17 @@ export async function buildStickerPng(
 
 // ---- A4 sheet of stickers --------------------------------------------------------
 
-// 2 across x 4 down is the most 70 mm squares an A4 holds (3 across is 210 mm). They
-// sit edge to edge, so one cut separates two neighbours; crop marks in the margins
-// show where to cut.
+// 2 across x 3 down with a 10 mm gap, so the stickers are not crowded and each one is
+// cut on its own four edges. Crop marks sit in the margins at every cut line; a short
+// header and footer line fit in the margins too.
 const A4 = { w: 210, h: 297 };
 export const SHEET_COLS = 2;
-export const SHEET_ROWS = 4;
+export const SHEET_ROWS = 3;
 export const STICKERS_PER_SHEET = SHEET_COLS * SHEET_ROWS;
-const LEFT = (A4.w - SHEET_COLS * STICKER_MM) / 2;
-const TOP = (A4.h - SHEET_ROWS * STICKER_MM) / 2;
+const GAP = 10;
+const PITCH = STICKER_MM + GAP;
+const LEFT = (A4.w - (SHEET_COLS * STICKER_MM + (SHEET_COLS - 1) * GAP)) / 2;
+const TOP = (A4.h - (SHEET_ROWS * STICKER_MM + (SHEET_ROWS - 1) * GAP)) / 2;
 const MARK_GAP = 1.5;
 const MARK_LEN = 4;
 const MARK_WIDTH = 0.25 / MM; // 0.25 pt, in mm
@@ -150,34 +152,47 @@ export function stickerSheetFileName(count: number): string {
   return `qlosk-stickers-${count}-${count === 1 ? "code" : "codes"}-a4.pdf`;
 }
 
-/** One line per cut: ticks outside the grid where each vertical and horizontal cut meets the edge. */
+/** Where each sticker starts (left edges across, top edges down), in mm. */
+const xAt = (col: number) => LEFT + col * PITCH;
+const yAt = (row: number) => TOP + row * PITCH;
+
+/** Ticks outside the grid where every cut line meets the edge: two per sticker side. */
 function cropMarks(): string {
-  const xs = Array.from({ length: SHEET_COLS + 1 }, (_, i) => LEFT + i * STICKER_MM);
-  const ys = Array.from({ length: SHEET_ROWS + 1 }, (_, i) => TOP + i * STICKER_MM);
-  const right = LEFT + SHEET_COLS * STICKER_MM;
-  const bottom = TOP + SHEET_ROWS * STICKER_MM;
+  const xs = Array.from({ length: SHEET_COLS }, (_, i) => [xAt(i), xAt(i) + STICKER_MM]).flat();
+  const ys = Array.from({ length: SHEET_ROWS }, (_, i) => [yAt(i), yAt(i) + STICKER_MM]).flat();
+  const top = yAt(0);
+  const bottom = yAt(SHEET_ROWS - 1) + STICKER_MM;
+  const left = xAt(0);
+  const right = xAt(SHEET_COLS - 1) + STICKER_MM;
   let d = "";
-  for (const x of xs) d += `M${x} ${TOP - MARK_GAP - MARK_LEN}V${TOP - MARK_GAP}M${x} ${bottom + MARK_GAP}V${bottom + MARK_GAP + MARK_LEN}`;
-  for (const y of ys) d += `M${LEFT - MARK_GAP - MARK_LEN} ${y}H${LEFT - MARK_GAP}M${right + MARK_GAP} ${y}H${right + MARK_GAP + MARK_LEN}`;
+  for (const x of xs) d += `M${x} ${top - MARK_GAP - MARK_LEN}V${top - MARK_GAP}M${x} ${bottom + MARK_GAP}V${bottom + MARK_GAP + MARK_LEN}`;
+  for (const y of ys) d += `M${left - MARK_GAP - MARK_LEN} ${y}H${left - MARK_GAP}M${right + MARK_GAP} ${y}H${right + MARK_GAP + MARK_LEN}`;
   return `<path d="${d}" fill="none" stroke="#000" stroke-width="${r(MARK_WIDTH * 1000) / 1000}"/>`;
 }
 
 function sheetPageSvg(cells: { code: string; art: QrArt }[]): string {
   const stickers = cells
     .map((cell, i) => {
-      const x = LEFT + (i % SHEET_COLS) * STICKER_MM;
-      const y = TOP + Math.floor(i / SHEET_COLS) * STICKER_MM;
+      const x = xAt(i % SHEET_COLS);
+      const y = yAt(Math.floor(i / SHEET_COLS));
       return `<g transform="translate(${x} ${y}) scale(${STICKER_MM / V})">${stickerBody(cell.art, cell.code)}</g>`;
     })
     .join("");
+  const note = (y: number, text: string) =>
+    `<text x="${LEFT}" y="${y}" ${BOLD} font-size="3.4" fill="${INK}">${text}</text>`;
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${A4.w} ${A4.h}" width="${r(A4.w * MM)}" height="${r(A4.h * MM)}">` +
-    `<rect width="${A4.w}" height="${A4.h}" fill="#fff"/>${stickers}${cropMarks()}</svg>`
+    `<rect width="${A4.w}" height="${A4.h}" fill="#fff"/>` +
+    note(16, `Qlosk trial stickers · ${STICKER_MM} × ${STICKER_MM} mm · ${STICKERS_PER_SHEET} per A4 sheet`) +
+    stickers +
+    cropMarks() +
+    note(283, "Print at 100%, no fit to page. Cut along the crop marks.") +
+    `</svg>`
   );
 }
 
 /**
- * A4 PDF of stickers, 8 to a page in the order given, with crop marks. Text is
+ * A4 PDF of stickers, 6 to a page in the order given, with crop marks. Text is
  * embedded and the QR is vector. Every code is read back from the finished PDF.
  */
 export async function buildStickerSheet(
@@ -217,8 +232,8 @@ export async function buildStickerSheet(
       const picture = await rasterisePdf(bytes, p + 1, scale);
       const side = STICKER_MM * MM * scale;
       pending = pending.filter(({ cell, i }) => {
-        const x = (LEFT + (i % SHEET_COLS) * STICKER_MM) * MM * scale;
-        const y = (TOP + Math.floor(i / SHEET_COLS) * STICKER_MM) * MM * scale;
+        const x = xAt(i % SHEET_COLS) * MM * scale;
+        const y = yAt(Math.floor(i / SHEET_COLS)) * MM * scale;
         const got = readPixels(crop(picture, x, y, side, side));
         if (got !== null && got !== cell.art.url) {
           throw new QrCheckError(`The QR code for ${cell.code} on the sticker sheet reads ${got} instead of ${cell.art.url}. Nothing was saved.`);

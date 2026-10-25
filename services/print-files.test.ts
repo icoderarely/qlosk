@@ -95,7 +95,7 @@ describe("downloading a sticker sheet", () => {
     const file = await downloadStickerSheet(all, { codes: ["7KX2M9", "R4PD8T"], baseUrl: BASE, userEmail: "admin@qlosk.com" });
     assert.equal(file.fileName, "qlosk-stickers-2-codes-a4.pdf");
     assert.equal(saved.length, 1);
-    assert.deepEqual(rows, [{ shopId: null, kind: "sheet", design: "sticker", theme: null, size: "A4x8", createdBy: "admin@qlosk.com", fileUrl: file.fileUrl }]);
+    assert.deepEqual(rows, [{ shopId: null, kind: "sheet", design: "sticker", theme: null, size: "A4x6", createdBy: "admin@qlosk.com", fileUrl: file.fileUrl }]);
   });
   it("a damaged code stops it before anything is saved", async () => {
     const { all, saved, rows } = await deps({ makeArt: damaged });

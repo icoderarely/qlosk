@@ -25,7 +25,7 @@ describe("the 7 x 7 cm sticker", () => {
     await assert.rejects(buildStickerPng("7KX2M9", BASE, await testFonts(), bad), QrCheckError);
   });
 
-  it("sets stickers on A4 sheets, 8 to a page, and every QR reads from the PDF", async () => {
+  it("sets stickers on A4 sheets, 6 to a page, and every QR reads from the PDF", async () => {
     const codes = ["7KX2M9", "ABCDEF", "GHJKMN", "PQRSTU", "VWXYZ2", "345678", "9ABCDE", "FGHJKM", "NPQRST"];
     const pdf = await buildStickerSheet(codes, BASE, await testFonts());
     const task = pdfjs.getDocument({ data: new Uint8Array(pdf), useSystemFonts: false });
@@ -36,8 +36,8 @@ describe("the 7 x 7 cm sticker", () => {
     await task.destroy();
     assert.equal(stickerSheetFileName(9), "qlosk-stickers-9-codes-a4.pdf");
   });
-  it("fits exactly 8 stickers on one page", async () => {
-    const pdf = await buildStickerSheet(["7KX2M9", "ABCDEF", "GHJKMN", "PQRSTU", "VWXYZ2", "345678", "9ABCDE", "FGHJKM"], BASE, await testFonts());
+  it("fits exactly 6 stickers on one page", async () => {
+    const pdf = await buildStickerSheet(["7KX2M9", "ABCDEF", "GHJKMN", "PQRSTU", "VWXYZ2", "345678"], BASE, await testFonts());
     const task = pdfjs.getDocument({ data: new Uint8Array(pdf), useSystemFonts: false });
     const doc = await task.promise;
     assert.equal(doc.numPages, 1);

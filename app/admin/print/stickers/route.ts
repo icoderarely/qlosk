@@ -9,7 +9,7 @@ import { QrCheckError } from "@/services/print";
 import { canDownloadPrintFiles, downloadStickerSheet } from "@/services/print-files";
 import { parseCodeList } from "@/services/qr";
 
-// A4 PDF of the 7 x 7 cm stickers for ?codes=A,B,C, 8 to a page with crop marks, in
+// A4 PDF of the 7 x 7 cm stickers for ?codes=A,B,C, 6 to a page with crop marks, in
 // the order given. Codes may be in stock or assigned; unknown and retired ones are
 // refused. Every QR is read back from the finished PDF before it is saved or sent.
 export async function GET(request: Request) {

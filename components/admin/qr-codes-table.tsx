@@ -156,7 +156,7 @@ export function QrCodesTable({
               <DownloadButton
                 variant="primary"
                 href={`/admin/print/stickers?codes=${chosen.map((c) => c.code).join(",")}`}
-                aria-label={`Download an A4 sheet of ${chosen.length} stickers, 8 per page`}
+                aria-label={`Download an A4 sheet of ${chosen.length} stickers, 6 per page`}
               >
                 Download sticker sheet ({chosen.length})
               </DownloadButton>

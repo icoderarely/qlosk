@@ -96,6 +96,6 @@ export async function downloadStickerSheet(
 ): Promise<Download> {
   const bytes = await buildStickerSheet(args.codes, args.baseUrl, deps.fonts, deps.makeArt);
   const fileUrl = await deps.storage.put(key("stickers", "pdf"), bytes, "application/pdf");
-  await deps.log.insert({ shopId: null, kind: "sheet", design: "sticker", theme: null, size: "A4x8", createdBy: args.userEmail, fileUrl });
+  await deps.log.insert({ shopId: null, kind: "sheet", design: "sticker", theme: null, size: "A4x6", createdBy: args.userEmail, fileUrl });
   return { bytes, fileName: stickerSheetFileName(args.codes.length), contentType: "application/pdf", fileUrl };
 }
