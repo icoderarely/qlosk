@@ -127,7 +127,7 @@ export type Visitor = { ip: string | null; userAgent: string | null; skipLog?: b
 // ---- Checks ------------------------------------------------------------------
 
 // Link-preview fetchers that isbot may not know, or that we want named outright.
-const PREVIEW_AGENTS = /WhatsApp\/|facebookexternalhit|Facebot|Twitterbot|TelegramBot|Slackbot|LinkedInBot|Discordbot|SkypeUriPreview|Pinterestbot|Applebot|Google-InspectionTool|Bytespider/i;
+const PREVIEW_AGENTS = /WhatsApp\/|facebookexternalhit|Facebot|Twitterbot|TelegramBot|Slackbot|LinkedInBot|Discordbot|SkypeUriPreview|Pinterestbot|Applebot|Google-InspectionTool|Googlebot|GoogleOther|Google-PageRenderer|Bytespider/i;
 
 /** Crawlers and link previews. A missing user agent counts: browsers always send one. */
 export function isCrawler(userAgent: string | null): boolean {

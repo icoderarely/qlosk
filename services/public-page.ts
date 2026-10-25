@@ -18,7 +18,7 @@ export type PublicStore = {
 };
 
 export type PublicLookup =
-  | { kind: "page"; props: ShopPageProps; code: string | null; title: string; description: string }
+  | { kind: "page"; props: ShopPageProps; code: string | null; title: string; description: string; publishedAt: Date | null }
   | { kind: "redirect"; slug: string }
   | { kind: "notfound" };
 
@@ -123,6 +123,7 @@ export async function lookupPublicPage(store: PublicStore, rawSlug: string): Pro
       kind: "page",
       props,
       code: shop.code,
+      publishedAt: shop.publishedAt,
       title: props.shop.name,
       description: props.shop.tagline ?? `${props.shop.name} on one page: call, WhatsApp, directions and more.`,
     };

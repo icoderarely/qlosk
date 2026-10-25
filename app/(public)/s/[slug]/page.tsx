@@ -3,6 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { cache, Suspense } from "react";
 import { DesktopFrame } from "@/components/shop-page/desktop-frame";
 import { ShopPage } from "@/components/shop-page/shop-page";
+import { SITE_URL } from "@/lib/brand";
 import { getDb } from "@/lib/db";
 import { loadSettings } from "@/lib/load-settings";
 import { qrBaseUrl } from "@/lib/print-assets";
@@ -10,15 +11,18 @@ import { createPublicStore } from "@/lib/public-page-store";
 import { trackingKeys } from "@/lib/tracking-env";
 import { qrSvg, qrTarget } from "@/services/print";
 import { lookupPublicPage, withTapLinks } from "@/services/public-page";
+import { shareMeta } from "@/services/share-card";
 import { signTapToken } from "@/services/tracking";
 
 // One lookup per request, shared by the page and its metadata.
 const lookup = cache((slug: string) => lookupPublicPage(createPublicStore(getDb()), slug));
 
 export async function generateMetadata({ params }: PageProps<"/s/[slug]">): Promise<Metadata> {
-  const result = await lookup((await params).slug);
-  if (result.kind !== "page") return { title: "Page not found", robots: { index: false } };
-  return { title: result.title, description: result.description };
+  const { slug } = await params;
+  const result = await lookup(slug);
+  // No live page: nothing of the shop is shown, and the generic Qlosk card stands in.
+  if (result.kind !== "page") return { title: "Page not found", robots: { index: false, follow: false } };
+  return shareMeta({ slug: slug.toLowerCase(), props: result.props, publishedAt: result.publishedAt, origin: SITE_URL });
 }
 
 // Server-rendered. The database read is request-time work, so it sits behind

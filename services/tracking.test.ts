@@ -241,7 +241,7 @@ const GOOGLEBOT = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.co
 
 describe("crawler check", () => {
   it("knows crawlers, link previews, scripts and a missing user agent", () => {
-    for (const ua of [GOOGLEBOT, "curl/8.4.0", "WhatsApp/2.23.20 A", "facebookexternalhit/1.1", "Twitterbot/1.0", "TelegramBot (like TwitterBot)", "Slackbot-LinkExpanding 1.0", null, "", "   "]) {
+    for (const ua of [GOOGLEBOT, "curl/8.4.0", "WhatsApp/2.23.20 A", "facebookexternalhit/1.1", "Twitterbot/1.0", "TelegramBot (like TwitterBot)", "Slackbot-LinkExpanding 1.0", "LinkedInBot/1.0 (compatible; Mozilla/5.0; +http://www.linkedin.com)", "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)", "Mozilla/5.0 (compatible; Google-InspectionTool/1.0)", "GoogleOther", null, "", "   "]) {
       assert.equal(isCrawler(ua), true, String(ua));
     }
   });
@@ -252,6 +252,15 @@ describe("crawler check", () => {
       "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/119.0 Mobile Safari/537.36 Instagram 310.0",
     ]) {
       assert.equal(isCrawler(ua), false, ua);
+    }
+  });
+
+  it("flags every link-preview fetcher on /q and still sends it on to /s, so the preview can load", async () => {
+    for (const userAgent of ["WhatsApp/2.23.20 A", "facebookexternalhit/1.1", "TelegramBot (like TwitterBot)", "Slackbot-LinkExpanding 1.0", "Twitterbot/1.0", "LinkedInBot/1.0", "Discordbot/2.0", GOOGLEBOT]) {
+      const { store, scans } = fake(ASSIGNED);
+      const out = await handleScan(store, "7KX2M9", { ip: "203.0.113.9", userAgent }, "salt", NOW);
+      assert.deepEqual(out, { kind: "redirect", slug: "velvet" }, userAgent);
+      assert.deepEqual([scans[0].isBot, scans[0].botReason], [true, "crawler"], userAgent);
     }
   });
 
