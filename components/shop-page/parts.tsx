@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { BrandMark } from "@/components/brand-mark";
 import { BRAND_NAME } from "@/lib/brand";
@@ -57,14 +58,14 @@ export function LocationLine({ text }: { text: string }) {
 const CHIP_BTN =
   "relative flex size-11 flex-none items-center justify-center rounded-xl border border-sp-line bg-sp-card text-sp-text";
 
-// Top bar: our mark on the left, a share button on the right.
+// Top bar: our mark (links to the landing page) on the left, a share button on the right.
 // `overlay` lays it over the top of the cover photo instead of in the flow.
 export function TopBar({ overlay = false }: { overlay?: boolean }) {
   return (
     <div className={`flex items-center justify-between px-5 pt-5 ${overlay ? "absolute inset-x-0 top-0 z-10" : ""}`}>
-      <span className={CHIP_BTN} role="img" aria-label={BRAND_NAME}>
+      <Link href="/" prefetch={false} className={`${CHIP_BTN} no-underline`} aria-label={`${BRAND_NAME} home`}>
         <BrandMark className="size-7" />
-      </span>
+      </Link>
       <ShareButton className={`${CHIP_BTN} cursor-pointer`} />
     </div>
   );
