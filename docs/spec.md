@@ -81,7 +81,7 @@ The QR code always encodes `/q/code`, never the shop page. That lets us count sc
 | `/admin-login` | Username and password sign-in. Lives outside `/admin`. Signed-in users who open it go to `/admin`. Anyone not signed in who opens any `/admin/...` page is redirected here. |
 | `/admin` | Overview: KPIs, scans chart, top buttons, needs attention, recent shops |
 | `/admin/shops` | List with status tabs, search, filters, bulk change of theme, layout, font |
-| `/admin/shops/new`, `/admin/shops/[id]` | Shop editor: tabs Details, Buttons, Look, Offers and Wi-Fi, Standee, QR and plan, Activity, plus live preview |
+| `/admin/shops/new`, `/admin/shops/[id]` | Shop editor: tabs Details, Buttons, Look, Offers and Wi-Fi, Standee, QR and plan, Activity, Quick setup (the first tab for a new shop), plus live preview |
 | `/admin/shops/[id]/standee.pdf`, `.png` | Server-generated standee downloads for that shop (role-checked) |
 | `/admin/qr` | Code stock, generate a batch, print sheet, assign and reassign. Each assigned code has a "Standee" button that opens that shop's Standee tab. |
 | `/admin/onboarding` | Board: Lead, Building, Preview sent, Printing, Live this week |
@@ -230,6 +230,7 @@ Vertical slices. Each ends with something clickable and a check.
 2. **ShopPage component.** All 5 themes, 5 layouts, 3 fonts with sample data. Done when `/dev/shop-page` shows every combination and matches the design boards.
 3. **Playground.** Pickers, shop-type switcher, URL state, WhatsApp button. Done when a copied URL reopens the same look.
 4. **Shops and editor.** List with filters and bulk actions; editor tabs; draft and publish; live preview. Done when you create a shop, change its look, publish, and `/s/slug` shows it.
+   - **Quick setup tab.** Paste a Google share or Maps link, an Instagram link and a website. No AI: the business is found by name through the Google Places API (New) (`GOOGLE_PLACES_API_KEY`, server-only) and gives name, address, phone, website, directions link and the review link (`search.google.com/local/writereview?placeid=...`). Instagram and website are read from the pasted URLs. The admin ticks what to apply, nothing is saved until Save draft or Publish, and the logo stays manual. A mobile number is also offered as the WhatsApp number. The default WhatsApp message is written from the customer's side: "Hi {shop}! 👋 I scanned your Qlosk code and wanted to get in touch. Could you help me with some details?" Only Google hosts are followed for redirects.
 5. **QR and redirects.** Code generation, assign and reassign, `/q/code`, `/r/...`, logging, unassigned page. Done when a test scan is logged and lands on the shop.
 6. **Standee designer and print files.** Standee tab, three designs, live preview, PDF and PNG downloads, unassigned sheet (section 11). Done when a test print scans from 1 m.
 7. **Bot filtering and rollups.** Checks from section 7, nightly job. Done when a curl with a bot user agent is flagged and a phone scan is counted.
