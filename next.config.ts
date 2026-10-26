@@ -20,6 +20,20 @@ const nextConfig: NextConfig = {
   // Native or file-reading packages the standee downloads use: load them from node_modules.
   serverExternalPackages: ["@resvg/resvg-js", "@napi-rs/canvas", "pdfkit", "svg-to-pdfkit", "pdfjs-dist"],
   partialPrefetching: true,
+  // Admin, sign-in and internal routes must never be indexed, whatever a page's own metadata says.
+  // The header also covers redirects, downloads (PDF/PNG) and route handlers, which have no <meta>.
+  async headers() {
+    return [
+      {
+        source: "/:path(admin|admin-login|api|dev)/:rest*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive, nosnippet" }],
+      },
+      {
+        source: "/:path(admin|admin-login)",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive, nosnippet" }],
+      },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {
