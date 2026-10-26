@@ -18,6 +18,7 @@ import { ButtonsTab } from "./buttons-tab";
 import { DetailsTab } from "./details-tab";
 import { LookTab } from "./look-tab";
 import { OffersTab } from "./offers-tab";
+import { QuickSetupTab } from "./quick-setup-tab";
 import { notify } from "../notify";
 import { Preview } from "./preview";
 import { QrPlanTab, type QrChoices } from "./qr-plan-tab";
@@ -36,6 +37,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "standee", label: "Standee" },
   { id: "qrplan", label: "QR and plan" },
   { id: "activity", label: "Activity" },
+  { id: "quicksetup", label: "Quick setup" },
 ];
 
 const ID_PREFIX = "editor";
@@ -70,7 +72,7 @@ export function ShopEditor({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [shopId, setShopId] = useState(data.id);
-  const [tab, setTab] = useState<TabId>(data.id === null ? "details" : (initialTab ?? "buttons"));
+  const [tab, setTab] = useState<TabId>(data.id === null ? "quicksetup" : (initialTab ?? "buttons"));
   const [state, setState] = useState<EditorState>(data.values);
   const [saved, setSaved] = useState(() => JSON.stringify(data.values));
   const [hasUnpublished, setHasUnpublished] = useState(data.hasUnpublished);
@@ -329,6 +331,7 @@ export function ShopEditor({
             {tab === "activity" ? (
               <ActivityTab shopId={shopId} changes={data.changes} traffic={data.traffic} canEdit={canEdit} />
             ) : null}
+            {tab === "quicksetup" ? <QuickSetupTab state={state} set={set} /> : null}
           </div>
         </fieldset>
 
