@@ -191,7 +191,11 @@ export async function searchPlace(
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
-  if (!res.ok) throw new Error(`Places API answered ${res.status}`);
+  if (!res.ok) {
+    // Google explains a rejected key in the body (billing off, API not enabled, key restricted).
+    const detail = await res.json().then((b: { error?: { message?: string } }) => b.error?.message, () => undefined);
+    throw new Error(`Places API answered ${res.status}${detail ? `: ${detail}` : ""}`);
+  }
   const data = (await res.json()) as { places?: RawPlace[] };
   return data.places?.[0] ? toPlaceMatch(data.places[0]) : null;
 }
