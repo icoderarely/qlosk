@@ -113,14 +113,13 @@ describe("quickSetup", () => {
     assert.ok(!r.fields.some((f) => f.key === "whatsapp"));
   });
 
-  it("without a key, still gives the name and a directions link from the link", async () => {
+  it("without a key, gives the name but no guessed directions link", async () => {
     const r = await quickSetup({ fetch: fakeFetch(SHARE_ROUTES), apiKey: null }, "https://share.google/abc", "");
     assert.ok(r.ok && !r.placeFound);
     const by = Object.fromEntries(r.fields.map((f) => [f.key, f.value]));
     assert.equal(by.name, "Classic Veg Restaurant");
-    assert.equal(by.maps, "https://www.google.com/maps/search/?api=1&query=Classic%20Veg%20Restaurant");
-    assert.ok(!by.phone && !by.review);
-    assert.match(r.note ?? "", /by hand/);
+    assert.ok(!by.maps && !by.phone && !by.review);
+    assert.match(r.note ?? "", /paste the Maps link/);
   });
 
   it("uses the exact place when a Maps link carries its cid", async () => {

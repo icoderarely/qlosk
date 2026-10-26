@@ -208,12 +208,12 @@ export async function searchPlace(
 }
 
 /**
- * A directions link that needs no API: the exact place when the pasted Maps
- * link carried its cid, otherwise a Maps search for the shop's name.
+ * A direct directions link that needs no API, only when the pasted Maps link
+ * carried the place's cid. A search-by-name link is not offered: it can open
+ * the wrong branch.
  */
-export function mapsFallback(place: LinkedPlace): string {
-  if (place.cid) return `https://maps.google.com/?cid=${place.cid}`;
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`;
+export function mapsFallback(place: LinkedPlace): string | null {
+  return place.cid ? `https://maps.google.com/?cid=${place.cid}` : null;
 }
 
 /** The Google review form for a place. One plain link, as the spec requires. */
@@ -281,15 +281,15 @@ export async function quickSetup(deps: QuickSetupDeps, text: string, currentName
     if (!linked) {
       note = "Could not read the Google link. Paste a Maps link (Share, then Copy link) or fill the details by hand.";
     } else if (!deps.apiKey) {
-      note = "Name and directions came from the link. Add the phone, address and review link by hand.";
+      note = "Only the name came from the link. Add the phone, address and review link by hand.";
     } else {
       try {
         const near = linked.lat !== null && linked.lng !== null ? { lat: linked.lat, lng: linked.lng } : null;
         place = await searchPlace(linked.name, near, deps.apiKey, deps.fetch);
-        if (!place) note = "Google found no listing by that name, so only the name and directions are shown.";
+        if (!place) note = "Google found no listing by that name, so only the name is shown.";
       } catch (error) {
         console.error("quick setup lookup failed", error);
-        note = "Google refused the lookup, so only the name and directions are shown.";
+        note = "Google refused the lookup, so only the name is shown.";
       }
     }
   }
@@ -307,7 +307,10 @@ export async function quickSetup(deps: QuickSetupDeps, text: string, currentName
     add("review", reviewUrl(place.id));
   } else if (linked) {
     add("name", linked.name.slice(0, 80));
-    add("maps", mapsFallback(linked));
+    add("maps", mapsFallback(linked) ?? "");
+    if (!mapsFallback(linked)) {
+      note = `${note ?? "Name read from the link."} For a direct directions link, paste the Maps link (Maps, then Share, then Copy link).`;
+    }
   }
   // A website the admin pasted wins over the one Google lists.
   add("website", input.website ?? place?.website ?? "");
