@@ -116,7 +116,7 @@ export function QrPlanTab({
                   <Button variant="primary" icon={ICON_DOWNLOAD} onClick={onOpenStandee}>
                     Design and download standee
                   </Button>
-                  <DownloadButton href={`/admin/print/shop/${id}/svg`}>QR as SVG</DownloadButton>
+                  <DownloadButton href={`/admin/print/code/${info.code}`}>QR sticker (PNG)</DownloadButton>
                 </div>
               ) : null}
               {canEdit ? (

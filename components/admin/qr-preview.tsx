@@ -57,10 +57,8 @@ export function QrPreviewDialog({ data, onClose }: { data: QrPreviewData | null;
           <div className="text-muted">{data.shopName ?? "Not assigned to a shop yet"}</div>
           <div className="break-all text-[13px] text-muted">{data.url}</div>
           <div className="flex flex-wrap justify-center gap-2">
-            {data.shopId ? (
-              <DownloadButton href={`/admin/print/shop/${data.shopId}/svg`}>Download SVG</DownloadButton>
-            ) : data.inStock ? (
-              <DownloadButton href={`/admin/print/code/${data.code}`}>Download SVG</DownloadButton>
+            {data.shopId || data.inStock ? (
+              <DownloadButton href={`/admin/print/code/${data.code}`}>Download sticker (PNG)</DownloadButton>
             ) : null}
             <Button onClick={onClose}>Close</Button>
           </div>
