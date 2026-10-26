@@ -69,7 +69,7 @@ The QR code always encodes `/q/code`, never the shop page. That lets us count sc
 | Route | What it does |
 | --- | --- |
 | `/s/[slug]` | Renders the published shop page. Old slugs forward to the new one. |
-| `/q/[code]` | Logs the scan, then 302 to `/s/[slug]`. An unassigned code shows a friendly "not activated yet" page with our WhatsApp contact. |
+| `/q/[code]` | Logs the scan, then 302 to `/s/[slug]`. An unassigned code shows a friendly "not activated yet" page and a retired code a "no longer in use" page (`/code-retired`); both show our WhatsApp contact and a "Visit Qlosk" link to the main site. |
 | `/r/[code]/[linkId]` | Logs a button tap with a signed token, then 302 to the real target. |
 | `/` | Landing page (section 10). |
 | `/playground` | Public page to try themes, layouts and fonts on a sample shop. Same section the landing page embeds. |
@@ -201,6 +201,8 @@ No CAPTCHA.
 - The QR encodes `https://<domain>/q/<code>` only. Vector output (SVG or PDF), error correction H, white border of at least 2 modules inside a white card (4 modules when printed without a card).
 - The Qlosk Q mark sits in the centre of the standee QR codes (section 11). It covers under 10% of the code and is near-black with no background tile. Nothing else is placed on the code and the code is never coloured.
 - Before any PDF, PNG or sheet is saved, the server decodes the QR from the rendered output and fails loudly if it does not read back exactly the expected URL.
+- Every QR download on `/admin/qr` (`/admin/print/code/<code>`, any code that is not retired) is the trial sticker: a 7 x 7 cm PNG at 600 dpi (1654 px) with the headline "Everything about us, one scan away.", the QR with the Q mark, the Call / Chat / Review / Map / Offers row and "Powered by Qlosk · qlosk.com" with the code as its number. The QR is decoded from the PNG before it is sent. Code: `services/sticker.ts`.
+- Several stickers at once: on `/admin/qr` an admin ticks codes (assigned or in stock, not retired) on the page and clicks "Download sticker sheet" (`/admin/print/stickers?codes=A,B,C`, up to 500). The PDF is A4 with 6 stickers per page (2 across x 3 down, each in an 80 mm cell with 5 mm of white around its border so they are not crowded; 2 x 4 is the most that physically fits), with crop marks in the margins on the cell lines, so each cut falls midway between two stickers, and a one-line header and footer. Every QR is read back from the finished PDF before the file is saved or sent, and one `print_files` row (kind sheet, design sticker, size A4x6) is logged. Code: `buildStickerSheet` in `services/sticker.ts`.
 - Print file is A5 (148 x 210 mm) with 3 mm bleed (or A4), QR at least 30 x 30 mm (the standee designs print it at about 65 to 80 mm). Also a sheet of unassigned codes.
 - Codes are 6 characters from an alphabet without 0, O, 1, I, L. Never reuse a retired code.
 
