@@ -1,3 +1,4 @@
+import { PhoneStatusBar } from "./phone-status-bar";
 import { STRINGS } from "./strings";
 
 const dataUri = (svg: string) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
@@ -10,7 +11,8 @@ export function DesktopFrame({ qr, children }: { qr?: { svg: string; label: stri
   return (
     <div className="desk-wrap">
       <div className="desk-bezel iphone">
-        <div className="desk-screen">
+        <PhoneStatusBar />
+        <div className="desk-screen iphone-inset">
           {children}
         </div>
       </div>

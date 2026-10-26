@@ -43,8 +43,12 @@
   box-shadow: none;
 }
 .desk-bezel.iphone::before,
-.desk-bezel.iphone::after {
+.desk-bezel.iphone::after,
+.desk-bezel.iphone .iphone-status {
   display: none;
+}
+.desk-screen.iphone-inset {
+  padding-top: 0;
 }
 @media (min-width: 520px) and (min-height: 600px) {
   .desk-bezel.iphone {
@@ -56,6 +60,12 @@
   .desk-bezel.iphone::before,
   .desk-bezel.iphone::after {
     display: block;
+  }
+  .desk-bezel.iphone .iphone-status {
+    display: flex;
+  }
+  .desk-screen.iphone-inset {
+    padding-top: calc(var(--fw) * 0.125);
   }
 }
 
@@ -80,6 +90,34 @@
   background: #000;
   border-radius: 999px;
   pointer-events: none;
+}
+/* Status strip: the page starts below it. */
+.iphone-status {
+  position: absolute;
+  z-index: 2;
+  top: var(--pad);
+  left: var(--pad);
+  right: var(--pad);
+  height: calc(var(--fw) * 0.125);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--fw) * 0.012) calc(var(--fw) * 0.075) 0;
+  background: #fff;
+  color: #000;
+  border-radius: calc(var(--fw) * 0.1) calc(var(--fw) * 0.1) 0 0;
+  pointer-events: none;
+}
+.iphone-status-time {
+  font: 600 calc(var(--fw) * 0.038) / 1 system-ui, -apple-system, sans-serif;
+}
+.iphone-status-icons {
+  height: calc(var(--fw) * 0.028);
+  width: auto;
+}
+.iphone-inset {
+  padding-top: calc(var(--fw) * 0.125);
 }
 .iphone::after {
   content: "";

@@ -9,6 +9,7 @@ import {
 } from "../admin/look-options";
 import { FONT_PACKS } from "../shop-page/fonts";
 import { ShopPage } from "../shop-page/shop-page";
+import { PhoneStatusBar } from "../shop-page/phone-status-bar";
 import type { FontId, LayoutId, ThemeId } from "../shop-page/types";
 import {
   DEFAULT_LOOK,
@@ -413,9 +414,10 @@ function Phone({ children }: { children: React.ReactNode }) {
             transform: `scale(${scale})`,
           } as React.CSSProperties}
         >
+          <PhoneStatusBar />
           <div
-            className="overflow-y-auto overflow-x-hidden overscroll-contain rounded-[42px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            style={{ width: SCREEN_W, height: SCREEN_H, "--page-min-h": `${SCREEN_H}px` } as React.CSSProperties}
+            className="iphone-inset overflow-y-auto overflow-x-hidden overscroll-contain rounded-[42px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            style={{ width: SCREEN_W, height: SCREEN_H, "--page-min-h": `calc(${SCREEN_H}px - var(--fw) * 0.125)` } as React.CSSProperties}
           >
             {children}
           </div>
