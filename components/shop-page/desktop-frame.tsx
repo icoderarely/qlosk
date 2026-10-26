@@ -13,7 +13,7 @@ export function DesktopFrame({ qr, children }: { qr?: { svg: string; label: stri
       <div className="desk-bezel iphone">
         <PhoneStatusBar />
         <div className="desk-screen iphone-inset">
-          {children}
+          <div className="relative isolate min-h-full">{children}</div>
         </div>
       </div>
       {qr ? (
