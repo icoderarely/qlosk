@@ -26,7 +26,7 @@ function currentValue(state: EditorState, key: FieldKey): string {
   return d.waMessage;
 }
 
-type Review = { fields: SuggestedField[]; ticked: Set<FieldKey>; placeFound: boolean; unknown: string[] };
+type Review = { fields: SuggestedField[]; ticked: Set<FieldKey>; placeFound: boolean; unknown: string[]; note: string | null };
 
 // Paste links, look the business up, tick what to use. Applying only fills the
 // editor; Save draft or Publish stores it like any other edit.
@@ -51,6 +51,7 @@ export function QuickSetupTab({ state, set }: TabProps) {
           ticked: new Set(result.fields.filter((f) => !currentValue(state, f.key).trim()).map((f) => f.key)),
           placeFound: result.placeFound,
           unknown: result.unknown,
+          note: result.note,
         });
       } catch {
         setError("You do not have permission to change shops.");
@@ -107,7 +108,7 @@ export function QuickSetupTab({ state, set }: TabProps) {
             description={
               review.placeFound
                 ? "Check the shop name and address match the right branch before applying."
-                : "No Google listing was found, so only the links you pasted are shown."
+                : (review.note ?? "Only the links you pasted are shown.")
             }
           />
           {review.fields.length === 0 ? <p className="m-0 text-[13px] text-muted">Nothing to apply.</p> : null}

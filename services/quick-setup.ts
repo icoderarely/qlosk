@@ -1,7 +1,7 @@
 // Quick setup: turns a few pasted links (a Google share or Maps link, Instagram,
 // the website) into suggested shop fields. Google's share pages are rendered by
 // script, so the business is found through the Places API (New) by name. No AI
-// involved. Suggestions are only shown; the admin applies them in the editor.
+// involved. The API key is optional. Suggestions are only shown; the admin applies them in the editor.
 // No Next.js imports; relative imports so node --test loads it.
 import type { LinkType } from "../components/shop-page/types.ts";
 import { LINK_DEFAULTS, normalizePhone, validateTarget } from "./links.ts";
@@ -49,7 +49,7 @@ function toUrl(raw: string): URL | null {
 
 export function classifyInput(text: string): ParsedInput {
   const out: ParsedInput = { googleLinks: [], instagram: null, website: null, unknown: [] };
-  for (const piece of text.split(/[\s,]+/)) {
+  for (const piece of text.split(/\s+/)) {
     const raw = piece.trim();
     if (!raw) continue;
     if (/^@[A-Za-z0-9._]{1,30}$/.test(raw)) {
@@ -87,7 +87,7 @@ export function classifyInput(text: string): ParsedInput {
 
 // ---- Resolving a Google link ----------------------------------------------------
 
-export type LinkedPlace = { name: string; lat: number | null; lng: number | null };
+export type LinkedPlace = { name: string; lat: number | null; lng: number | null; cid: string | null };
 
 const MAX_HOPS = 6;
 const TIMEOUT_MS = 8000;
@@ -104,7 +104,14 @@ function nameFromUrl(url: URL): LinkedPlace | null {
   // A bare share id or a coordinate pair is not a name.
   if (!name || /^https?:/i.test(name) || /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(name)) return null;
   const at = /@(-?\d+\.\d+),(-?\d+\.\d+)/.exec(url.pathname) ?? /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/.exec(url.href);
-  return { name: name.slice(0, 120), lat: at ? Number(at[1]) : null, lng: at ? Number(at[2]) : null };
+  // A full Maps link names the place as !1s0x<area>:0x<id>; the second half, in decimal, is its cid.
+  const feature = /!1s0x[0-9a-f]+:0x([0-9a-f]+)/i.exec(url.href);
+  return {
+    name: name.slice(0, 120),
+    lat: at ? Number(at[1]) : null,
+    lng: at ? Number(at[2]) : null,
+    cid: feature ? BigInt(`0x${feature[1]}`).toString() : null,
+  };
 }
 
 /**
@@ -200,6 +207,15 @@ export async function searchPlace(
   return data.places?.[0] ? toPlaceMatch(data.places[0]) : null;
 }
 
+/**
+ * A directions link that needs no API: the exact place when the pasted Maps
+ * link carried its cid, otherwise a Maps search for the shop's name.
+ */
+export function mapsFallback(place: LinkedPlace): string {
+  if (place.cid) return `https://maps.google.com/?cid=${place.cid}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`;
+}
+
 /** The Google review form for a place. One plain link, as the spec requires. */
 export function reviewUrl(placeId: string): string {
   return `https://search.google.com/local/writereview?placeid=${encodeURIComponent(placeId)}`;
@@ -219,7 +235,7 @@ export type FieldKey = "name" | "address" | "phone" | "whatsapp" | "waMessage" |
 export type SuggestedField = { key: FieldKey; label: string; value: string };
 
 export type QuickSetupResult =
-  | { ok: true; fields: SuggestedField[]; placeFound: boolean; unknown: string[] }
+  | { ok: true; fields: SuggestedField[]; placeFound: boolean; unknown: string[]; note: string | null }
   | { ok: false; error: string };
 
 const FIELD_LABELS: Record<FieldKey, string> = {
@@ -248,19 +264,33 @@ export async function quickSetup(deps: QuickSetupDeps, text: string, currentName
     return { ok: false, error: "Paste a Google share or Maps link, an Instagram link or a website." };
   }
 
+  // Without a Places key, or when Google refuses it, the name and directions
+  // still come from the pasted link itself; phone, address and review stay manual.
   let place: PlaceMatch | null = null;
+  let linked: LinkedPlace | null = null;
+  let note: string | null = null;
   if (input.googleLinks.length) {
-    if (!deps.apiKey) return { ok: false, error: "Add GOOGLE_PLACES_API_KEY to look up Google links." };
     try {
       for (const link of input.googleLinks) {
-        const linked = await resolveGoogleLink(link, deps.fetch);
-        if (!linked) continue;
-        place = await searchPlace(linked.name, linked.lat !== null && linked.lng !== null ? { lat: linked.lat, lng: linked.lng } : null, deps.apiKey, deps.fetch);
-        if (place) break;
+        linked = await resolveGoogleLink(link, deps.fetch);
+        if (linked) break;
       }
     } catch (error) {
-      console.error("quick setup lookup failed", error);
-      return { ok: false, error: "Could not reach Google. Try again, or fill the details by hand." };
+      console.error("quick setup link failed", error);
+    }
+    if (!linked) {
+      note = "Could not read the Google link. Paste a Maps link (Share, then Copy link) or fill the details by hand.";
+    } else if (!deps.apiKey) {
+      note = "Name and directions came from the link. Add the phone, address and review link by hand.";
+    } else {
+      try {
+        const near = linked.lat !== null && linked.lng !== null ? { lat: linked.lat, lng: linked.lng } : null;
+        place = await searchPlace(linked.name, near, deps.apiKey, deps.fetch);
+        if (!place) note = "Google found no listing by that name, so only the name and directions are shown.";
+      } catch (error) {
+        console.error("quick setup lookup failed", error);
+        note = "Google refused the lookup, so only the name and directions are shown.";
+      }
     }
   }
 
@@ -275,14 +305,17 @@ export async function quickSetup(deps: QuickSetupDeps, text: string, currentName
     if (isMobile(place.phone)) add("whatsapp", place.phone);
     add("maps", place.mapsUrl);
     add("review", reviewUrl(place.id));
+  } else if (linked) {
+    add("name", linked.name.slice(0, 80));
+    add("maps", mapsFallback(linked));
   }
   // A website the admin pasted wins over the one Google lists.
   add("website", input.website ?? place?.website ?? "");
   add("instagram", input.instagram ?? "");
-  const name = (place?.name ?? currentName).trim();
+  const name = (place?.name ?? linked?.name ?? currentName).trim();
   if (name) add("waMessage", defaultWaMessage(name));
 
-  return { ok: true, fields, placeFound: place !== null, unknown: input.unknown };
+  return { ok: true, fields, placeFound: place !== null, unknown: input.unknown, note };
 }
 
 // ---- Applying ---------------------------------------------------------------------

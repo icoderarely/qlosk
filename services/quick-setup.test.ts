@@ -68,7 +68,7 @@ describe("resolveGoogleLink", () => {
   it("reads the name and position from a Maps place link without fetching", async () => {
     const url = "https://www.google.com/maps/place/Classic+Veg/@18.5204,73.8567,17z/data=x";
     const found = await resolveGoogleLink(url, fakeFetch({}));
-    assert.deepEqual(found, { name: "Classic Veg", lat: 18.5204, lng: 73.8567 });
+    assert.deepEqual(found, { name: "Classic Veg", lat: 18.5204, lng: 73.8567, cid: null });
   });
 
   it("refuses a redirect that leaves Google", async () => {
@@ -113,9 +113,21 @@ describe("quickSetup", () => {
     assert.ok(!r.fields.some((f) => f.key === "whatsapp"));
   });
 
-  it("asks for the key when a Google link is pasted without one", async () => {
-    const r = await quickSetup({ fetch: fakeFetch({}), apiKey: null }, "https://share.google/abc", "");
-    assert.deepEqual(r, { ok: false, error: "Add GOOGLE_PLACES_API_KEY to look up Google links." });
+  it("without a key, still gives the name and a directions link from the link", async () => {
+    const r = await quickSetup({ fetch: fakeFetch(SHARE_ROUTES), apiKey: null }, "https://share.google/abc", "");
+    assert.ok(r.ok && !r.placeFound);
+    const by = Object.fromEntries(r.fields.map((f) => [f.key, f.value]));
+    assert.equal(by.name, "Classic Veg Restaurant");
+    assert.equal(by.maps, "https://www.google.com/maps/search/?api=1&query=Classic%20Veg%20Restaurant");
+    assert.ok(!by.phone && !by.review);
+    assert.match(r.note ?? "", /by hand/);
+  });
+
+  it("uses the exact place when a Maps link carries its cid", async () => {
+    const url = "https://www.google.com/maps/place/Classic+Veg/@18.5,73.8,17z/data=!4m6!3m5!1s0x3bc2c0:0xff!8m2";
+    const r = await quickSetup({ fetch: fakeFetch({}), apiKey: null }, url, "");
+    assert.ok(r.ok);
+    assert.equal(r.fields.find((f) => f.key === "maps")?.value, "https://maps.google.com/?cid=255");
   });
 
   it("still works for Instagram alone, with no key", async () => {
@@ -124,9 +136,11 @@ describe("quickSetup", () => {
     assert.deepEqual(r.fields.map((f) => f.key), ["instagram", "waMessage"]);
   });
 
-  it("reports a lookup that fails instead of throwing", async () => {
+  it("falls back to the link's own data when Google refuses the key", async () => {
     const r = await quickSetup({ fetch: fakeFetch({ ...SHARE_ROUTES, "https://places.googleapis.com/v1/places:searchText": { status: 403 } }), apiKey: "k" }, "https://share.google/abc", "");
-    assert.equal(r.ok, false);
+    assert.ok(r.ok && !r.placeFound);
+    assert.match(r.note ?? "", /refused/);
+    assert.ok(r.fields.some((f) => f.key === "name"));
   });
 
   it("asks for something to work with when the paste has nothing usable", async () => {
