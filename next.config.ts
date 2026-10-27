@@ -34,6 +34,16 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Mathlo (the brain-training app) keeps its legal pages as static files in public/mathlo/.
+  // These serve them at clean URLs: /mathlo/privacy, /mathlo/terms, /mathlo/delete-account, /mathlo/support.
+  async rewrites() {
+    return [
+      {
+        source: "/mathlo/:page(privacy|terms|delete-account|support)",
+        destination: "/mathlo/:page.html",
+      },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {
