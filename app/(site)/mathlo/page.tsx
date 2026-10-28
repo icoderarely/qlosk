@@ -136,6 +136,7 @@ export default function MathloPage() {
         </a>
         <nav aria-label="Page sections" className="m-nav-links">
           <a href="#games">Games</a>
+          <a href="#watch">Watch</a>
           <a href="#daily">Daily habit</a>
           <a href="#better">Get better</a>
           <a href="#screens">Screens</a>
@@ -185,6 +186,25 @@ export default function MathloPage() {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section id="watch" className="m-section m-wrap" aria-labelledby="watch-title">
+          <p className="m-over">See it in action</p>
+          <h2 id="watch-title">Watch Mathlo play.</h2>
+          <figure className="m-video">
+            {/* The film has music and no narration: it starts only when the visitor presses play. */}
+            <video controls playsInline preload="none" poster="/mathlo/video/brag-poster.webp" aria-label="A 34 second tour of Mathlo: the daily challenge, six games, streaks, mastery and outfits">
+              <source src="/mathlo/video/brag.mp4" type="video/mp4" />
+              Your browser can&apos;t play this video. <a href="/mathlo/video/brag.mp4">Download it instead</a>.
+            </video>
+            <figcaption>
+              Music: &quot;Happy Beats / Business Moves&quot; by Sascha Ende,{" "}
+              <a href="https://ende.app/en/standard-license" target="_blank" rel="noopener noreferrer">
+                ende.app
+              </a>{" "}
+              (CC BY 4.0).
+            </figcaption>
+          </figure>
         </section>
 
         <section id="daily" className="m-section m-wrap m-split" aria-labelledby="daily-title">

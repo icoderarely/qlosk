@@ -368,6 +368,27 @@
   margin-top: 6px;
 }
 
+/* video */
+.m-video {
+  margin: 32px 0 0;
+}
+.m-video video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 26px;
+  background: #0a1030;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--glass-line);
+}
+.m-video figcaption {
+  margin-top: 12px;
+  color: var(--text-2);
+  font-size: 0.85rem;
+}
+.m-video figcaption a {
+  color: var(--text);
+}
+
 /* split sections */
 .m-split {
   display: grid;
