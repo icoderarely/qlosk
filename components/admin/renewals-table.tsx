@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { markShopPaid, undoShopPaid } from "@/app/admin/billing/actions";
+import { markShopPaid, undoShopPaid } from "@/app/qr/admin/billing/actions";
 import { Button, buttonClass } from "./button";
 import { Card } from "./card";
 import { DataTable, Td, Th } from "./data-table";

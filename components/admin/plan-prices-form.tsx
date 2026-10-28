@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { savePlanPrices } from "@/app/admin/billing/actions";
+import { savePlanPrices } from "@/app/qr/admin/billing/actions";
 import { buttonClass } from "./button";
 import { Card } from "./card";
 import { TextField } from "./form-field";

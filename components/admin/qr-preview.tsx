@@ -58,7 +58,7 @@ export function QrPreviewDialog({ data, onClose }: { data: QrPreviewData | null;
           <div className="break-all text-[13px] text-muted">{data.url}</div>
           <div className="flex flex-wrap justify-center gap-2">
             {data.shopId || data.inStock ? (
-              <DownloadButton href={`/admin/print/code/${data.code}`}>Download sticker (PNG)</DownloadButton>
+              <DownloadButton href={`/qr/admin/print/code/${data.code}`}>Download sticker (PNG)</DownloadButton>
             ) : null}
             <Button onClick={onClose}>Close</Button>
           </div>

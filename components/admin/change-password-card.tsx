@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { changeMyPassword } from "@/app/admin/settings/actions";
+import { changeMyPassword } from "@/app/qr/admin/settings/actions";
 import { buttonClass } from "./button";
 import { Card, CardHeading } from "./card";
 import { TextField } from "./form-field";

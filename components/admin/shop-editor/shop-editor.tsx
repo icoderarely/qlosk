@@ -3,8 +3,8 @@
 import type { ShopPlanData } from "@/services/billing";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { changeShopStatusAction, publishShopPage, saveShopDraft } from "@/app/admin/shops/editor-actions";
-import { saveStandee } from "@/app/admin/shops/standee-actions";
+import { changeShopStatusAction, publishShopPage, saveShopDraft } from "@/app/qr/admin/shops/editor-actions";
+import { saveStandee } from "@/app/qr/admin/shops/standee-actions";
 import { Button, LinkButton } from "../button";
 import { Chip } from "../chip";
 import { ICON_ARROW_LEFT, ICON_EXTERNAL } from "../icons";
@@ -182,7 +182,7 @@ export function ShopEditor({
         setMessage({ ok: true, text: result.message });
         if (shopId === null) {
           setShopId(result.id);
-          router.replace(`/admin/shops/${result.id}`);
+          router.replace(`/qr/admin/shops/${result.id}`);
         } else {
           router.refresh();
         }
@@ -197,7 +197,7 @@ export function ShopEditor({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1.5">
           <LinkButton
-            href="/admin/shops"
+            href="/qr/admin/shops"
             variant="ghost"
             icon={ICON_ARROW_LEFT}
             className="self-start px-0 text-menu"
@@ -214,7 +214,7 @@ export function ShopEditor({
         <div className="flex flex-wrap gap-2.5">
           {published ? (
             <LinkButton
-              href={`/s/${state.slug}`}
+              href={`/qr/s/${state.slug}`}
               target="_blank"
               rel="noreferrer"
               icon={ICON_EXTERNAL}

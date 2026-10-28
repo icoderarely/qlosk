@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { bulkChangeLook } from "@/app/admin/shops/actions";
+import { bulkChangeLook } from "@/app/qr/admin/shops/actions";
 import { Button, LinkButton } from "./button";
 import { Card } from "./card";
 import { DataTable, Td, Th } from "./data-table";
@@ -123,7 +123,7 @@ export function ShopsTable({ list, canEdit }: { list: ShopList; canEdit: boolean
               }))}
             />
             {canEdit ? (
-              <LinkButton href="/admin/shops/new" variant="primary" icon={ICON_PLUS}>
+              <LinkButton href="/qr/admin/shops/new" variant="primary" icon={ICON_PLUS}>
                 New shop
               </LinkButton>
             ) : null}
@@ -354,7 +354,7 @@ export function ShopsTable({ list, canEdit }: { list: ShopList; canEdit: boolean
                   <StatusChip status={s.status} />
                 </Td>
                 <Td className="pr-4 text-right">
-                  <LinkButton href={`/admin/shops/${s.id}`} aria-label={`Edit ${s.name}`}>
+                  <LinkButton href={`/qr/admin/shops/${s.id}`} aria-label={`Edit ${s.name}`}>
                     Edit
                   </LinkButton>
                 </Td>

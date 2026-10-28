@@ -2,6 +2,8 @@
 
 Visual reference: `docs/design/` (ShopPage, AdminApp, LandingV2, Standee, Logo, Colors). The product is called Qlosk (qlosk.com). Where this spec and the design files disagree, ask.
 
+**URL layout (Oct 2026).** qlosk.com is now a developer brand: `/` is a one-screen Qlosk page and `/mathlo` is the Mathlo app page. This QR product lives under `/qr`. Every path in this spec (`/s/...`, `/q/...`, `/r/...`, `/playground`, `/admin...`, `/privacy`) is relative to `/qr`, so `/s/velvet` is `qlosk.com/qr/s/velvet`. `/api/...` stays at the root. The old root addresses redirect permanently (308) and must keep doing so, because QR stickers are already printed: the list is `LEGACY_REDIRECTS` in `lib/routes.ts`.
+
 ## 1. What we are building
 
 A done-for-you service for local shops in India. One permanent QR code opens a mobile page with Call, WhatsApp, Google review, Instagram, Wi-Fi, Maps and an offer. We build each page, print the standee, and send the owner a monthly scan report. One admin app manages every shop, its look, its QR code and its renewals.
@@ -62,7 +64,7 @@ Route handlers and server actions stay thin: validate input, call a service, ret
 
 ## 3. Routes
 
-The QR code always encodes `/q/code`, never the shop page. That lets us count scans, reassign a code to another shop, and rename a shop's address without reprinting.
+The QR code always encodes `/qr/q/code` (`/q/code` on stickers printed before the move, which redirects), never the shop page. That lets us count scans, reassign a code to another shop, and rename a shop's address without reprinting.
 
 **Public**
 
@@ -198,7 +200,7 @@ No CAPTCHA.
 
 **QR and print**
 
-- The QR encodes `https://<domain>/q/<code>` only. Vector output (SVG or PDF), error correction H, white border of at least 2 modules inside a white card (4 modules when printed without a card).
+- The QR encodes `https://<domain>/qr/q/<code>` only (the saved QR address is `https://<domain>/qr`). Vector output (SVG or PDF), error correction H, white border of at least 2 modules inside a white card (4 modules when printed without a card).
 - The Qlosk Q mark sits in the centre of the standee QR codes (section 11). It covers under 10% of the code and is near-black with no background tile. Nothing else is placed on the code and the code is never coloured.
 - Before any PDF, PNG or sheet is saved, the server decodes the QR from the rendered output and fails loudly if it does not read back exactly the expected URL.
 - Every QR download on `/admin/qr` (`/admin/print/code/<code>`, any code that is not retired) is the trial sticker: a 7 x 7 cm PNG at 600 dpi (1654 px) with the headline "Everything about us, one scan away.", the QR with the Q mark, the Call / Chat / Review / Map / Offers row and "Powered by Qlosk · qlosk.com" with the code as its number. The QR is decoded from the PNG before it is sent. Code: `services/sticker.ts`.

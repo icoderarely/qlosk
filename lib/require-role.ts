@@ -40,7 +40,7 @@ export const getCurrentUser = cache(async (): Promise<AdminUser | null> => {
 //   requireRole("owner")   owner only
 export async function requireRole(atLeast: Role): Promise<AdminUser> {
   const user = await getCurrentUser();
-  if (!user) redirect("/admin-login");
+  if (!user) redirect("/qr/admin-login");
   if (!hasRole(user.role, atLeast)) {
     throw new Error("Your role cannot do this.");
   }

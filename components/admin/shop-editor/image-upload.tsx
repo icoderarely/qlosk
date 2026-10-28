@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
-import { uploadShopImage } from "@/app/admin/shops/editor-actions";
+import { uploadShopImage } from "@/app/qr/admin/shops/editor-actions";
 import { Button } from "../button";
 import { ICON_UPLOAD } from "../icons";
 

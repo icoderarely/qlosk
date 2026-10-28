@@ -23,11 +23,11 @@ export function LegalPage({ doc, whatsappHref }: { doc: LegalDoc; whatsappHref: 
     <>
       <header className="lg-head">
         <div className="lg-wrap lg-headrow">
-          <Link href="/" className="l-brand" aria-label={`${BRAND_NAME}, home`}>
+          <Link href="/qr" className="l-brand" aria-label={`${BRAND_NAME}, home`}>
             <span className="l-mark"><BrandMark className="size-full" /></span>
             <span className="l-serif l-brandname">{BRAND_NAME}</span>
           </Link>
-          <Link href="/" className="lg-back">Back to home</Link>
+          <Link href="/qr" className="lg-back">Back to home</Link>
         </div>
       </header>
       <main className="lg-main">

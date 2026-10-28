@@ -6,7 +6,7 @@ import {
   changeTeamRole,
   removeTeamAccount,
   resetTeamPassword,
-} from "@/app/admin/settings/actions";
+} from "@/app/qr/admin/settings/actions";
 import { Button, buttonClass } from "./button";
 import { Card, CardHeading } from "./card";
 import { Chip } from "./chip";

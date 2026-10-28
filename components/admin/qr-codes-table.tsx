@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { assignQrCode, deleteQrCodes, reassignQrCode, retireQrCode } from "@/app/admin/qr/actions";
+import { assignQrCode, deleteQrCodes, reassignQrCode, retireQrCode } from "@/app/qr/admin/qr/actions";
 import { Button, DownloadButton, LinkButton } from "./button";
 import { Card } from "./card";
 import { Chip } from "./chip";
@@ -155,7 +155,7 @@ export function QrCodesTable({
             <>
               <DownloadButton
                 variant="primary"
-                href={`/admin/print/stickers?codes=${chosen.map((c) => c.code).join(",")}`}
+                href={`/qr/admin/print/stickers?codes=${chosen.map((c) => c.code).join(",")}`}
                 aria-label={`Download an A4 sheet of ${chosen.length} stickers, 6 per page`}
               >
                 Download sticker sheet ({chosen.length})
@@ -323,7 +323,7 @@ function CodeRow({
         </Td>
         <Td className="font-semibold">
           {row.shopId ? (
-            <Link href={`/admin/shops/${row.shopId}`} className="text-ink underline">
+            <Link href={`/qr/admin/shops/${row.shopId}`} className="text-ink underline">
               {row.shopName}
             </Link>
           ) : row.status === "retired" ? (
@@ -336,12 +336,12 @@ function CodeRow({
         <Td className="pr-4 text-right">
           <div className="inline-flex flex-wrap justify-end gap-2">
             {assigned && row.shopId ? (
-              <LinkButton href={`/admin/shops/${row.shopId}?tab=standee`} aria-label={`Open the standee for ${row.code}`}>
+              <LinkButton href={`/qr/admin/shops/${row.shopId}?tab=standee`} aria-label={`Open the standee for ${row.code}`}>
                 Standee
               </LinkButton>
             ) : null}
             {row.status !== "retired" ? (
-              <DownloadButton href={`/admin/print/code/${row.code}`} aria-label={`Download QR for ${row.code}`}>
+              <DownloadButton href={`/qr/admin/print/code/${row.code}`} aria-label={`Download QR for ${row.code}`}>
                 Download
               </DownloadButton>
             ) : null}

@@ -11,7 +11,7 @@ export function ShareButton({ className }: { className: string }) {
 
   async function copy() {
     const url = new URL(window.location.href);
-    if (!url.pathname.startsWith("/playground")) url.search = "";
+    if (!url.pathname.startsWith("/qr/playground")) url.search = "";
     url.hash = "";
     try {
       await navigator.clipboard.writeText(url.toString());

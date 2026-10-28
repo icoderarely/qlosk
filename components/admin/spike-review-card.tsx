@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { reviewUnusualTraffic } from "@/app/admin/reports/actions";
+import { reviewUnusualTraffic } from "@/app/qr/admin/reports/actions";
 import { Button } from "./button";
 import { Card } from "./card";
 import { Chip } from "./chip";

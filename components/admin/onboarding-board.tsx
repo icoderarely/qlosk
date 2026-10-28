@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { addLead, moveShopStage } from "@/app/admin/onboarding/actions";
+import { addLead, moveShopStage } from "@/app/qr/admin/onboarding/actions";
 import { ActionLink } from "./action-link";
 import { Button, buttonClass } from "./button";
 import { Card } from "./card";

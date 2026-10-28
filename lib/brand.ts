@@ -8,6 +8,8 @@ export const SUPPORT_EMAIL = "support@qlosk.com";
 // Public origin of the marketing site (no trailing slash). Used for canonicals, the sitemap,
 // social cards and structured data. Set SITE_URL on Vercel; it defaults to the live domain.
 export const SITE_URL = (process.env.SITE_URL ?? "https://qlosk.com").replace(/\/+$/, "");
+// Where the QR product's own marketing site lives; structured data and llms.txt describe this address.
+export const QR_URL = `${SITE_URL}/qr`;
 export const SITE_DESCRIPTION =
   "One QR code for your whole shop: Call, WhatsApp, Google review, Wi-Fi, Maps and your latest offer. We build the page, print the standee and send a monthly report.";
 // Details on the legal pages. Set them in the environment on Vercel (see .env.example).

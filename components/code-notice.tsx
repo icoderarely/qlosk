@@ -19,7 +19,7 @@ export function CodeNotice({ title, children, whatsappText }: { title: string; c
         </Suspense>
         <p className="mt-5">
           <Link
-            href="/"
+            href="/qr"
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] px-4 font-bold text-neutral-900 underline focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             <BrandMark className="size-6" />

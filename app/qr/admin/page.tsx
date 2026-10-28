@@ -1,0 +1,147 @@
+import type { Metadata } from "next";
+import { ActionLink } from "@/components/admin/action-link";
+import { LinkButton } from "@/components/admin/button";
+import { Card } from "@/components/admin/card";
+import { DataTable, Td, Th } from "@/components/admin/data-table";
+import { formatCode, formatNumber, formatScans } from "@/components/admin/format";
+import { ICON_PLUS } from "@/components/admin/icons";
+import { PageHeader } from "@/components/admin/page-header";
+import { RangePicker } from "@/components/admin/range-picker";
+import { ScansChart } from "@/components/admin/scans-chart";
+import { StatCard, StatRow } from "@/components/admin/stat-card";
+import { StatusChip } from "@/components/admin/status-chip";
+import { getDb } from "@/lib/db";
+import { requireRole } from "@/lib/require-role";
+import { createStatsStore } from "@/lib/stats-store";
+import { getOverview, parseRange } from "@/services/stats";
+import { Suspense } from "react";
+
+export const metadata: Metadata = { title: "Overview" };
+
+// The session is request-time data, so the page body sits behind its own Suspense
+// boundary: a navigation into this page can show the fallback instead of blocking.
+export default function Page(props: Parameters<typeof Body>[0]) {
+  return (
+    <Suspense fallback={<div className="min-h-[50dvh]" role="status" aria-label="Loading" />}>
+      <Body {...props} />
+    </Suspense>
+  );
+}
+
+async function Body({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const user = await requireRole("viewer");
+  const range = parseRange((await searchParams).range);
+  const overview = await getOverview(createStatsStore(getDb()), range);
+  const canEdit = user.role !== "viewer";
+
+  return (
+    <>
+      <PageHeader
+        title="Overview"
+        subtitle={`Everything across your shops, last ${range} days. Numbers are updated nightly.`}
+        actions={
+          <>
+            <RangePicker value={range} />
+            {canEdit ? (
+              <LinkButton href="/qr/admin/shops/new" variant="primary" icon={ICON_PLUS}>
+                New shop
+              </LinkButton>
+            ) : null}
+          </>
+        }
+      />
+
+      <StatRow>
+        {overview.kpis.map((k) => (
+          <StatCard key={k.label} label={k.label} value={formatNumber(Number(k.value))} note={k.note} tone={k.tone} />
+        ))}
+      </StatRow>
+
+      <div className="flex flex-wrap gap-4">
+        <Card aria-label="Scans per day" className="flex-[2_1_480px] p-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="m-0 text-base font-extrabold">Scans per day</h2>
+            <span className="text-[13px] text-muted">Counted scans, all shops</span>
+          </div>
+          <ScansChart series={overview.scansSeries} axis={overview.scansAxis} days={overview.range} />
+        </Card>
+        <Card aria-label="Most used buttons" className="flex flex-[1_1_300px] flex-col gap-3.5 p-5">
+          <h2 className="m-0 text-base font-extrabold">Most used buttons</h2>
+          {overview.buttons.length === 0 ? (
+            <p className="m-0 text-muted">No button taps in this period yet.</p>
+          ) : null}
+          {overview.buttons.map((b) => (
+            <div key={b.label} className="flex flex-col gap-1.5">
+              <div className="flex justify-between font-semibold">
+                <span>{b.label}</span>
+                <span className="text-muted">{b.percent}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-line-soft">
+                <div className="h-full rounded-full bg-accent" style={{ width: `${b.percent}%` }} />
+              </div>
+            </div>
+          ))}
+        </Card>
+      </div>
+
+      <div className="flex flex-wrap items-start gap-4">
+        <Card aria-label="Needs attention" className="flex-[1_1_340px] p-5">
+          <h2 className="m-0 mb-2 text-base font-extrabold">Needs attention</h2>
+          {overview.attention.length === 0 ? <p className="m-0 text-muted">Nothing needs attention.</p> : null}
+          {overview.attention.map((a) => (
+            <div
+              key={`${a.title}-${a.detail}`}
+              className="flex items-center justify-between gap-3 border-t border-line-soft py-3"
+            >
+              <div className="min-w-0">
+                <div className="font-bold">{a.title}</div>
+                <div className="text-[13px] text-muted">{a.detail}</div>
+              </div>
+              <ActionLink href={a.href} external={a.external} label={`${a.action}: ${a.title}, ${a.detail}`}>
+                {a.action}
+              </ActionLink>
+            </div>
+          ))}
+        </Card>
+
+        <Card aria-label="Recent shops" className="flex-[2_1_520px] p-5">
+          <div className="mb-2 flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="m-0 text-base font-extrabold">Recent shops</h2>
+            <LinkButton href="/qr/admin/shops">View all shops</LinkButton>
+          </div>
+          {overview.recentShops.length === 0 ? <p className="m-0 text-muted">No shops yet.</p> : null}
+          {overview.recentShops.length > 0 ? (
+            <DataTable
+              minWidth={540}
+              head={
+                <>
+                  <Th>Shop</Th>
+                  <Th>Code</Th>
+                  <Th>Plan</Th>
+                  <Th className="text-right">Scans, {overview.range} days</Th>
+                  <Th>Status</Th>
+                </>
+              }
+            >
+              {overview.recentShops.map((r) => (
+                <tr key={r.id}>
+                  <Td className="font-bold">{r.name}</Td>
+                  <Td className="font-code text-[13px]">{formatCode(r.code)}</Td>
+                  <Td>{r.plan}</Td>
+                  <Td className="text-right font-semibold">{formatScans(r.scans)}</Td>
+                  <Td>
+                    <StatusChip status={r.status} />
+                  </Td>
+                </tr>
+              ))}
+            </DataTable>
+          ) : null}
+        </Card>
+      </div>
+    </>
+  );
+}

@@ -79,11 +79,11 @@ function shortDate(d: Date): string {
 
 function nudge(shop: BoardShop, text: string): { href: string; external: boolean } {
   const link = shop.ownerWhatsapp ? whatsappTarget(shop.ownerWhatsapp, text) : null;
-  return link ? { href: link, external: true } : { href: `/admin/shops/${shop.id}`, external: false };
+  return link ? { href: link, external: true } : { href: `/qr/admin/shops/${shop.id}`, external: false };
 }
 
 function card(shop: BoardShop, now: Date): BoardCard {
-  const open = { href: `/admin/shops/${shop.id}`, external: false };
+  const open = { href: `/qr/admin/shops/${shop.id}`, external: false };
   const days = whole(shop.stageChangedAt, now);
   const type = shop.shopType ?? "Shop";
   const base = { id: shop.id, name: shop.name };
@@ -146,7 +146,7 @@ function todayTasks(shops: BoardShop[], now: Date): TodayTask[] {
   const tasks: TodayTask[] = [];
   for (const s of shops) {
     const days = whole(s.stageChangedAt, now);
-    const open = { href: `/admin/shops/${s.id}`, external: false };
+    const open = { href: `/qr/admin/shops/${s.id}`, external: false };
     if (s.stage === "building" && s.hasPublished) tasks.push({ label: `Send preview to ${s.name}`, ...open });
     if (s.stage === "preview_sent" && days >= 2) {
       tasks.push({

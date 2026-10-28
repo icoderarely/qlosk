@@ -20,23 +20,23 @@ export function Footer({ whatsappHref }: { whatsappHref: string }) {
           <div className="l-footcols">
             <nav className="l-footcol" aria-label="Product">
               <b>Product</b>
-              <Link href="/#how">How it works</Link>
-              <Link href="/#try">Try a look</Link>
-              <Link href="/#features">Features</Link>
-              <Link href="/#pricing">Pricing</Link>
-              <Link href="/playground">Playground</Link>
+              <Link href="/qr#how">How it works</Link>
+              <Link href="/qr#try">Try a look</Link>
+              <Link href="/qr#features">Features</Link>
+              <Link href="/qr#pricing">Pricing</Link>
+              <Link href="/qr/playground">Playground</Link>
             </nav>
             <nav className="l-footcol" aria-label="Help">
               <b>Help</b>
-              <Link href="/#faq">FAQ</Link>
+              <Link href="/qr#faq">FAQ</Link>
               <a href={whatsappHref}>WhatsApp us</a>
               <a href={SUPPORT_EMAIL.includes("@") ? `mailto:${SUPPORT_EMAIL}` : "#top"}>{SUPPORT_EMAIL}</a>
             </nav>
             <nav className="l-footcol" aria-label="Legal">
               <b>Legal</b>
-              <Link href="/privacy">Privacy</Link>
-              <Link href="/terms">Terms</Link>
-              <Link href="/refunds">Refunds</Link>
+              <Link href="/qr/privacy">Privacy</Link>
+              <Link href="/qr/terms">Terms</Link>
+              <Link href="/qr/refunds">Refunds</Link>
             </nav>
           </div>
         </div>

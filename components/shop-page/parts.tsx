@@ -63,7 +63,7 @@ const CHIP_BTN =
 export function TopBar({ overlay = false }: { overlay?: boolean }) {
   return (
     <div className={`flex items-center justify-between px-5 pt-5 ${overlay ? "absolute inset-x-0 top-0 z-10" : ""}`}>
-      <Link href="/" prefetch={false} className={`${CHIP_BTN} no-underline`} aria-label={`${BRAND_NAME} home`}>
+      <Link href="/qr" prefetch={false} className={`${CHIP_BTN} no-underline`} aria-label={`${BRAND_NAME} home`}>
         <BrandMark className="size-7" />
       </Link>
       <ShareButton className={`${CHIP_BTN} cursor-pointer`} />
@@ -76,7 +76,7 @@ export function Footer({ className = "" }: { className?: string }) {
   return (
     <div className={`mt-auto flex flex-col items-center gap-2.5 pt-4 text-center ${className}`}>
       <a
-        href="/playground"
+        href="/qr/playground"
         className="inline-flex min-h-11 items-center gap-2 rounded-full bg-sp-chipbg px-5 text-[14px] font-bold text-sp-chiptext no-underline"
       >
         {STRINGS.getYourOwn}

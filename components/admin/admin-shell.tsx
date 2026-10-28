@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { logout } from "@/app/admin/actions";
+import { logout } from "@/app/qr/admin/actions";
 import { BrandTile } from "@/components/brand-mark";
 import { BRAND_NAME } from "@/lib/brand";
 import { Icon } from "./icon";

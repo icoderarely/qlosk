@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { checkStandee } from "@/app/admin/shops/standee-actions";
+import { checkStandee } from "@/app/qr/admin/shops/standee-actions";
 import { standeeContent } from "@/services/standee";
 import type { QrArt } from "@/services/qr-art";
 import { StandeePreview } from "../../standee/standee-preview";
@@ -192,7 +192,7 @@ export function StandeePreviewCard({
   const status = hasCode ? (check?.key === checkKey ? check.result : null) : null;
 
   const query = new URLSearchParams({ design: choices.design, theme: choices.theme, headline: choices.headline, size: choices.size });
-  const href = (ext: "pdf" | "png") => `/admin/shops/${shopId}/standee.${ext}?${query}`;
+  const href = (ext: "pdf" | "png") => `/qr/admin/shops/${shopId}/standee.${ext}?${query}`;
   const blocked = !hasCode || !canDownload || status?.ok === false;
   const why = !shopId
     ? "Save the shop first, then assign a QR code."

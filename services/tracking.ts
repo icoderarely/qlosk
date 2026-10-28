@@ -289,5 +289,5 @@ export async function handleTap(
 
 /** The button address the public page uses when the shop has a QR code. */
 export function tapHref(code: string, linkId: string, token: string): string {
-  return `/r/${code}/${linkId}?t=${encodeURIComponent(token)}`;
+  return `/qr/r/${code}/${linkId}?t=${encodeURIComponent(token)}`;
 }

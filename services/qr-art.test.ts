@@ -24,6 +24,11 @@ describe("qrTarget (the QR encodes /q/<code> only)", () => {
   it("never carries the shop page address", () => {
     assert.equal(qrTarget(BASE, "7KX2M9").includes("/s/"), false);
   });
+  it("keeps a path on the base, so the QR product's address under /qr works", () => {
+    const target = qrTarget("https://qlosk.com/qr", "7KX2M9");
+    assert.equal(target, "https://qlosk.com/qr/q/7KX2M9");
+    assert.ok(rawMatrix(target).length <= 41, "still fits the standee's QR size");
+  });
   it("refuses a code that could not have been issued", () => {
     assert.throws(() => qrTarget(BASE, "0OIL11"));
     assert.throws(() => qrTarget(BASE, "ABC"));

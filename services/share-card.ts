@@ -105,7 +105,7 @@ export function shareImageVersion(publishedAt: Date | null): number {
 }
 
 export function shareImagePath(slug: string, publishedAt: Date | null): string {
-  return `/s/${slug}/og?v=${shareImageVersion(publishedAt)}`;
+  return `/qr/s/${slug}/og?v=${shareImageVersion(publishedAt)}`;
 }
 
 /** The fields generateMetadata sets for a live shop. `origin` has no trailing slash. */

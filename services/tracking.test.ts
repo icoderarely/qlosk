@@ -235,7 +235,7 @@ describe("handleTap", () => {
 
 describe("tapHref", () => {
   it("builds the /r address with the token", () => {
-    assert.equal(tapHref("7KX2M9", LINK, "a.b"), `/r/7KX2M9/${LINK}?t=a.b`);
+    assert.equal(tapHref("7KX2M9", LINK, "a.b"), `/qr/r/7KX2M9/${LINK}?t=a.b`);
   });
 });
 

@@ -271,7 +271,7 @@ const MAX_ATTENTION = 6;
 function attentionItems(shops: ShopFacts[], held: HeldShop[], rows: StatDay[], lastWeek: string[], now: Date): Attention[] {
   const byId = new Map(shops.map((s) => [s.id, s]));
   const items: Attention[] = [];
-  const open = (id: string) => `/admin/shops/${id}`;
+  const open = (id: string) => `/qr/admin/shops/${id}`;
 
   for (const h of held) {
     const shop = byId.get(h.shopId);
@@ -280,7 +280,7 @@ function attentionItems(shops: ShopFacts[], held: HeldShop[], rows: StatDay[], l
       title: "Unusual traffic to review",
       detail: `${shop.name} · ${h.scans} scans held out of reports`,
       action: "Review",
-      href: "/admin/reports",
+      href: "/qr/admin/reports",
       external: false,
     });
   }
@@ -318,7 +318,7 @@ function attentionItems(shops: ShopFacts[], held: HeldShop[], rows: StatDay[], l
       title: "Standee in progress",
       detail: `${s.name} · ${s.code ? `code ${s.code}` : "no QR code assigned yet"}`,
       action: "Open board",
-      href: "/admin/onboarding",
+      href: "/qr/admin/onboarding",
       external: false,
     });
   }

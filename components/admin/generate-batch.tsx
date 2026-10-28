@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { generateQrBatch } from "@/app/admin/qr/actions";
+import { generateQrBatch } from "@/app/qr/admin/qr/actions";
 import { Button, buttonClass } from "./button";
 import { Card } from "./card";
 import { SelectField, TextField } from "./form-field";
@@ -42,7 +42,7 @@ export function GenerateBatch({ canEdit }: { canEdit: boolean }) {
       </Button>
       {/* A plain GET form: the browser downloads the PDF the route sends back. */}
       <form
-        action="/admin/print/sheet"
+        action="/qr/admin/print/sheet"
         method="get"
         className="flex flex-col gap-3 border-t border-line pt-3.5"
       >

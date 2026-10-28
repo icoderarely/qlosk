@@ -87,7 +87,7 @@ describe("getOnboarding", () => {
     const [a, b] = columns[2].cards;
     assert.equal(a.action.external, true);
     assert.ok(a.action.href.startsWith("https://wa.me/919820012345"));
-    assert.deepEqual(b.action, { label: "Open shop", href: "/admin/shops/2", external: false });
+    assert.deepEqual(b.action, { label: "Open shop", href: "/qr/admin/shops/2", external: false });
     assert.deepEqual(today.map((t) => t.label), ["Follow up with With number", "Follow up with No number"]);
   });
 

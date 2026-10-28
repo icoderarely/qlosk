@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { undoShopChange } from "@/app/admin/shops/editor-actions";
+import { undoShopChange } from "@/app/qr/admin/shops/editor-actions";
 import { Button } from "../button";
 import { Card } from "../card";
 import { FieldRow } from "../form-field";

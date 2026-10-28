@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { saveAllSettings } from "@/app/admin/settings/actions";
+import { saveAllSettings } from "@/app/qr/admin/settings/actions";
 import { buttonClass, DownloadButton } from "./button";
 import { Card, CardHeading } from "./card";
 import { FieldRow, SelectField, TextField } from "./form-field";
@@ -211,7 +211,7 @@ export function SettingsForm({
         </p>
         {canEdit ? (
           <div className="flex flex-wrap gap-2.5 border-t border-line-soft pt-3.5">
-            <DownloadButton href="/admin/settings/export">Export all shop data</DownloadButton>
+            <DownloadButton href="/qr/admin/settings/export">Export all shop data</DownloadButton>
             <button type="button" disabled={pending} onClick={save} className={buttonClass("primary")}>
               {pending ? "Saving…" : "Save settings"}
             </button>

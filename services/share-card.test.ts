@@ -88,7 +88,7 @@ describe("share metadata", () => {
 
   it("points the image at /og with the publish time as ?v=, so each publish gets a fresh address", () => {
     const first = Math.floor(new Date("2026-10-25T10:00:00Z").getTime() / 1000);
-    assert.deepEqual(meta.openGraph.images, [{ url: `/s/velvet/og?v=${first}`, width: 1200, height: 630, alt: "Velvet Salon" }]);
+    assert.deepEqual(meta.openGraph.images, [{ url: `/qr/s/velvet/og?v=${first}`, width: 1200, height: 630, alt: "Velvet Salon" }]);
     assert.notEqual(shareImagePath("velvet", new Date("2026-10-25T10:00:01Z")), shareImagePath("velvet", new Date("2026-10-25T10:00:00Z")));
     assert.equal(meta.twitter.card, "summary_large_image");
   });

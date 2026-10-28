@@ -2,11 +2,12 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/brand";
 
 // Marketing pages are open to every crawler, AI ones included. The QR redirects and customer
-// shop pages are not marketing targets. /admin, /admin-login, /api and /dev are deliberately
+// shop pages are not marketing targets. /qr/admin, /qr/admin-login, /api and /qr/dev are deliberately
 // not listed: robots.txt is public (it would advertise the paths) and a blocked URL can't be
 // fetched, so a crawler would never see its noindex. They send X-Robots-Tag: noindex
-// (next.config.ts) and admin sits behind sign-in.
-const PRIVATE = ["/q/", "/r/", "/s/"];
+// (next.config.ts) and admin sits behind sign-in. The old root addresses (/q/, /r/, /s/) only
+// redirect, but stay listed so crawlers don't chase them.
+const PRIVATE = ["/qr/q/", "/qr/r/", "/qr/s/", "/q/", "/r/", "/s/"];
 
 const AI_CRAWLERS = [
   "GPTBot",

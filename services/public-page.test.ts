@@ -165,7 +165,7 @@ describe("withTapLinks", () => {
   it("sends buttons through /r with a token when the shop has a code", () => {
     const props = withTapLinks(toPageProps(shop()), "7KX2M9", sign);
     const call = props.links.find((l) => l.type === "call")!;
-    assert.equal(call.href, `/r/7KX2M9/${call.id}?t=tok-7KX2M9-1`);
+    assert.equal(call.href, `/qr/r/7KX2M9/${call.id}?t=tok-7KX2M9-1`);
     assert.equal(props.links.find((l) => l.type === "wifi")?.href, "#");
   });
 
@@ -227,7 +227,7 @@ describe("expired plan", () => {
     assert.equal(r.kind, "page");
     if (r.kind !== "page") return;
     const tapped = withTapLinks(r.props, r.code, () => "tok");
-    assert.ok(tapped.links.every((l) => l.href.startsWith("/r/ABC234/")));
+    assert.ok(tapped.links.every((l) => l.href.startsWith("/qr/r/ABC234/")));
   });
 });
 

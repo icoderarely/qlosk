@@ -1,8 +1,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { changeShopPlan, markShopPaid, undoShopPaid } from "@/app/admin/billing/actions";
-import { assignQrCode, reassignQrCode, retireQrCode } from "@/app/admin/qr/actions";
-import { changeShopStatusAction } from "@/app/admin/shops/editor-actions";
+import { changeShopPlan, markShopPaid, undoShopPaid } from "@/app/qr/admin/billing/actions";
+import { assignQrCode, reassignQrCode, retireQrCode } from "@/app/qr/admin/qr/actions";
+import { changeShopStatusAction } from "@/app/qr/admin/shops/editor-actions";
 import type { ShopPlanData } from "@/services/billing";
 import type { DbShopStatus } from "@/services/shops";
 import { Button, buttonClass, DownloadButton } from "../button";
@@ -116,7 +116,7 @@ export function QrPlanTab({
                   <Button variant="primary" icon={ICON_DOWNLOAD} onClick={onOpenStandee}>
                     Design and download standee
                   </Button>
-                  <DownloadButton href={`/admin/print/code/${info.code}`}>QR sticker (PNG)</DownloadButton>
+                  <DownloadButton href={`/qr/admin/print/code/${info.code}`}>QR sticker (PNG)</DownloadButton>
                 </div>
               ) : null}
               {canEdit ? (
