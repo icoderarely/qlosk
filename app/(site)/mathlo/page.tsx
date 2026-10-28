@@ -60,7 +60,7 @@ const FAQ = [
   { q: "Do I need an account?", a: "No. Play as a guest and everything stays on your phone. Sign in with Google only if you want your progress saved and available on a new phone." },
   { q: "Does it work offline?", a: "Yes. The games run on your phone, so you can play without a connection." },
   { q: "Is there an iPhone version?", a: "It is planned. Android comes first, and we will add the App Store button here when iPhone is ready." },
-  { q: "Will it help me pass an exam?", a: "Mathlo is a game for practice and fun. It does not promise exam results, but a few minutes a day of mental maths does keep the basics sharp." },
+  { q: "Will it help me pass an exam?", a: "Mathlo is a game for practice and fun. It does not promise exam results, but regular practice is how mental maths gets faster and sharper." },
 ];
 
 const art = (id: string) => readFileSync(path.join(process.cwd(), "components/mathlo/art", `${id}.svg`), "utf8");
@@ -149,7 +149,7 @@ export default function MathloPage() {
           <div className="m-hero-copy">
             <p className="m-pill">Daily brain games</p>
             <h1 id="hero-title">
-              Two minutes a day keeps your <span>brain sharp.</span>
+              Train your brain <span>a little more every day.</span>
             </h1>
             <p className="m-lede">
               Mathlo is a daily brain gym with quick mental-maths and logic puzzles. Play today&apos;s Daily Challenge, keep your streak going,
@@ -249,7 +249,7 @@ export default function MathloPage() {
           <ul className="m-trust">
             <li>
               <strong>No ads</strong>
-              <span>Nothing interrupts your two minutes.</span>
+              <span>Nothing gets between you and the next puzzle.</span>
             </li>
             <li>
               <strong>Guest-friendly</strong>
