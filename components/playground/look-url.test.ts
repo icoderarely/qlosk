@@ -49,7 +49,7 @@ describe("playground look URL", () => {
   });
 
   it("adds 91 to a plain 10-digit number", () => {
-    const url = whatsappLink(DEFAULT_LOOK, { theme: "A", layout: "B", font: "C", type: "Salon" }, "9334954096");
-    assert.ok(url.startsWith("https://wa.me/919334954096?text="));
+    const url = whatsappLink(DEFAULT_LOOK, { theme: "A", layout: "B", font: "C", type: "Salon" }, "9812345678");
+    assert.ok(url.startsWith("https://wa.me/919812345678?text="));
   });
 });
