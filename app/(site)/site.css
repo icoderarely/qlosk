@@ -77,6 +77,7 @@ a {
 }
 .q-home h1 {
   margin: 0;
+  color: #fff;
   font-size: clamp(1.9rem, 6.2vh + 1vw, 3.6rem);
   line-height: 1.04;
   font-weight: 800;
@@ -86,7 +87,6 @@ a {
 .q-home h1 em {
   font-style: normal;
   color: var(--cream);
-  background: linear-gradient(transparent 62%, rgba(251, 241, 181, 0.22) 62%);
 }
 .q-home-lede {
   margin: clamp(8px, 1.6vh, 14px) 0 0;
@@ -154,6 +154,7 @@ a {
 }
 .q-home footer {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 4px 16px;

@@ -51,7 +51,7 @@ export default function Home() {
         </nav>
       </main>
       <footer>
-        <span>© {new Date().getFullYear()} Qlosk</span>
+        <span>© Qlosk</span>
         <a href={`mailto:${DEVELOPER_EMAIL}`}>{DEVELOPER_EMAIL}</a>
       </footer>
     </div>
