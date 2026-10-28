@@ -5,13 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacy Policy · Mathlo</title>
 <meta name="description" content="How Mathlo handles your data. Guests keep everything on their phone. If you sign in, we save your progress to your account. No ads, no tracking, nothing sold.">
-<meta name="theme-color" content="#12082B">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="mathlo-icon-rounded.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#FFC93C">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="wrap">
 <header class="site">
-  <div class="logo">Math<span>lo</span></div>
+  <div class="logo"><img src="mathlo-icon-rounded.svg" alt="" width="36" height="36">math<span>lo</span></div>
   <nav class="site" aria-label="Mathlo pages">
     <a href="privacy" aria-current="page">Privacy</a>
     <a href="terms">Terms</a>
@@ -36,7 +40,7 @@
 </div>
 
 <h2>1. Who we are</h2>
-<p>Mathlo is a daily brain-training app. It is run by Qlosk, Mumbai, India ("we", "us"). We decide why and how the data described here is used. Questions about privacy? Write to <a href="mailto:mathlo@qlosk.com">mathlo@qlosk.com</a>.</p>
+<p>Mathlo is a daily brain-training app. It is made and run by Navneet Anand, an individual developer in Mumbai, India, publishing as Qlosk ("we", "us"). We decide why and how the data described here is used. Questions about privacy? Write to <a href="mailto:mathlo@qlosk.com">mathlo@qlosk.com</a>.</p>
 
 <h2>2. Guests (no sign-in)</h2>
 <p>Everything stays on your phone, in the app's private storage, and we don't receive it:</p>
@@ -44,7 +48,7 @@
   <li>Progress: XP, level, streaks and streak freezes, scores, personal bests, round history, levels and stars, practice stats, quests, achievements, mascot outfits.</li>
   <li>Your display name (starts as "Player") and your learning goal.</li>
   <li>Settings: sound, haptics, timer, reminders and their times, play length.</li>
-  <li>A short error log (the last 50 errors: time and message), to help fix bugs. It stays on your phone unless you choose to send it to us yourself.</li>
+  <li>A short error log (the last 50 errors: time and message), to help fix bugs. It stays on your phone unless you choose to send it to us (see "Reporting a bug" below).</li>
 </ul>
 <p>All of it is wiped when you uninstall Mathlo or use <em>Settings → Account → Delete all my data</em>. Your phone's own backup (for example Google backup) may include app data if you turned backups on. That is controlled by your phone, not by us.</p>
 
@@ -52,17 +56,20 @@
 <div class="tablewrap"><table>
 <thead><tr><th>Data</th><th>Where it is stored</th><th>Why</th><th>Who receives it</th></tr></thead>
 <tbody>
-<tr><td>Sign-in details from Google: your Google account ID, email address, name and profile picture link</td><td>Firebase Authentication</td><td>To sign you in and recognise your account. The app shows your email in Settings and may use your first name as your display name if you haven't picked one.</td><td>Google (Firebase), as our service provider</td></tr>
+<tr><td>Sign-in details from Google: your Google account ID, email address, name and profile picture link</td><td>Firebase Authentication</td><td>To sign you in and recognise your account. The app shows your email in Settings, shows your Google profile picture as your avatar (loaded from Google when you open the app), and may use your first name as your display name if you haven't picked one.</td><td>Google (Firebase), as our service provider</td></tr>
 <tr><td>Game progress: everything listed for guests above except the error log, plus friend-challenge results (game, scores and a puzzle code; no names)</td><td>On your phone and in Cloud Firestore</td><td>To keep your progress safe and restore it on a new phone</td><td>Google (Firebase), as our service provider</td></tr>
 </tbody></table></div>
 <p>Only you can read or change your synced data: our database rules allow each signed-in account to reach its own records and nothing else. We don't show your data to other players.</p>
+
+<h3>Reporting a bug</h3>
+<p><em>Settings → Report a bug</em> opens an email draft in your own mail app, addressed to <a href="mailto:mathlo@qlosk.com">mathlo@qlosk.com</a>. It already contains the app version, your phone's operating system and version, and up to 10 recent entries from the error log (time and error message, no personal details). You can read, change or delete any of it before sending, and nothing is sent unless you press Send. If you send it, we receive the email, your email address and what you wrote, and use them only to fix the problem and reply to you.</p>
 
 <h2>4. What we do NOT collect</h2>
 <ul>
   <li>No phone number, no password (Google handles sign-in).</li>
   <li>No location, contacts, photos, camera or microphone.</li>
   <li>No advertising ID. No ads at all.</li>
-  <li>No analytics and no crash-reporting service.</li>
+  <li>No analytics and no crash-reporting service. Error details reach us only in a bug report you send yourself.</li>
   <li>We do not sell or rent your data, and we don't share it for advertising.</li>
 </ul>
 
@@ -70,7 +77,7 @@
 <ul>
   <li><strong>Google Firebase</strong> (Firebase Authentication and Cloud Firestore) stores sign-in and synced data for us. The database is in Google's <strong>asia-south1 (Mumbai, India)</strong> region. Google may process some data in other countries to run these services. Firebase's privacy information: <a href="https://firebase.google.com/support/privacy">firebase.google.com/support/privacy</a>.</li>
   <li><strong>Google Play.</strong> You get the app through Google Play, which has its own privacy policy. If you allow "share usage and diagnostics" on your phone, Google may give us anonymous crash and usage counts through its developer tools. We can't tell who you are from these.</li>
-  <li><strong>Share sheet.</strong> If you share a result or a challenge code, the app you pick (WhatsApp, Instagram and so on) receives it and its own policy applies.</li>
+  <li><strong>Share sheet.</strong> If you share a result, an invite (a picture of your mascot with your display name, streak and level) or a challenge code, the app you pick (WhatsApp, Instagram and so on) receives it and its own policy applies.</li>
   <li><strong>Review prompt.</strong> If the app asks you to rate it, Google shows and handles the prompt.</li>
   <li><strong>This website</strong> uses no cookies, analytics or ads. The host of qlosk.com may keep standard server logs (such as IP address and time of visit) for a short time for security.</li>
 </ul>
@@ -85,7 +92,7 @@
 <ul>
   <li><strong>On your phone:</strong> until you uninstall the app, clear its data, or use Delete all my data.</li>
   <li><strong>Account and synced progress:</strong> until you delete your account. Deleting it removes your synced progress and your sign-in record straight away (see <a href="delete-account">Delete your account</a>). We don't run separate backups; Google may keep deleted data in its own systems for a limited time before it is fully erased, under its data deletion terms.</li>
-  <li><strong>Emails with us:</strong> as long as we need them to help you, then deleted. You can ask us to delete them sooner.</li>
+  <li><strong>Emails with us (including bug reports):</strong> as long as we need them to help you and fix the problem, then deleted. You can ask us to delete them sooner.</li>
 </ul>
 
 <h2>9. Your rights</h2>

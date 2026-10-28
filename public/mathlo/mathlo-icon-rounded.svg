@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+<defs><linearGradient id="flame" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB13D"/><stop offset="1" stop-color="#FF5A36"/></linearGradient>
+<g id="mascot">
+<path d="M775 548 C810 522 862 528 862 605" fill="none" stroke="#B49CFF" stroke-width="46" stroke-linecap="round"/>
+<path transform="translate(857 462)" d="M0 -60 C25 -30 40 -10 40 20 C40 45 22 60 0 60 C-22 60 -40 45 -40 20 C-40 0 -28 -12 -18 -30 C-12 -12 -4 -4 6 -2 C10 -22 6 -42 0 -60Z" fill="url(#flame)"/>
+<path d="M520 315 L520 282 C520 238 572 228 594 250" fill="none" stroke="#9170F8" stroke-width="24" stroke-linecap="round"/>
+<ellipse cx="512" cy="615" rx="308" ry="310" fill="#B49CFF"/>
+<ellipse cx="512" cy="622" rx="262" ry="168" fill="#C9B8FF"/>
+<path d="M728 452 C760 472 782 500 792 520 L768 522 C758 496 742 472 718 458Z" fill="#7B5BE6"/>
+<path d="M238 520 C228 400 340 305 512 305 C690 305 792 390 790 505 C770 508 748 514 728 520 C700 495 660 465 618 448 C598 478 575 505 552 525 C538 495 512 465 485 448 C462 478 440 505 415 525 C398 495 372 468 340 452 C312 480 280 508 238 520Z" fill="#9170F8"/>
+<path d="M352 388 C338 405 335 425 340 446" fill="none" stroke="#7B5BE6" stroke-width="10" stroke-linecap="round"/>
+<path d="M483 375 C476 400 476 420 480 440" fill="none" stroke="#7B5BE6" stroke-width="10" stroke-linecap="round"/>
+<path d="M618 380 C610 400 612 420 618 440" fill="none" stroke="#7B5BE6" stroke-width="10" stroke-linecap="round"/>
+<path d="M305 392 C350 345 430 322 535 321" fill="none" stroke="#B9A4FF" stroke-width="22" stroke-linecap="round"/>
+<circle cx="405" cy="557" r="85" fill="#FFFFFF"/>
+<circle cx="620" cy="557" r="85" fill="#FFFFFF"/>
+<circle cx="420" cy="580" r="47" fill="#1B1338"/>
+<circle cx="605" cy="580" r="47" fill="#1B1338"/>
+<circle cx="435" cy="556" r="16" fill="#FFFFFF"/>
+<circle cx="620" cy="556" r="16" fill="#FFFFFF"/>
+<ellipse cx="328" cy="680" rx="38" ry="26" fill="#E886E8"/>
+<ellipse cx="697" cy="680" rx="38" ry="26" fill="#E886E8"/>
+<path d="M465 692 Q512 732 559 692" fill="none" stroke="#1B1338" stroke-width="20" stroke-linecap="round"/>
+</g></defs>
+<clipPath id="c"><rect width="1024" height="1024" rx="225"/></clipPath><g clip-path="url(#c)"><rect width="1024" height="1024" fill="#FFC93C"/><g transform="translate(-241.66 0) scale(1.3312)"><use href="#mascot"/></g></g></svg>
