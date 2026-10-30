@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 // One place to switch the store buttons on. Set a URL and the button becomes a real link.
-const PLAY_STORE_URL: string | null = null;
+const PLAY_STORE_URL: string | null = "https://play.google.com/store/apps/details?id=com.qlosk.mathlo";
 const APP_STORE_URL: string | null = null;
 
 const GAMES = [
@@ -56,8 +56,9 @@ const SHOTS = [
 ];
 
 const FAQ = [
-  { q: "Is Mathlo free?", a: "Yes. There are no ads and nothing to buy. The mascot's outfits are earned by playing." },
-  { q: "Do I need an account?", a: "No. Play as a guest and everything stays on your phone. Sign in with Google only if you want your progress saved and available on a new phone." },
+  { q: "Is Mathlo free?", a: "Yes. There are no ads and no real-money purchases. Coins, hints and the mascot's outfits are all earned by playing." },
+  { q: "Do I need an account?", a: "No. Play as a guest and your progress stays on your phone. Sign in with Google only if you want your progress saved and available on a new phone." },
+  { q: "Do you collect my data?", a: "Only anonymous usage data, like which games are played, so we can see what to improve. No names, emails or advertising ID, and you can turn it off in Settings. Nothing is ever sold." },
   { q: "Does it work offline?", a: "Yes. The games run on your phone, so you can play without a connection." },
   { q: "Is there an iPhone version?", a: "It is planned. Android comes first, and we will add the App Store button here when iPhone is ready." },
   { q: "Will it help me pass an exam?", a: "Mathlo is a game for practice and fun. It does not promise exam results, but regular practice is how mental maths gets faster and sharper." },
@@ -83,7 +84,7 @@ function AppleGlyph() {
   );
 }
 
-// Not links until the apps are in the stores: no href, not focusable, clearly dimmed.
+// A real link once its store URL is set; until then no href, not focusable, clearly dimmed.
 function StoreButton({ kind, href }: { kind: "play" | "apple"; href: string | null }) {
   const name = kind === "play" ? "Google Play" : "App Store";
   const small = kind === "play" ? "Get it on" : "Download on the";
@@ -120,6 +121,8 @@ export default function MathloPage() {
     applicationCategory: "GameApplication",
     operatingSystem: "Android",
     url: "https://qlosk.com/mathlo",
+    ...(PLAY_STORE_URL ? { downloadUrl: PLAY_STORE_URL, installUrl: PLAY_STORE_URL } : {}),
+    offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
     publisher: { "@type": "Organization", name: "Qlosk", url: "https://qlosk.com" },
   };
 
@@ -142,7 +145,13 @@ export default function MathloPage() {
           <a href="#screens">Screens</a>
           <a href="#faq">FAQ</a>
         </nav>
-        <div className="m-nav-soon" aria-disabled="true">Coming soon</div>
+        {PLAY_STORE_URL ? (
+          <a className="m-nav-cta" href={PLAY_STORE_URL}>
+            Get the app
+          </a>
+        ) : (
+          <div className="m-nav-soon" aria-disabled="true">Coming soon</div>
+        )}
       </header>
 
       <main>
@@ -273,7 +282,7 @@ export default function MathloPage() {
             </li>
             <li>
               <strong>Guest-friendly</strong>
-              <span>Play as a guest and everything stays on your phone.</span>
+              <span>Play as a guest and your progress stays on your phone.</span>
             </li>
             <li>
               <strong>Optional sign-in</strong>
@@ -296,7 +305,9 @@ export default function MathloPage() {
 
         <section className="m-section m-wrap m-cta" aria-labelledby="cta-title">
           <h2 id="cta-title">Ready for today&apos;s round?</h2>
-          <p className="m-body">Mathlo is coming to Google Play soon, with iPhone to follow.</p>
+          <p className="m-body">
+            {PLAY_STORE_URL ? "Get Mathlo free on Google Play. iPhone is coming later." : "Mathlo is coming to Google Play soon, with iPhone to follow."}
+          </p>
           <div className="m-stores m-stores-center">
             <StoreButton kind="play" href={PLAY_STORE_URL} />
             <StoreButton kind="apple" href={APP_STORE_URL} />

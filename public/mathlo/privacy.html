@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacy Policy · Mathlo</title>
-<meta name="description" content="How Mathlo handles your data. Guests keep everything on their phone. If you sign in, we save your progress to your account. No ads, no tracking, nothing sold.">
+<meta name="description" content="How Mathlo handles your data. Your progress stays on your phone unless you sign in. Anonymous usage data helps us improve the app, and you can turn it off. No ads, nothing sold.">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="mathlo-icon-rounded.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -25,16 +25,17 @@
 </header>
 <main>
 <h1>Privacy Policy</h1>
-<p class="meta">Version 2 (optional sign-in and sync) · Effective 28 October 2026</p>
+<p class="meta">Version 3 (anonymous usage data) · Effective 30 October 2026 · <a href="#changes">What changed</a></p>
 
-<p class="lead">Short version: you can play as a guest and everything stays on your phone. If you choose to sign in with Google, we save your progress to your account so it is safe and can move to a new phone. No ads, no tracking, and we never sell your data.</p>
+<p class="lead">Short version: you can play as a guest and your progress stays on your phone. If you choose to sign in with Google, we save your progress to your account so it is safe and can move to a new phone. The app also sends anonymous usage data (for example, which games are played) so we can see what to improve; you can turn this off in Settings. No ads, and we never sell your data.</p>
 
 <div class="card good">
   <strong>In one minute</strong>
 <ul>
   <li>Signing in is optional. Guests' progress never leaves the phone.</li>
+  <li>Anonymous usage data (screens opened, games played, scores, chests opened) goes to Google Analytics for Firebase. No names, emails or advertising ID. Turn it off any time: <em>Settings → Share anonymous usage data</em>.</li>
   <li>If you sign in, your Google account email and name, and your game progress, are stored with Google Firebase (servers in Mumbai, India).</li>
-  <li>No ads. No analytics. No location. No contacts. Nothing sold.</li>
+  <li>No ads. No location. No contacts. Nothing sold.</li>
   <li>Delete your account any time: <em>Settings → Account → Delete account</em>.</li>
 </ul>
 </div>
@@ -43,7 +44,7 @@
 <p>Mathlo is a daily brain-training app. It is made and run by Navneet Anand, an individual developer in Mumbai, India, publishing as Qlosk ("we", "us"). We decide why and how the data described here is used. Questions about privacy? Write to <a href="mailto:mathlo@qlosk.com">mathlo@qlosk.com</a>.</p>
 
 <h2>2. Guests (no sign-in)</h2>
-<p>Everything stays on your phone, in the app's private storage, and we don't receive it:</p>
+<p>Your progress stays on your phone, in the app's private storage, and we don't receive it (only the anonymous usage data in section 4 leaves the phone):</p>
 <ul>
   <li>Progress: XP, level, streaks and streak freezes, scores, personal bests, round history, levels and stars, practice stats, quests, achievements, mascot outfits.</li>
   <li>Your display name (starts as "Player") and your learning goal.</li>
@@ -64,54 +65,69 @@
 <h3>Reporting a bug</h3>
 <p><em>Settings → Report a bug</em> opens an email draft in your own mail app, addressed to <a href="mailto:mathlo@qlosk.com">mathlo@qlosk.com</a>. It already contains the app version, your phone's operating system and version, and up to 10 recent entries from the error log (time and error message, no personal details). You can read, change or delete any of it before sending, and nothing is sent unless you press Send. If you send it, we receive the email, your email address and what you wrote, and use them only to fix the problem and reply to you.</p>
 
-<h2>4. What we do NOT collect</h2>
+<h2>4. Anonymous usage data (everyone)</h2>
+<p>To learn which games people enjoy and where the app is confusing, Mathlo uses <strong>Google Analytics for Firebase</strong>. It is on by default and you can turn it off any time in <em>Settings → Share anonymous usage data</em>. When it is off, the app stops sending usage data.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>What is sent</th><th>Examples</th></tr></thead>
+<tbody>
+<tr><td>App events</td><td>A screen was opened; a round finished (game, mode, score, best combo, XP, hints, time taken); the Daily Challenge was completed; a level was reached; a chest was opened (coins and XP inside); a hint or outfit was bought with in-game coins; something was shared (what kind, not where); sign-in was used (not who signed in).</td></tr>
+<tr><td>Basic device and app details</td><td>App version, phone model, operating system and version, language, screen size, and the first time the app was opened.</td></tr>
+<tr><td>A random app ID</td><td>An ID created for this installation of the app, so a day's events can be counted together. It is not your name, email, account ID or advertising ID, and it changes if you reinstall the app.</td></tr>
+<tr><td>Rough region</td><td>Google works out a country or city from your connection's IP address. Google Analytics doesn't store the IP address itself.</td></tr>
+</tbody></table></div>
+<p>We never send your name, email, display name, account ID or advertising ID with usage data, and we only see totals and trends (for example, "how many players came back after a week"), not individual people. We've switched off Google signals, ad personalisation and sharing this data with other Google products. We use it only to improve Mathlo, based on our legitimate interest in understanding how the app is used, with your choice to switch it off.</p>
+
+<h2>5. What we do NOT collect</h2>
 <ul>
   <li>No phone number, no password (Google handles sign-in).</li>
   <li>No location, contacts, photos, camera or microphone.</li>
   <li>No advertising ID. No ads at all.</li>
-  <li>No analytics and no crash-reporting service. Error details reach us only in a bug report you send yourself.</li>
+  <li>No crash-reporting service. Error details reach us only in a bug report you send yourself.</li>
+  <li>No names, emails or advertising ID in usage data (see section 4).</li>
   <li>We do not sell or rent your data, and we don't share it for advertising.</li>
 </ul>
 
-<h2>5. Service providers and other parties</h2>
+<h2>6. Service providers and other parties</h2>
 <ul>
-  <li><strong>Google Firebase</strong> (Firebase Authentication and Cloud Firestore) stores sign-in and synced data for us. The database is in Google's <strong>asia-south1 (Mumbai, India)</strong> region. Google may process some data in other countries to run these services. Firebase's privacy information: <a href="https://firebase.google.com/support/privacy">firebase.google.com/support/privacy</a>.</li>
+  <li><strong>Google Firebase</strong> (Firebase Authentication and Cloud Firestore) stores sign-in and synced data for us, and <strong>Google Analytics for Firebase</strong> receives the anonymous usage data in section 4. The database is in Google's <strong>asia-south1 (Mumbai, India)</strong> region. Google may process some data in other countries to run these services. Firebase's privacy information: <a href="https://firebase.google.com/support/privacy">firebase.google.com/support/privacy</a>.</li>
   <li><strong>Google Play.</strong> You get the app through Google Play, which has its own privacy policy. If you allow "share usage and diagnostics" on your phone, Google may give us anonymous crash and usage counts through its developer tools. We can't tell who you are from these.</li>
   <li><strong>Share sheet.</strong> If you share a result, an invite (a picture of your mascot with your display name, streak and level) or a challenge code, the app you pick (WhatsApp, Instagram and so on) receives it and its own policy applies.</li>
   <li><strong>Review prompt.</strong> If the app asks you to rate it, Google shows and handles the prompt.</li>
   <li><strong>This website</strong> uses no cookies, analytics or ads. The host of qlosk.com may keep standard server logs (such as IP address and time of visit) for a short time for security.</li>
 </ul>
 
-<h2>6. Phone permissions</h2>
-<p>Mathlo asks for one permission you will notice: <strong>notifications</strong>, for your daily and streak reminders. They are scheduled on your phone; nothing is sent to us. You can say no and still play, and change it any time in your phone's settings. On Android the app also declares permissions that don't show a prompt: internet access (only used for sign-in and sync), restoring reminders after a restart, and vibration.</p>
+<h2>7. Phone permissions</h2>
+<p>Mathlo asks for one permission you will notice: <strong>notifications</strong>, for your daily and streak reminders. They are scheduled on your phone; nothing is sent to us. You can say no and still play, and change it any time in your phone's settings. On Android the app also declares permissions that don't show a prompt: internet access (used for sign-in, sync and anonymous usage data), restoring reminders after a restart, and vibration.</p>
 
-<h2>7. Children and age rules</h2>
-<p>Accounts are for people aged 18 or older; the app asks you to confirm this before you sign in. If we learn that someone younger has an account, we delete it. Guest mode is open to everyone and sends us no personal data. If you are a parent and think your child has signed in, write to <a href="mailto:mathlo@qlosk.com">mathlo@qlosk.com</a> and we will delete the account.</p>
+<h2>8. Children and age rules</h2>
+<p>Accounts are for people aged 18 or older; the app asks you to confirm this before you sign in. If we learn that someone younger has an account, we delete it. Guest mode is open to everyone and sends us no personal data; the usage data in section 4 is anonymous and can be turned off in Settings. If you are a parent and think your child has signed in, write to <a href="mailto:mathlo@qlosk.com">mathlo@qlosk.com</a> and we will delete the account.</p>
 
-<h2>8. How long we keep data</h2>
+<h2>9. How long we keep data</h2>
 <ul>
   <li><strong>On your phone:</strong> until you uninstall the app, clear its data, or use Delete all my data.</li>
   <li><strong>Account and synced progress:</strong> until you delete your account. Deleting it removes your synced progress and your sign-in record straight away (see <a href="delete-account">Delete your account</a>). We don't run separate backups; Google may keep deleted data in its own systems for a limited time before it is fully erased, under its data deletion terms.</li>
+  <li><strong>Anonymous usage data:</strong> Google Analytics keeps event details for 2 months, then deletes them automatically. Reports we keep show only totals. Because this data isn't linked to your account, deleting your account doesn't touch it, and it can't be used to identify you.</li>
   <li><strong>Emails with us (including bug reports):</strong> as long as we need them to help you and fix the problem, then deleted. You can ask us to delete them sooner.</li>
 </ul>
 
-<h2>9. Your rights</h2>
-<p>Under India's Digital Personal Data Protection Act, 2023 you can ask to see your data, correct it, erase it, nominate someone to act for you, and have complaints heard. In the European Union or UK, GDPR also gives you the right to restrict or object to processing, to data portability, and to complain to your data protection authority. For EU/UK users, we rely on your consent when you sign in, and on our legitimate interest in keeping the app working.</p>
+<h2>10. Your rights</h2>
+<p>Under India's Digital Personal Data Protection Act, 2023 you can ask to see your data, correct it, erase it, nominate someone to act for you, and have complaints heard. In the European Union or UK, GDPR also gives you the right to restrict or object to processing, to data portability, and to complain to your data protection authority. For EU/UK users, we rely on your consent when you sign in, and on our legitimate interest in keeping the app working and understanding how it is used (section 4). You can object to the usage data at any time by turning it off in Settings.</p>
 <p>The fastest way to erase your data is <em>Settings → Account → Delete account</em> in the app. To use any other right, or to complain, contact our Grievance Officer: <a href="mailto:dev@qlosk.com">Navneet Anand, dev@qlosk.com</a>. We reply within 30 days. If you're not happy with our answer, you can approach the Data Protection Board of India.</p>
 
-<h2>10. Security</h2>
+<h2>11. Security</h2>
 <p>Synced data travels over encrypted connections and is stored by Google Firebase, which encrypts it at rest. Database rules let each account reach only its own data. On your phone, data sits in the app's private storage, protected by your screen lock and the app sandbox. No system is perfectly safe, so keep your phone and Google account secure.</p>
 
-<h2>11. If something goes wrong</h2>
+<h2>12. If something goes wrong</h2>
 <p>If a breach puts your personal data at risk, we will tell the people affected and the authorities as the law requires, without undue delay, and explain what happened and what to do.</p>
 
-<h2>12. Changes to this policy</h2>
+<h2 id="changes">13. Changes to this policy</h2>
+<p><strong>30 October 2026 (version 3):</strong> added anonymous usage data (section 4) and the Settings switch to turn it off.</p>
 <p>We will update this policy when the app changes, for example before we add leagues. We'll post the new version here, change the date at the top, and tell you in the app about big changes.</p>
 
-<h2>13. Governing law</h2>
+<h2>14. Governing law</h2>
 <p>This policy follows the laws of India.</p>
 
-<h2>14. Contact</h2>
+<h2>15. Contact</h2>
 <p>Qlosk, Mumbai, India<br>Email: <a href="mailto:mathlo@qlosk.com">mathlo@qlosk.com</a><br>Grievance Officer: <a href="mailto:dev@qlosk.com">Navneet Anand, dev@qlosk.com</a></p>
 </main>
 <footer class="site">
