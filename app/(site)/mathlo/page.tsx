@@ -11,7 +11,7 @@ const fredoka = Fredoka({ subsets: ["latin"], variable: "--font-fredoka", weight
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", weight: ["500", "600", "700"], display: "swap", adjustFontFallback: true });
 
 const TITLE = "Mathlo: Daily Brain Games";
-const DESCRIPTION = "Quick mental maths and logic puzzles. A daily challenge and a streak to keep. Six games, no ads.";
+const DESCRIPTION = "Quick mental maths and logic puzzles. A daily challenge and a streak to keep. Six games, no ads while you play.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
@@ -56,9 +56,9 @@ const SHOTS = [
 ];
 
 const FAQ = [
-  { q: "Is Mathlo free?", a: "Yes. There are no ads and no real-money purchases. Coins, hints and the mascot's outfits are all earned by playing." },
+  { q: "Is Mathlo free?", a: "Yes. There are no ads while you play and no real-money purchases. Coins, hints and the mascot's outfits are earned by playing; optional short videos can give you a free hint or bonus coins." },
   { q: "Do I need an account?", a: "No. Play as a guest and your progress stays on your phone. Sign in with Google only if you want your progress saved and available on a new phone." },
-  { q: "Do you collect my data?", a: "Only anonymous usage data, like which games are played, so we can see what to improve. No names, emails or advertising ID, and you can turn it off in Settings. Nothing is ever sold." },
+  { q: "Do you collect my data?", a: "Anonymous usage data, like which games are played, so we can see what to improve; you can turn it off in Settings. If you choose to watch an optional reward video, Google AdMob may use your advertising ID for that ad (guests get non-personalised ads). We never get your name or email from ads, and nothing is ever sold." },
   { q: "Does it work offline?", a: "Yes. The games run on your phone, so you can play without a connection." },
   { q: "Is there an iPhone version?", a: "It is planned. Android comes first, and we will add the App Store button here when iPhone is ready." },
   { q: "Will it help me pass an exam?", a: "Mathlo is a game for practice and fun. It does not promise exam results, but regular practice is how mental maths gets faster and sharper." },
@@ -172,7 +172,7 @@ export default function MathloPage() {
             <ul className="m-chips" aria-label="Highlights">
               <li>6 games</li>
               <li>Daily challenge</li>
-              <li>No ads</li>
+              <li>No ads while you play</li>
             </ul>
           </div>
           <div className="m-hero-art">
@@ -277,8 +277,8 @@ export default function MathloPage() {
           <h2 id="trust-title" className="m-center">Made to be calm and honest.</h2>
           <ul className="m-trust">
             <li>
-              <strong>No ads</strong>
-              <span>Nothing gets between you and the next puzzle.</span>
+              <strong>No ads while you play</strong>
+              <span>Nothing gets between you and the next puzzle. Optional videos only if you tap.</span>
             </li>
             <li>
               <strong>Guest-friendly</strong>
