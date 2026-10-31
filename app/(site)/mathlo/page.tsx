@@ -267,7 +267,7 @@ export default function MathloPage() {
           <div>
             <p className="m-over">Play your way</p>
             <h2 id="wardrobe-title">Dress up your mascot.</h2>
-            <p className="m-body">Earn hats, glasses, scarves and themes just by playing. Nothing to buy.</p>
+            <p className="m-body">Earn coins as you play and spend them on outfits for your mascot and on hints.</p>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized static WebP */}
           <img className="m-shot" src="/mathlo/img/09-wardrobe.webp" alt={SHOTS[8].alt} width={720} height={1280} loading="lazy" />

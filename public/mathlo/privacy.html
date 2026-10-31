@@ -25,7 +25,7 @@
 </header>
 <main>
 <h1>Privacy Policy</h1>
-<p class="meta">Version 3 (anonymous usage data) · Effective 30 October 2026 · <a href="#changes">What changed</a></p>
+<p class="meta">Version 3.1 (Remote Config) · Effective 31 October 2026 · <a href="#changes">What changed</a></p>
 
 <p class="lead">Short version: you can play as a guest and your progress stays on your phone. If you choose to sign in with Google, we save your progress to your account so it is safe and can move to a new phone. The app also sends anonymous usage data (for example, which games are played) so we can see what to improve; you can turn this off in Settings. No ads, and we never sell your data.</p>
 
@@ -57,7 +57,7 @@
 <div class="tablewrap"><table>
 <thead><tr><th>Data</th><th>Where it is stored</th><th>Why</th><th>Who receives it</th></tr></thead>
 <tbody>
-<tr><td>Sign-in details from Google: your Google account ID, email address, name and profile picture link</td><td>Firebase Authentication</td><td>To sign you in and recognise your account. The app shows your email in Settings, shows your Google profile picture as your avatar (loaded from Google when you open the app), and may use your first name as your display name if you haven't picked one.</td><td>Google (Firebase), as our service provider</td></tr>
+<tr><td>Sign-in details from Google: your Google account ID, email address, name and profile picture link</td><td>Firebase Authentication</td><td>To sign you in and recognise your account. The app shows your email in Settings, does not show your Google profile picture (your avatar is always the Mathlo icon), and may use your first name as your display name if you haven't picked one.</td><td>Google (Firebase), as our service provider</td></tr>
 <tr><td>Game progress: everything listed for guests above except the error log, plus friend-challenge results (game, scores and a puzzle code; no names)</td><td>On your phone and in Cloud Firestore</td><td>To keep your progress safe and restore it on a new phone</td><td>Google (Firebase), as our service provider</td></tr>
 </tbody></table></div>
 <p>Only you can read or change your synced data: our database rules allow each signed-in account to reach its own records and nothing else. We don't show your data to other players.</p>
@@ -89,7 +89,7 @@
 
 <h2>6. Service providers and other parties</h2>
 <ul>
-  <li><strong>Google Firebase</strong> (Firebase Authentication and Cloud Firestore) stores sign-in and synced data for us, and <strong>Google Analytics for Firebase</strong> receives the anonymous usage data in section 4. The database is in Google's <strong>asia-south1 (Mumbai, India)</strong> region. Google may process some data in other countries to run these services. Firebase's privacy information: <a href="https://firebase.google.com/support/privacy">firebase.google.com/support/privacy</a>.</li>
+  <li><strong>Google Firebase</strong> (Firebase Authentication and Cloud Firestore) stores sign-in and synced data for us, and <strong>Google Analytics for Firebase</strong> receives the anonymous usage data in section 4. <strong>Firebase Remote Config</strong> lets us send small updates to the app without a new release, such as gifts from the Mathlo team and switching features on or off; it uses the Firebase installation ID and receives no personal data. The database is in Google's <strong>asia-south1 (Mumbai, India)</strong> region. Google may process some data in other countries to run these services. Firebase's privacy information: <a href="https://firebase.google.com/support/privacy">firebase.google.com/support/privacy</a>.</li>
   <li><strong>Google Play.</strong> You get the app through Google Play, which has its own privacy policy. If you allow "share usage and diagnostics" on your phone, Google may give us anonymous crash and usage counts through its developer tools. We can't tell who you are from these.</li>
   <li><strong>Share sheet.</strong> If you share a result, an invite (a picture of your mascot with your display name, streak and level) or a challenge code, the app you pick (WhatsApp, Instagram and so on) receives it and its own policy applies.</li>
   <li><strong>Review prompt.</strong> If the app asks you to rate it, Google shows and handles the prompt.</li>
@@ -121,6 +121,7 @@
 <p>If a breach puts your personal data at risk, we will tell the people affected and the authorities as the law requires, without undue delay, and explain what happened and what to do.</p>
 
 <h2 id="changes">13. Changes to this policy</h2>
+<p><strong>31 October 2026 (version 3.1):</strong> added Firebase Remote Config (section 6); the app no longer shows your Google profile picture.</p>
 <p><strong>30 October 2026 (version 3):</strong> added anonymous usage data (section 4) and the Settings switch to turn it off.</p>
 <p>We will update this policy when the app changes, for example before we add leagues. We'll post the new version here, change the date at the top, and tell you in the app about big changes.</p>
 
