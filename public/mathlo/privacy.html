@@ -25,7 +25,7 @@
 </header>
 <main>
 <h1>Privacy Policy</h1>
-<p class="meta">Version 4 (rewarded videos) · Effective 1 November 2026 · <a href="#changes">What changed</a></p>
+<p class="meta">Version 4.1 (challenge codes) · Effective 3 November 2026 · <a href="#changes">What changed</a></p>
 
 <p class="lead">Short version: you can play as a guest and your progress stays on your phone. If you choose to sign in with Google, we save your progress to your account so it is safe and can move to a new phone. The app also sends anonymous usage data (for example, which games are played) so we can see what to improve; you can turn this off in Settings. Mathlo may offer optional short videos (ads) that you choose to watch for a reward; there are no ads while you play. We never sell your data.</p>
 
@@ -52,6 +52,9 @@
   <li>A short error log (the last 50 errors: time and message), to help fix bugs. It stays on your phone unless you choose to send it to us (see "Reporting a bug" below).</li>
 </ul>
 <p>All of it is wiped when you uninstall Mathlo or use <em>Settings → Account → Delete all my data</em>. Your phone's own backup (for example Google backup) may include app data if you turned backups on. That is controlled by your phone, not by us.</p>
+
+<h3>Friend challenges (guests and signed-in players)</h3>
+<p>When you tap <em>Challenge a friend</em>, the app saves the game, its level or difficulty, the puzzle number and your score in Cloud Firestore under a random 6-character code, so a friend can play the same puzzle. It holds no name, email, account or device ID. The code stops working after 6 hours and is deleted when a friend plays it or when it expires.</p>
 
 <h2>3. If you sign in</h2>
 <div class="tablewrap"><table>
@@ -118,6 +121,7 @@
 <ul>
   <li><strong>On your phone:</strong> until you uninstall the app, clear its data, or use Delete all my data.</li>
   <li><strong>Account and synced progress:</strong> until you delete your account. Deleting it removes your synced progress and your sign-in record straight away (see <a href="delete-account">Delete your account</a>). We don't run separate backups; Google may keep deleted data in its own systems for a limited time before it is fully erased, under its data deletion terms.</li>
+  <li><strong>Friend challenge codes:</strong> 6 hours at most, or until a friend plays the challenge, then deleted.</li>
   <li><strong>Anonymous usage data:</strong> Google Analytics keeps event details for 2 months, then deletes them automatically. Reports we keep show only totals. Because this data isn't linked to your account, deleting your account doesn't touch it, and it can't be used to identify you.</li>
   <li><strong>Emails with us (including bug reports):</strong> as long as we need them to help you and fix the problem, then deleted. You can ask us to delete them sooner.</li>
 </ul>
@@ -133,6 +137,7 @@
 <p>If a breach puts your personal data at risk, we will tell the people affected and the authorities as the law requires, without undue delay, and explain what happened and what to do.</p>
 
 <h2 id="changes">13. Changes to this policy</h2>
+<p><strong>3 November 2026 (version 4.1):</strong> friend challenge codes are now short and kept in Cloud Firestore for up to 6 hours (new text under section 2 and in section 9).</p>
 <p><strong>1 November 2026 (version 4):</strong> added optional rewarded videos from Google AdMob (new section 4A), the advertising ID, the consent form and Settings → Ads; updated sections 5, 6, 7 and 8.</p>
 <p><strong>31 October 2026 (version 3.1):</strong> added Firebase Remote Config (section 6); the app no longer shows your Google profile picture.</p>
 <p><strong>30 October 2026 (version 3):</strong> added anonymous usage data (section 4) and the Settings switch to turn it off.</p>
