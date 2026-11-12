@@ -43,16 +43,17 @@ const GAMES = [
 ] as const;
 
 const SHOTS = [
-  { file: "01-home", alt: "Mathlo home: a 12-day streak, level 4 and today's Daily Challenge with three rounds done" },
-  { file: "02-games", alt: "The Games tab with Speed Math, Chain Math, Target 24 and Mini Sudoku" },
+  { file: "01-home", alt: "Mathlo Home: a 12-day streak, today's Daily Challenge done, the next path level and four chests" },
+  { file: "02-play-path", alt: "The Play tab: one path of levels with stars to earn, here Mini Sudoku level 4" },
   { file: "03-speed-math", alt: "Speed Math mid-round with a timer ring, combo counter and number keypad" },
-  { file: "04-target-24", alt: "Target 24: four number tiles and operators to make 24" },
-  { file: "05-pipe-flow", alt: "Pipe Flow: a five by five grid of pipes with water flowing" },
+  { file: "04-target-24", alt: "Target 24: four number tiles and operators to make 24, with Undo and Hint" },
+  { file: "05-sudoku", alt: "A 4 by 4 Mini Sudoku with a count-up clock" },
   { file: "06-streak", alt: "The streak screen: a 12 day streak, a streak freeze and the month calendar" },
-  { file: "07-mastery", alt: "The times-table mastery map from Unseen to Mastered" },
-  { file: "08-level-map", alt: "A Mini Sudoku level map with a winding path and stars to earn" },
-  { file: "09-wardrobe", alt: "The wardrobe: hats and outfits for the Mathlo mascot" },
-  { file: "10-grid-slide", alt: "Number Grid Slide: an orange three by three board with a par move count" },
+  { file: "07-daily-done", alt: "Daily Challenge done: scores for the three rounds and the Daily chest ready on Home" },
+  { file: "08-trainer", alt: "Trainer topics: times tables, squares, cubes, percentages, complements and quick estimation" },
+  { file: "09-wardrobe", alt: "The wardrobe: hats and outfits for the Mathlo mascot, bought with coins" },
+  { file: "10-chest", alt: "A Daily chest opened: coins and XP" },
+  { file: "11-weekly-recap", alt: "The weekly recap: 6 of 7 days played" },
 ];
 
 const FAQ = [
@@ -177,7 +178,7 @@ export default function MathloPage() {
           </div>
           <div className="m-hero-art">
             {/* eslint-disable @next/next/no-img-element -- pre-sized static WebP */}
-            <img className="m-hero-shot" src="/mathlo/img/01-home.webp" alt={SHOTS[0].alt} width={720} height={1280} fetchPriority="high" />
+            <img className="m-hero-shot" src="/mathlo/img/01-home.webp" alt={SHOTS[0].alt} width={720} height={1606} fetchPriority="high" />
             <img className="m-hero-mascot" src="/mathlo/img/mascot.svg" alt="" width={150} height={151} />
             {/* eslint-enable @next/next/no-img-element */}
           </div>
@@ -202,7 +203,7 @@ export default function MathloPage() {
           <h2 id="watch-title">Watch Mathlo play.</h2>
           <figure className="m-video">
             {/* The film has music and no narration: it starts only when the visitor presses play. */}
-            <video controls playsInline preload="none" poster="/mathlo/video/brag-poster.webp" aria-label="A 34 second tour of Mathlo: the daily challenge, six games, streaks, mastery and outfits">
+            <video controls playsInline preload="none" poster="/mathlo/video/brag-poster.webp" aria-label="A 34 second tour of Mathlo: the daily challenge, six games, streaks and outfits">
               <source src="/mathlo/video/brag.mp4" type="video/mp4" />
               Your browser can&apos;t play this video. <a href="/mathlo/video/brag.mp4">Download it instead</a>.
             </video>
@@ -222,27 +223,26 @@ export default function MathloPage() {
             <h2 id="daily-title">A fresh set of rounds every day.</h2>
             <p className="m-body">Finish it to grow your streak. Miss a day? A streak freeze has your back, and you can win a broken streak back with a rescue.</p>
             <ul className="m-list">
-              <li>Three rounds a day, then a chest to open</li>
-              <li>Streak freezes, earned every week</li>
+              <li>Three rounds a day, the same for everyone, then a chest to open</li>
+              <li>A free streak freeze every Monday, and more from chests and milestones</li>
               <li>Daily quests and XP that level you up</li>
               <li>Challenge a friend to the exact same puzzle with a code</li>
             </ul>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized static WebP */}
-          <img className="m-shot" src="/mathlo/img/06-streak.webp" alt={SHOTS[5].alt} width={720} height={1280} loading="lazy" />
+          <img className="m-shot" src="/mathlo/img/06-streak.webp" alt={SHOTS[5].alt} width={720} height={1606} loading="lazy" />
         </section>
 
         <section id="better" className="m-section m-wrap m-split m-flip" aria-labelledby="better-title">
           {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized static WebP */}
-          <img className="m-shot" src="/mathlo/img/07-mastery.webp" alt={SHOTS[6].alt} width={720} height={1280} loading="lazy" />
+          <img className="m-shot" src="/mathlo/img/08-trainer.webp" alt={SHOTS[7].alt} width={720} height={1606} loading="lazy" />
           <div>
             <p className="m-over">Get better, not just busier</p>
-            <h2 id="better-title">See what you&apos;ve mastered.</h2>
-            <p className="m-body">A times-table map shows which facts are solid and which need work, so your practice goes where it counts.</p>
+            <h2 id="better-title">Practise what counts.</h2>
+            <p className="m-body">Trainer drills grow with you, and one path of levels takes you through every puzzle, so your practice goes where it counts.</p>
             <ul className="m-list">
-              <li>Times-table mastery map, from Unseen to Mastered</li>
-              <li>Trainer drills for squares, cubes, percentages, complements and quick estimation</li>
-              <li>Level maps with stars for every game</li>
+              <li>Trainer drills for times tables, squares, cubes, percentages, complements and quick estimation</li>
+              <li>One path of levels across the games, with stars to earn and a chest at the end of every chapter</li>
               <li>A weekly recap of your progress, and a Weekly Boss to beat</li>
               <li>Brain workouts that fit the time you have</li>
             </ul>
@@ -257,7 +257,7 @@ export default function MathloPage() {
           <div className="m-gallery" role="region" aria-label="Screenshots, scroll sideways" tabIndex={0}>
             {/* eslint-disable @next/next/no-img-element -- pre-sized static WebP */}
             {SHOTS.map((s) => (
-              <img key={s.file} src={`/mathlo/img/${s.file}.webp`} alt={s.alt} width={720} height={1280} loading="lazy" />
+              <img key={s.file} src={`/mathlo/img/${s.file}.webp`} alt={s.alt} width={720} height={1606} loading="lazy" />
             ))}
             {/* eslint-enable @next/next/no-img-element */}
           </div>
@@ -270,7 +270,7 @@ export default function MathloPage() {
             <p className="m-body">Earn coins as you play and spend them on outfits for your mascot and on hints.</p>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized static WebP */}
-          <img className="m-shot" src="/mathlo/img/09-wardrobe.webp" alt={SHOTS[8].alt} width={720} height={1280} loading="lazy" />
+          <img className="m-shot" src="/mathlo/img/09-wardrobe.webp" alt={SHOTS[8].alt} width={720} height={1606} loading="lazy" />
         </section>
 
         <section className="m-section m-wrap" aria-labelledby="trust-title">
