@@ -44,7 +44,7 @@ const GAMES = [
 
 const SHOTS = [
   { file: "01-home", alt: "Mathlo Home: a 12-day streak, today's Daily Challenge done, the next path level and four chests" },
-  { file: "02-play-path", alt: "The Play tab: one path of levels with stars to earn, here Mini Sudoku level 4" },
+  { file: "02-play-path", alt: "The Play tab: one path of levels across Sudoku, Pipe Flow, Grid Slide and Speed Math, with stars to earn" },
   { file: "03-speed-math", alt: "Speed Math mid-round with a timer ring, combo counter and number keypad" },
   { file: "04-target-24", alt: "Target 24: four number tiles and operators to make 24, with Undo and Hint" },
   { file: "05-sudoku", alt: "A 4 by 4 Mini Sudoku with a count-up clock" },
@@ -54,6 +54,8 @@ const SHOTS = [
   { file: "09-wardrobe", alt: "The wardrobe: hats and outfits for the Mathlo mascot, bought with coins" },
   { file: "10-chest", alt: "A Daily chest opened: coins and XP" },
   { file: "11-weekly-recap", alt: "The weekly recap: 6 of 7 days played" },
+  { file: "12-pipe-flow", alt: "Pipe Flow: turn the pipes to lead the water through every gem to the drain, with Undo and Hint" },
+  { file: "13-grid-slide", alt: "Number Grid Slide: slide the tiles back into order, with Undo" },
 ];
 
 const FAQ = [
